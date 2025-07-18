@@ -1,0 +1,7 @@
+inventory management+ (modal)
+form to add
+-item
+-brand
+-total quantity
+
+text-based logs..

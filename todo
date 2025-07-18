@@ -1,0 +1,33 @@
+<!-- fix submit order date to unix and start log (ongoing) -->
+<!-- get the available quantity and remove to available -->
+
+    -a design window with design ids
+    when order was made make it so it shows what design was ordered and
+    in transaction table make a button to view the orders and design
+    
+    -make a sure it logs everything
+    order
+    price edit
+    quantity edit
+    item delete
+    brand add
+    size add
+    types add
+    colors add
+    sizes add
+    
+    -log pagination
+    
+    <!-- -transaction table on dashbaord order by date that shows the ff orders, transaction details, design ID, order date, deadline, view transaction details button, that directs to the page that shows  -->
+    
+    -function to cancel the order made
+
+	-do register on settings page
+    -order should not be allowed when price isnt set
+    -make a button per order to set finish or not
+    -make a separate table for voided order
+    -if unix time now is greater than time deadline update status to delayed. if button clicked is finished then finish
+
+
+optional:
+    make a function that changes the date for demo purposes
