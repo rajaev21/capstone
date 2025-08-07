@@ -38,7 +38,8 @@ const LoginForm = () => {
       if (result.message === "isLoggedIn") {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("account", JSON.stringify(result.account));
-        console.log(JSON.stringify(result.account));
+        localStorage.setItem("role", JSON.stringify(result.account.role))
+        console.log(JSON.stringify(result.account.role));
         setIsLoggedIn(true);
       } else {
         alert(result.message)

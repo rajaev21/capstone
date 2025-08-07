@@ -1,4 +1,3 @@
-import CryptoJS from "crypto-js";
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import axios from "axios";
@@ -17,7 +16,6 @@ import Settings from "./components/settings/Settings";
 import Order from "./components/orders/Order";
 
 function App() {
-  // const key = "my-secret-key-123";
   const [inventory, setInventory] = useState({});
   const [logs, setLogs] = useState({});
   const [brand, setBrand] = useState({});
@@ -44,7 +42,7 @@ function App() {
     fetchTransaction();
     fetchPlacement();
   }, []);
-  
+
   const fetchTransaction = () => {
     axios
       .get("http://localhost/capstone/submit.php?action=getTransaction")
@@ -125,87 +123,93 @@ function App() {
       });
   };
   return (
-    <Routes>
-      <Route path="/login" element={<LoginForm />} />
-      <Route path="/register" element={<RegisterForm />} />
-      <Route
-        path="/home"
-        element={
-          <>
-            <Navbar />
-            <WelcomePage
-              transaction={transaction}
-              setTransaction={setTransaction}
-              fetchTransaction={fetchTransaction}
-            />
-          </>
-        }
-      />
-      <Route
-        path="/order"
-        element={
-          <>
-            <Navbar />
-            <Order
-              brand={brand}
-              type={type}
-              color={color}
-              size={size}
-              inventory={inventory}
-              inventoryCheck={inventoryCheck}
-              setInventoryCheck={setInventoryCheck}
-              fetchInventoryCheck={fetchInventoryCheck}
-              fetchInventory={fetchInventory}
-              fetchLogs={fetchLogs}
-              placement={placement}
-              setPlacement={setPlacement}
-            />
-          </>
-        }
-      />
-      <Route
-        path="/inventory"
-        element={
-          <>
-            <Navbar />
-            <Inventory
-              inventory={inventory}
-              logs={logs}
-              setLogs={setLogs}
-              brand={brand}
-              type={type}
-              color={color}
-              size={size}
-              fetchInventory={fetchInventory}
-              fetchLogs={fetchLogs}
-              fetchInventoryCheck={fetchInventoryCheck}
-            />
-          </>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <>
-            <Navbar />
-            <Settings
-              brand={brand}
-              setBrand={setBrand}
-              color={color}
-              setColor={setColor}
-              size={size}
-              setSize={setSize}
-              type={type}
-              setType={setType}
-              fetchColor={fetchColor}
-              fetchType={fetchType}
-              fetchSize={fetchSize}
-              fetchBrand={fetchBrand}
-            />
-          </>
-        }
-      />
-    </Routes>
+    <>
+      {Array.isArray(transaction) ? (
+        <Routes>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route
+            path="/home"
+            element={
+              <>
+                <Navbar />
+                <WelcomePage
+                  transaction={transaction}
+                  setTransaction={setTransaction}
+                  fetchTransaction={fetchTransaction}
+                />
+              </>
+            }
+          />
+          <Route
+            path="/order"
+            element={
+              <>
+                <Navbar />
+                <Order
+                  brand={brand}
+                  type={type}
+                  color={color}
+                  size={size}
+                  inventory={inventory}
+                  inventoryCheck={inventoryCheck}
+                  setInventoryCheck={setInventoryCheck}
+                  fetchInventoryCheck={fetchInventoryCheck}
+                  fetchInventory={fetchInventory}
+                  fetchLogs={fetchLogs}
+                  placement={placement}
+                  setPlacement={setPlacement}
+                />
+              </>
+            }
+          />
+          <Route
+            path="/inventory"
+            element={
+              <>
+                <Navbar />
+                <Inventory
+                  inventory={inventory}
+                  logs={logs}
+                  setLogs={setLogs}
+                  brand={brand}
+                  type={type}
+                  color={color}
+                  size={size}
+                  fetchInventory={fetchInventory}
+                  fetchLogs={fetchLogs}
+                  fetchInventoryCheck={fetchInventoryCheck}
+                />
+              </>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <>
+                <Navbar />
+                <Settings
+                  brand={brand}
+                  setBrand={setBrand}
+                  color={color}
+                  setColor={setColor}
+                  size={size}
+                  setSize={setSize}
+                  type={type}
+                  setType={setType}
+                  fetchColor={fetchColor}
+                  fetchType={fetchType}
+                  fetchSize={fetchSize}
+                  fetchBrand={fetchBrand}
+                />
+              </>
+            }
+          />
+        </Routes>
+      ) : (
+        "No Data Acquired"
+      )}
+    </>
   );
 }
 

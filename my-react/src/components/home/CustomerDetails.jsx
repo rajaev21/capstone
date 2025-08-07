@@ -10,6 +10,7 @@ const CustomerDetails = ({ id }) => {
     fetchCustomerDetails(id);
   }, [id, doSwitch]);
 
+  console.log(id);
   const fetchCustomerDetails = (id) => {
     axios
       .get(
@@ -18,7 +19,7 @@ const CustomerDetails = ({ id }) => {
       .then((response) => {
         if (response.data) {
           setDetails(response.data);
-          console.log(response.data);
+          console.log(response);
           setAllOrderDone(
             response.data.every((prev) => prev.status === "finished")
           );

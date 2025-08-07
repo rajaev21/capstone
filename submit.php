@@ -6,6 +6,8 @@ header('Content-Type: application/json');
 date_default_timezone_set('Asia/Manila');
 
 
+
+
 class Database
 {
     private $conn;
@@ -62,11 +64,11 @@ class Database
         return $result;
     }
 
-    public function insertOrder($brand, $type, $size, $color, $quantity, $td_id, $design_id)
+    public function insertOrder($brand, $type, $size, $color, $quantity, $td_id, $design_id, $status)
     {
-        $query = "INSERT INTO orders (`brand`, `type`, `color`, `size`,`quantity`,`transaction_id`, `design_id`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO orders (`brand`, `type`, `color`, `size`,`quantity`,`transaction_id`, `status` , `design_id`) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("iiiiiii", $brand, $type, $color, $size, $quantity, $td_id, $design_id);
+        $stmt->bind_param("iiiiiiii", $brand, $type, $color, $size, $quantity, $td_id,$status, $design_id);
         $stmt->execute();
         $result = $stmt->insert_id;
         $stmt->close();
@@ -95,7 +97,7 @@ class Database
             JOIN transaction_detail td ON od.td_id = td.td_id
             JOIN customer_detail cd ON td.cd_id = cd.cd_id
             WHERE cd.id = ? ";
-            
+
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -407,7 +409,8 @@ class Database
         return $result;
     }
 
-    function getSubTableID($table, $name){
+    function getSubTableID($table, $name)
+    {
         $id = $table . "_id";
         $colname = $table . "_name";
         $query = "select `$id` from `$table` where `$colname` = ?";
@@ -648,7 +651,7 @@ function Register($db, $data)
         $lastname = $data['lastname'];
         $phonenumber = $data['phonenumber'];
 
-        $result = $db->userRegister($username, $hashed_password, $firstname, $lastname, $phonenumber, 3);
+        $result = $db->userRegister($username, $hashed_password, $firstname, $lastname, $phonenumber, 2);
 
         echo json_encode(['message' => 'Registration Complete']);
     } catch (Exception $e) {
@@ -695,7 +698,7 @@ function submitOrder($db, $data, $unixNow)
 
         $affected_row = $db->subtractInventory($order_id, $quantity);
         if ($affected_row) {
-            $result = $db->insertOrder($brand[0]["brand_id"], $type[0]["type_id"], $size[0]["size_id"], $color[0]["color_id"], $quantity, $td_id, $design_id);
+            $result = $db->insertOrder($brand[0]["brand_id"], $type[0]["type_id"], $size[0]["size_id"], $color[0]["color_id"], $quantity, $td_id, $design_id, 1);
         } else {
             echo json_encode(['message' => 'Not enough inventory']);
             return;

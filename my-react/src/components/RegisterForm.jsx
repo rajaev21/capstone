@@ -14,7 +14,7 @@ const RegisterForm = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("isLoggedIn");
-    if (token === "true") {
+    if (token === "false") {
       setIsLoggedIn(true);
       navigate("/");
     }
@@ -33,8 +33,6 @@ const RegisterForm = () => {
   };
 
   const handleRegister = async (e) => {
-    alert("");
-
     const data = {
       username: username,
       password: password,
@@ -62,6 +60,7 @@ const RegisterForm = () => {
         setPassword("");
         setConfirmPassword("");
         setPhonenumber("");
+        navigate("/home")
       }
     } catch (error) {
       alert(`Registration failed: ${error.message}`);

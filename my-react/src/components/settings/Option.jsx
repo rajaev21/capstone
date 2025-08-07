@@ -7,6 +7,8 @@ const Option = ({ option, setOption, name, fetch }) => {
     name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
   const [optionID, optionName] = [`${name}_id`, `${name}_name`];
   const [search, setSearch] = useState("");
+  const [pageCount, setPageCount] = useState(0);
+  const role = localStorage.getItem("role");
 
   const filteredItems =
     Array.isArray(option) &&
@@ -15,6 +17,12 @@ const Option = ({ option, setOption, name, fetch }) => {
         String(val).toLowerCase().includes(search.toLowerCase())
       )
     );
+
+  const itemsPerPage = 5;
+  const start = pageCount * itemsPerPage;
+  const end = start + itemsPerPage;
+  const currentItems = filteredItems.slice(start, end);
+  const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
 
   function addOption(e) {
     e.preventDefault();
@@ -57,8 +65,10 @@ const Option = ({ option, setOption, name, fetch }) => {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
-        if(response.data.message === 'fk'){
-          alert('This option is being used in inventory. Item in inventory first!')
+        if (response.data.message === "fk") {
+          alert(
+            "This option is being used in inventory. Item in inventory first!"
+          );
         }
         fetch();
       })
@@ -132,29 +142,32 @@ const Option = ({ option, setOption, name, fetch }) => {
         />
       </h6>
 
-      <table className="table table-hover">
+      <table className="table table-striped table-bordered">
         <thead className="table-light">
           <tr>
             <td>ID</td>
             <td>Name</td>
+            {role == 2 && role == 1 && <td>Action</td>}
           </tr>
         </thead>
         <tbody>
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item, idx) => (
+          {currentItems.length > 0 ? (
+            currentItems.map((item, idx) => (
               <tr key={idx}>
                 {Object.values(item).map((val, i) => (
                   <td key={i}>{val}</td>
                 ))}
 
-                <td>
-                  <button
-                    className="btn btn-danger"
-                    onClick={(e) => deleteItem(e, item[optionID])}
-                  >
-                    Delete
-                  </button>
-                </td>
+                {role == 2 && role == 1 && (
+                  <td>
+                    <button
+                      className="btn btn-danger"
+                      onClick={(e) => deleteItem(e, item[optionID])}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                )}
               </tr>
             ))
           ) : (
@@ -169,6 +182,54 @@ const Option = ({ option, setOption, name, fetch }) => {
           )}
         </tbody>
       </table>
+      <nav className="d-flex justify-content-center mt-3">
+        <ul className="pagination">
+          <li className="page-item">
+            <button
+              className="page-link"
+              onClick={() => setPageCount(0)}
+              disabled={pageCount === 0}
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </button>
+          </li>
+
+          <li className="page-item">
+            <button
+              className="page-link"
+              onClick={() => setPageCount((prev) => prev - 1)}
+              disabled={pageCount === 0}
+            >
+              Previous
+            </button>
+          </li>
+
+          <li className="page-item">
+            <button className="page-link">{pageCount + 1}</button>
+          </li>
+
+          <li className="page-item">
+            <button
+              className="page-link"
+              onClick={() => setPageCount((prev) => prev + 1)}
+              disabled={pageCount + 1 >= totalPage}
+              style={{ width: "80px" }}
+            >
+              Next
+            </button>
+          </li>
+
+          <li className="page-item">
+            <button
+              className="page-link"
+              onClick={() => setPageCount(totalPage - 1)}
+              disabled={pageCount === totalPage - 1}
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };

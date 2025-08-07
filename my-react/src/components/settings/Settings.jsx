@@ -1,6 +1,7 @@
 import React from "react";
 import Option from "./Option";
 import Price from "./Price"
+import { Link } from "react-router-dom";
 
 
 const Settings = ({
@@ -72,10 +73,8 @@ const Settings = ({
         </div>
       </div>
       </div>
-      {/* <div className="">
-        <div className="h3 text-center">Prices</div>
-        <Price brand={brand} type={type} color={color} size={size} />
-      </div> */}
+      
+      <Link to="/register">Register Employee</Link>
     </div>
   );
 };

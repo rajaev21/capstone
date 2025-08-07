@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 const Navbar = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const role = localStorage.getItem("role");
 
   useEffect(() => {
     const token = localStorage.getItem("isLoggedIn");
@@ -20,7 +21,8 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  return (
+  return (<>
+ 
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
         {/* brand */}
@@ -67,6 +69,8 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    
+    </>
   );
 };
 

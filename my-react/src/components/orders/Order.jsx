@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import OrderForm from "./OrderForm";
 import CustomerForm from "./CustomerForm";
 import TransansactionForm from "./TransansactionForm";
-import TestOrderForm from "./TestOrderForm";
-import Design from "./Design";
+import TestOrderForm from "./Inventory";
+import CurrentOrder from "./CurrentOrder";
 
 const Order = ({
   inventory,
@@ -48,7 +47,6 @@ const Order = ({
   }, []);
 
   const addOrder = () => {
-
     if (customerDetail.firstname === "") {
       alert("Please fill firstname.");
       return;
@@ -66,10 +64,10 @@ const Order = ({
       return;
     }
     if (transaction.deadline === "") {
-      alert("Please fill deadline.");
+      alert("Please set a deadline.");
       return;
     }
-    if(order.length === 0){
+    if (order.length === 0) {
       alert("Please set orders.");
       return;
     }
@@ -105,10 +103,7 @@ const Order = ({
           deadline: "",
           note: "",
         });
-        setOrder([]);
-        fetchInventoryCheck();
-        fetchInventory();
-        fetchLogs();
+        window.location.reload();
       })
       .catch((error) => {
         console.error("There was an error submitting the order!", error);
@@ -117,48 +112,72 @@ const Order = ({
 
   return (
     <>
-      {Array.isArray(placement) && placement.length > 0 ? (
-        <div className="container">
-          <CustomerForm
-            customerDetail={customerDetail}
-            setCustomerDetail={setCustomerDetail}
-          />
-          {/* <OrderForm
-          order={order}
-          setOrder={setOrder}
-          allBrand={brand}
-          allType={type}
-          allColor={color}
-          allSize={size}
-          inventoryCheck={inventoryCheck}
-          setInventoryCheck={setInventoryCheck}
-          match={match}
-          setMatch={setMatch}
-        /> */}
+      <div className="container">
+        {placement.length > 0 ? (
+          <div className="row">
+            <div className="col">
+              <TestOrderForm
+                inventory={inventory}
+                order={order}
+                setOrder={setOrder}
+                placement={placement}
+              />
+            </div>
+            <div className="col">
+              <CustomerForm
+                customerDetail={customerDetail}
+                setCustomerDetail={setCustomerDetail}
+              />
+              {/* <OrderForm
+                    order={order}
+                    setOrder={setOrder}
+                    allBrand={brand}
+                    allType={type}
+                    allColor={color}
+                    allSize={size}
+                    inventoryCheck={inventoryCheck}
+                    setInventoryCheck={setInventoryCheck}
+                    match={match}
+                    setMatch={setMatch}
+                  /> */}
 
-          {Array.isArray(inventory) && (
-            <TestOrderForm
-              inventory={inventory}
-              order={order}
-              setOrder={setOrder}
-              placement={placement}
-            />
-          )}
-
-          {Array.isArray(placement) && (
-            <TransansactionForm
-              transaction={transaction}
-              setTransaction={setTransaction}
-            />
-          )}
-
-          <button onClick={() => addOrder()}> Submit Order </button>
-        </div>
-      ) : (
-        <div className="spinner-border m-5" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      )}
+              <TransansactionForm
+                transaction={transaction}
+                setTransaction={setTransaction}
+              />
+              {order.length == 0 ? (
+                <div className=""></div>
+              ) : (
+                <div className="">
+                  <CurrentOrder
+                    inventory={inventory}
+                    order={order}
+                    setOrder={setOrder}
+                  />
+                  <button
+                    className="btn btn-success"
+                    onClick={() => addOrder()}
+                  >
+                    {" "}
+                    Submit Order{" "}
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => window.location.reload()}
+                  >
+                    {" "}
+                    Cancel Order{" "}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="spinner-border m-5" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        )}
+      </div>
     </>
   );
 };
