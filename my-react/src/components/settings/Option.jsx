@@ -147,7 +147,7 @@ const Option = ({ option, setOption, name, fetch }) => {
           <tr>
             <td>ID</td>
             <td>Name</td>
-            {role == 2 && role == 1 && <td>Action</td>}
+            {role == 2 || role == 1 && <td>Action</td>}
           </tr>
         </thead>
         <tbody>
@@ -158,7 +158,7 @@ const Option = ({ option, setOption, name, fetch }) => {
                   <td key={i}>{val}</td>
                 ))}
 
-                {role == 2 && role == 1 && (
+                {role == 2 || role == 1 && (
                   <td>
                     <button
                       className="btn btn-danger"

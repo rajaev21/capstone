@@ -1,4 +1,11 @@
 <?php
+
+$phonenumber = $argv[1] ?? '';
+$message = $argv[2] ?? '';
+
+$clean = preg_replace('/^0?9/', '', $phonenumber);
+$recipient = '+63'.$clean;
+
 $BASE_URL = "https://api.textbee.dev/api/v1";
 $API_KEY = "f79ea1de-a93f-454d-a2c1-c5548a2d9ecf";
 $DEVICE_ID = "688f88c86cd203ecb5910f3a";
@@ -7,8 +14,8 @@ $DEVICE_ID = "688f88c86cd203ecb5910f3a";
 $url = $BASE_URL . "/gateway/devices/" . $DEVICE_ID . "/send-sms";
 
 $data = [
-  "recipients" => ["+639630383642"],
-  "message" => "aray ko"
+  "recipients" => [$recipient],
+  "message" => $message
 ];
 
 $ch = curl_init($url);

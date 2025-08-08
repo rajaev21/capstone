@@ -11,8 +11,6 @@ const WelcomePage = ({ transaction, setTransaction, fetchTransaction }) => {
     navigate(`/home?id=${id}`);
   };
 
-  const finishOrder = () => {};
-
   return (
     <div className="container">
       <div className="row">

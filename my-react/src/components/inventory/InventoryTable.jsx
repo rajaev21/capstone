@@ -7,6 +7,7 @@ const InventoryTable = ({ inventory, fetch, fetchLogs }) => {
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [pageCount, setPageCount] = useState(0);
+  console.log(role)
 
   const filteredItems =
     Array.isArray(inventory) &&
@@ -105,7 +106,7 @@ const InventoryTable = ({ inventory, fetch, fetchLogs }) => {
             <th>Quantity</th>
             <th>Price (PHP)</th>
 
-            {role == 2 && role == 1 && <th>Action</th>}
+            {role == 2 || role == 1 && <th>Action</th>}
           </tr>
         </thead>
         <tbody>
@@ -119,7 +120,7 @@ const InventoryTable = ({ inventory, fetch, fetchLogs }) => {
                 <td> {item.size.toString().toUpperCase()}</td>
                 <td> {item.qty}</td>
                 <td> {item.price == 0 ? "No price set" : item.price}</td>
-                {role == 2 && role == 1 && (
+                {role == 2 || role == 1 && (
                   <td>
                     <p>
                       <button

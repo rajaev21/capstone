@@ -1,13 +1,5 @@
 import { useState } from "react";
-const TransactionTable = ({
-  transaction,
-  setTransaction,
-  fetchTransaction,
-  encrypt,
-  decrypt,
-  goto,
-  deleteOrder,
-}) => {
+const TransactionTable = ({ transaction, setTransaction, fetchTransaction, encrypt, decrypt, goto, deleteOrder, }) => {
   const [search, setSearch] = useState("");
   const [pageCount, setPageCount] = useState(0);
   const filteredItems =

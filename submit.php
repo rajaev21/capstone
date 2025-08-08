@@ -68,7 +68,7 @@ class Database
     {
         $query = "INSERT INTO orders (`brand`, `type`, `color`, `size`,`quantity`,`transaction_id`, `status` , `design_id`) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("iiiiiiii", $brand, $type, $color, $size, $quantity, $td_id,$status, $design_id);
+        $stmt->bind_param("iiiiiiii", $brand, $type, $color, $size, $quantity, $td_id, $status, $design_id);
         $stmt->execute();
         $result = $stmt->insert_id;
         $stmt->close();
@@ -118,7 +118,7 @@ class Database
 
     public function getTransaction()
     {
-        $query = "select 
+        $query = "SELECT 
             cd.first_name as firstname,
             cd.last_name as lastname,
             cd.phone_number as phonenumber,
@@ -136,7 +136,7 @@ class Database
 
             s.status_name as status
             
-            from transaction_detail td
+            FROM transaction_detail td
             join customer_detail cd on cd.cd_id = td.customer_id
             join user u on u.user_id = td.user_id
             join status s on s.status_id = td.status
@@ -152,7 +152,7 @@ class Database
 
     public function getCustomer()
     {
-        $query = "select * from customer_detail";
+        $query = "SELECT * FROM customer_detail";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -174,7 +174,7 @@ class Database
 
     public function getLogs()
     {
-        $query = "select * from logs order by timestamp desc";
+        $query = "SELECT * FROM logs order by timestamp desc";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -193,7 +193,7 @@ class Database
         i.qty as qty,
         i.price as price
         
-        from inventory i
+        FROM inventory i
         inner join brand b on i.brand = b.brand_id
         inner join type t on i.type = t.type_id
         inner join color c on i.color = c.color_id
@@ -227,7 +227,7 @@ class Database
 
     public function existingInventory($brand, $type, $color, $size,)
     {
-        $query = "select inventory_id, qty from inventory where brand = ? and type = ? and color = ? and size = ?";
+        $query = "SELECT inventory_id, qty FROM inventory where brand = ? and type = ? and color = ? and size = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("iiii", $brand, $type, $color, $size);
         $stmt->execute();
@@ -260,7 +260,7 @@ class Database
 
     public function getAll($table)
     {
-        $query = "select * from `$table`";
+        $query = "SELECT * FROM `$table`";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -284,7 +284,7 @@ class Database
     public function deleteRowWithID($table, $column, $id)
     {
         try {
-            $query = "delete from `$table` where `$column` = ?";
+            $query = "delete FROM `$table` where `$column` = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
@@ -309,7 +309,7 @@ class Database
 
     public function selectInventoryWithID($id)
     {
-        $query = "select * from inventory where inventory_id = ?";
+        $query = "SELECT * FROM inventory where inventory_id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('i', $id);
         $stmt->execute();
@@ -320,7 +320,7 @@ class Database
 
     public function selectCustomerWithNumber($phonenumber)
     {
-        $query = "select * from customer_detail where phone_number = ?";
+        $query = "SELECT * FROM customer_detail where phone_number = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('s', $phonenumber);
         $stmt->execute();
@@ -342,8 +342,7 @@ class Database
 
     public function fetchCustomerOrder($id)
     {
-
-        $query = "select
+        $query = "SELECT
         cd.first_name as firstname,
         cd.last_name as lastname,
         cd.phone_number as phonenumber,
@@ -356,18 +355,21 @@ class Database
         s.size_name as size,
         o.quantity as quantity,
         o.design_id as design,
-        st.status_name as status,
+        o_st.status_name as status,
+        td_st.status_name as transaction_status,
         o.order_id as order_id,
-        td.td_id as transaction_id
+        td.td_id as transaction_id,
+        td.customer_id as customer_id
         
-        from transaction_detail td 
+        FROM transaction_detail td 
         join customer_detail cd on cd.cd_id = td.customer_id 
         join orders o on o.transaction_id = td.td_id
         join brand b on b.brand_id = o.brand
         join color c on c.color_id = o.color
         join size s on s.size_id = o.size
         join type t on t.type_id = o.type
-        join status st on st.status_id = o.status
+        join status o_st on o_st.status_id = o.status
+        join status td_st on td_st.status_id = td.status
         where td_id = ?";
 
         $stmt = $this->conn->prepare($query);
@@ -402,7 +404,7 @@ class Database
 
     function checkStatus()
     {
-        $query = "select * from transaction_detail where status = 1 or status = 2";
+        $query = "SELECT * FROM transaction_detail where status = 1 or status = 2";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -413,13 +415,78 @@ class Database
     {
         $id = $table . "_id";
         $colname = $table . "_name";
-        $query = "select `$id` from `$table` where `$colname` = ?";
+        $query = "SELECT `$id` FROM `$table` where `$colname` = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("s", $name);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
         return $result;
+    }
+
+    function finishOrder($id)
+    {
+        $query = "UPDATE transaction_detail SET status = 3 WHERE td_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->affected_rows;
+
+        return $result;
+    }
+
+    function selectCustomerWithID($id)
+    {
+
+        $query = "SELECT * FROM customer_detail WHERE cd_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $data = $stmt->get_result();
+        $result = $data->fetch_object();
+
+        return $result;
+    }
+
+    function sendFinishOrder($message, $phonenumber)
+    {
+
+        $clean = preg_replace('/^0?9/', '', $phonenumber);
+        $recipient = '+63' . $clean;
+
+        $BASE_URL = "https://api.textbee.dev/api/v1";
+        $API_KEY = "f79ea1de-a93f-454d-a2c1-c5548a2d9ecf";
+        $DEVICE_ID = "688f88c86cd203ecb5910f3a";
+
+
+        $url = $BASE_URL . "/gateway/devices/" . $DEVICE_ID . "/send-sms";
+
+        $data = [
+            "recipients" => [$recipient],
+            "message" => $message
+        ];
+
+        $ch = curl_init($url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "Content-Type: application/json",
+            "x-api-key: $API_KEY"
+        ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            echo "cURL Error: " . curl_error($ch);
+        } else {
+            echo "Response: " . $response;
+        }
+
+        curl_close($ch);
+
+        return $response;
     }
 }
 
@@ -535,10 +602,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'setStatus':
             setStatus($db, $data);
             break;
+        case 'finishOrder':
+            finishOrder($db, $data);
+            break;
         default:
             echo json_encode(['message' => 'Invalid action']);
             break;
     }
+}
+
+function finishOrder($db, $data)
+{
+    $id = $data['id'];
+    $customer_id = $data['customer_id'];
+
+    $result = $db->finishOrder($id);
+
+    if ($customer_id) {
+        $customer = $db->selectCustomerWithID($customer_id);
+        $fullname = ucwords($customer->first_name . " " . $customer->last_name);
+        $phonenumber = $customer->phone_number;
+
+        $message = "Hi $fullname! This is FABRIK SALES JARO , your order is ready for pickup. You can collect it at your our store during business hours. Thank you for shopping with us!";
+        $result = $db->sendFinishOrder($message, $phonenumber);
+    }
+    echo json_encode($result);
 }
 
 function setStatus($db, $data)
