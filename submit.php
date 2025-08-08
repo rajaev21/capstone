@@ -739,7 +739,7 @@ function Register($db, $data)
         $lastname = $data['lastname'];
         $phonenumber = $data['phonenumber'];
 
-        $result = $db->userRegister($username, $hashed_password, $firstname, $lastname, $phonenumber, 2);
+        $result = $db->userRegister($username, $hashed_password, $firstname, $lastname, $phonenumber, 3);
 
         echo json_encode(['message' => 'Registration Complete']);
     } catch (Exception $e) {
