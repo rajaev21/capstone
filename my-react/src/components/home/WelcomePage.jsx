@@ -26,8 +26,10 @@ const WelcomePage = ({ transaction, setTransaction, fetchTransaction }) => {
           {id ? (
             <CustomerDetails id={id} />
           ) : (
-            <div className="">View Detail</div>
-          )}
+              <div className="d-flex justify-content-center">
+                <div className="text-center fs-3 fw-bold">Click view more to view Order Details</div>
+              </div>
+            )}
         </div>
       </div>
     </div>

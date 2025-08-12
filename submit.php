@@ -140,7 +140,7 @@ class Database
             join customer_detail cd on cd.cd_id = td.customer_id
             join user u on u.user_id = td.user_id
             join status s on s.status_id = td.status
-            order by deadline desc
+            order by status desc, deadline desc
             ";
 
         $stmt = $this->conn->prepare($query);
@@ -359,6 +359,7 @@ class Database
         td_st.status_name as transaction_status,
         o.order_id as order_id,
         td.td_id as transaction_id,
+        td.note as note,
         td.customer_id as customer_id
         
         FROM transaction_detail td 

@@ -1,10 +1,8 @@
 <?php
 
-$phonenumber = $argv[1] ?? '';
-$message = $argv[2] ?? '';
-
 $clean = preg_replace('/^0?9/', '', $phonenumber);
 $recipient = '+63'.$clean;
+
 
 $BASE_URL = "https://api.textbee.dev/api/v1";
 $API_KEY = "f79ea1de-a93f-454d-a2c1-c5548a2d9ecf";

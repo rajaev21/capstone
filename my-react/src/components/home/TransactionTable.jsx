@@ -21,7 +21,7 @@ const TransactionTable = ({ transaction, setTransaction, fetchTransaction, encry
     const date = new Date(unix * 1000);
     const yy = date.getFullYear();
     const mm = months[date.getMonth()];
-    const dd = date.getDay();
+    const dd = date.getDate();
 
     const format = `${mm} ${dd}, ${yy}`;
 

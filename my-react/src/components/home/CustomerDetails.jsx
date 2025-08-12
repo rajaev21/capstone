@@ -76,8 +76,6 @@ const CustomerDetails = ({ id, status }) => {
       });
   };
 
-  console.log(details);
-
   return (
     <div className="container my-4">
       <button className="btn btn-primary">Extend Expiration Date</button>
@@ -97,8 +95,11 @@ const CustomerDetails = ({ id, status }) => {
               <p className="card-text mb-1">
                 <strong>Gmail:</strong> {details[0].gmail}
               </p>
-              <p className="card-text">
+              <p className="card-text mb-1">
                 <strong>Address:</strong> {details[0].address}
+              </p>
+              <p className="card-text">
+                <strong>Note:</strong> {details[0].note}
               </p>
             </div>
           </div>
