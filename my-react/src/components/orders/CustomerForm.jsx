@@ -12,54 +12,66 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
     <>
       {customerDetail && (
         <div>
-          <div>
-            <label>First Name:</label>
+          Firstname:
+          <div className="input-group input-group-sm">
+            <label className="input-group-text"><i class="bi bi-person"></i></label>
             <input
+            className="form-control"
               type="text"
               name="firstname"
               value={customerDetail.firstname}
               onChange={e => handleCustomerFormChange(e)}
             />
           </div>
-          <div>
-            <label>Last Name:</label>
+          Lastname:
+          <div className="input-group input-group-sm">
+            <label className="input-group-text"><i class="bi bi-person"></i></label>
             <input
+            className="form-control"
               type="text"
               name="lastname"
               value={customerDetail.lastname}
               onChange={e => handleCustomerFormChange(e)}
             />
           </div>
-          <div>
-            <label>Phone Number:</label>
+          Phone number: 
+          <div className="input-group input-group-sm">
+            <label className="input-group-text"><i class="bi bi-telephone"></i></label>
             <input
+            className="form-control"
               type="number"
               name="phonenumber"
               value={customerDetail.phonenumber}
               onChange={e => handleCustomerFormChange(e)}
             />
-          </div>
-          <div>
-            <label>Facebook:</label>
+          </div >
+          Facebook:
+          <div className="input-group input-group-sm">
+            <label className="input-group-text"><i class="bi bi-facebook"></i></label>
             <input
+            className="form-control"
               type="text"
               name="facebook"
               value={customerDetail.facebook}
               onChange={e => handleCustomerFormChange(e)}
             />
           </div>
-          <div>
-            <label>Gmail:</label>
+          Gmail:
+          <div className="input-group input-group-sm">
+            <label className="input-group-text"><i class="bi bi-google"></i></label>
             <input
+            className="form-control"
               type="email"
               name="gmail"
               value={customerDetail.gmail}
               onChange={e => handleCustomerFormChange(e)}
             />
           </div>
-          <div>
-            <label>Address:</label>
+          Address:
+          <div className="input-group input-group-sm">
+            <label className="input-group-text"><i class="bi bi-map"></i></label>
             <input
+            className="form-control"
               type="text"
               name="address"
               value={customerDetail.address}

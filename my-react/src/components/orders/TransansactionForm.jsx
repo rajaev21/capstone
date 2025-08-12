@@ -19,25 +19,35 @@ const TransactionForm = ({ transaction, setTransaction }) => {
 
   return (
     <>
-      <label htmlFor="inputDeadline">Deadline</label>
-      <input
-        id="inputDeadline"
-        type="date"
-        value={transaction.deadline}
-        onChange={(e) => {
-          changeDate(e);
-        }}
-      />
-
-      <label htmlFor="textNote">Note</label>
-      <textarea
-        id="textNote"
-        type="note"
-        value={transaction.note}
-        onChange={(e) =>
-          setTransaction((prev) => ({ ...prev, note: e.target.value }))
-        }
-      />
+      Deadline: 
+      <div className="input-group input-group-sm">
+        <label className="input-group-text">
+          <i class="bi bi-calendar-check"></i>
+        </label>
+        <input
+          className="form-control"
+          id="inputDeadline"
+          type="date"
+          value={transaction.deadline}
+          onChange={(e) => {
+            changeDate(e);
+          }}
+        />
+      </div>
+      Note:
+      <div className="input-group input-group-sm">
+        
+        <label className="input-group-text"><i class="bi bi-pen"></i></label>
+        <textarea
+        className="form-control"
+          id="textNote"
+          type="note"
+          value={transaction.note}
+          onChange={(e) =>
+            setTransaction((prev) => ({ ...prev, note: e.target.value }))
+          }
+        />
+      </div>
     </>
   );
 };

@@ -46,48 +46,53 @@ const CurrentOrder = ({ inventory, order, setOrder }) => {
     });
   }
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Order</th>
-          <th>Quantity</th>
-          <th>Price</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Array.isArray(newInventory) &&
-          order.length > 0 &&
-          order.map((item, index) => (
-            <tr>
-              <td className="text-capitalize">
-                {item.brand} {item.type} {item.color} {item.size}
-              </td>
-              <td>
-                <input
-                  onBlur={(e) => valueCheck(index, e, item.id)}
-                  type="number"
-                  value={item.qty}
-                  onChange={(e) => {
-                    qtyChange(index, e, item.id);
-                  }}
-                />
-              </td>
-              <td>{item.qty * item.price}</td>
-              <td>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => {
-                    removeOrder(index);
-                  }}
-                >
-                  Remove Order
-                </button>
-              </td>
-            </tr>
-          ))}
-      </tbody>
-    </table>
+    <div className="">
+      <table className="table table-bordered">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.isArray(newInventory) &&
+            order.length > 0 &&
+            order.map((item, index) => (
+              <tr>
+                <td className="text-capitalize">
+                  {item.brand} {item.type} {item.color} {item.size}
+                </td>
+                <td>
+                  <div className="input-group">
+                    <input
+                      className="form-control"
+                      onBlur={(e) => valueCheck(index, e, item.id)}
+                      type="number"
+                      value={item.qty}
+                      onChange={(e) => {
+                        qtyChange(index, e, item.id);
+                      }}
+                    />
+                  </div>
+                </td>
+                <td className="text-center">{item.qty * item.price}</td>
+                <td>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => {
+                      removeOrder(index);
+                    }}
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

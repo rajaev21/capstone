@@ -71,7 +71,7 @@ const CustomerDetails = ({ id, status }) => {
       })
       .then((res) => {
         if(res.data){
-          // window.location.reload();
+          window.location.reload();
         }
       });
   };

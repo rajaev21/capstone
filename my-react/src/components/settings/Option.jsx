@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from "react";
 import axios from "axios";
 
 const Option = ({ option, setOption, name, fetch }) => {
-  const capitalizedName =
-    name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-  const [optionID, optionName] = [`${name}_id`, `${name}_name`];
+  const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+  const optionID = `${name}_id`;
+  const optionName = `${name}_name`;
   const [search, setSearch] = useState("");
   const [pageCount, setPageCount] = useState(0);
   const role = localStorage.getItem("role");
 
-  const filteredItems =
-    Array.isArray(option) &&
-    option.filter((item) =>
-      Object.values(item).some((val) =>
-        String(val).toLowerCase().includes(search.toLowerCase())
+  const filteredItems = Array.isArray(option)
+    ? option.filter((item) =>
+        Object.values(item).some((val) =>
+          String(val).toLowerCase().includes(search.toLowerCase())
+        )
       )
-    );
+    : [];
 
   const itemsPerPage = 5;
   const start = pageCount * itemsPerPage;
@@ -24,208 +23,218 @@ const Option = ({ option, setOption, name, fetch }) => {
   const currentItems = filteredItems.slice(start, end);
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
 
+  const isAdmin = role === "1" || role === "2";
+
   function addOption(e) {
     e.preventDefault();
     const value = e.target.optionName.value.trim().toLowerCase();
-    const isDuplicate = option.find((item) => item[optionName] === value);
-    if (isDuplicate) {
-      alert(`${value} already existed`);
+    if (option.some((item) => item[optionName] === value)) {
+      alert(`${value} already exists`);
       return;
     }
-    const data = {
-      table: name,
-      value: value,
-      action: "insertOption",
-    };
+
     if (value) {
       axios
-        .post("http://localhost/capstone/submit.php", data, {
-          headers: { "Content-Type": "application/json" },
-        })
-        .then((response) => {
-          if (typeof response.data !== "number") {
+        .post(
+          "http://localhost/capstone/submit.php",
+          { table: name, value, action: "insertOption" },
+          { headers: { "Content-Type": "application/json" } }
+        )
+        .then((res) => {
+          if (typeof res.data !== "number") {
             alert("Error in data");
             return;
           }
           alert("Item inserted");
           fetch();
         })
-        .catch((error) => {
-          console.error("There was an error adding the option!", error);
-        });
+        .catch((err) => console.error("Error adding option:", err));
+
       e.target.reset();
     }
   }
 
-  function deleteItem(e, id) {
-    e.preventDefault();
-    const data = { id: id, table: name, action: "deleteOption" };
+  function deleteItem(id) {
     axios
-      .post("http://localhost/capstone/submit.php", data, {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((response) => {
-        if (response.data.message === "fk") {
+      .post(
+        "http://localhost/capstone/submit.php",
+        { id, table: name, action: "deleteOption" },
+        { headers: { "Content-Type": "application/json" } }
+      )
+      .then((res) => {
+        if (res.data.message === "fk") {
           alert(
-            "This option is being used in inventory. Item in inventory first!"
+            "This option is being used in inventory. Remove it from inventory first!"
           );
         }
         fetch();
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((err) => console.error(err));
   }
 
   return (
-    <div>
-      <div className="d-flex justify-content-end mb-3">
-        <button
-          type="button"
-          className="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target={`#${name}`}
-        >
-          Add {capitalizedName}
-        </button>
+    <div className="p-3">
+      {/* Header */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="fw-bold">{capitalizedName}s</h4>
+        {isAdmin && (
+          <button
+            className="btn btn-primary btn-sm shadow-sm d-flex align-items-center"
+            data-bs-toggle="modal"
+            data-bs-target={`#modal-${name}`}
+          >
+            <i class="bi bi-plus"></i> Add {capitalizedName}
+          </button>
+        )}
       </div>
 
-      <div
-        className="modal fade"
-        id={name}
-        tabIndex="-1"
-        aria-labelledby="optionModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="optionModalLabel">
-                Add New {capitalizedName}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={(e) => addOption(e)}>
-                <div className="mb-3">
-                  <label htmlFor="optionName" className="form-label">
-                    {capitalizedName} name
+      {/* Modal */}
+      {isAdmin && (
+        <div
+          className="modal fade"
+          id={`modal-${name}`}
+          tabIndex="-1"
+          aria-labelledby={`modalLabel-${name}`}
+          aria-hidden="true"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content shadow">
+              <form onSubmit={addOption}>
+                <div className="modal-header border-0">
+                  <h5 className="modal-title fw-bold">
+                    Add New {capitalizedName}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <label className="form-label fw-semibold">
+                    {capitalizedName} Name
                   </label>
                   <input
                     type="text"
-                    className="form-control"
-                    id="optionName"
                     name="optionName"
+                    className="form-control"
+                    autoFocus
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-primary">
-                  {" "}
-                  Save{" "}
-                </button>
+                <div className="modal-footer border-0">
+                  <button
+                    type="button"
+                    className="btn btn-light"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary shadow-sm">
+                    Save
+                  </button>
+                </div>
               </form>
             </div>
           </div>
         </div>
-      </div>
-      <h6>
-        Search:{" "}
+      )}
+
+      {/* Search */}
+      <div className="input-group mb-3 shadow-sm">
+        <span className="input-group-text bg-light border-0">
+          <i class="bi bi-search"></i>
+        </span>
         <input
           type="text"
+          className="form-control border-0"
+          placeholder={`Search ${capitalizedName}s...`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-      </h6>
+      </div>
 
-      <table className="table table-striped table-bordered">
-        <thead className="table-light">
-          <tr>
-            <td>ID</td>
-            <td>Name</td>
-            {role == 2 || role == 1 && <td>Action</td>}
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.length > 0 ? (
-            currentItems.map((item, idx) => (
-              <tr key={idx}>
-                {Object.values(item).map((val, i) => (
-                  <td key={i}>{val}</td>
-                ))}
-
-                {role == 2 || role == 1 && (
-                  <td>
-                    <button
-                      className="btn btn-danger"
-                      onClick={(e) => deleteItem(e, item[optionID])}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                )}
-              </tr>
-            ))
-          ) : (
+      {/* Table */}
+      <div className="table-responsive shadow-sm rounded">
+        <table className="table table-hover align-middle mb-0">
+          <thead className="table-primary">
             <tr>
-              <td
-                colSpan={Object.keys(option[0] || {}).length}
-                className="text-center"
-              >
-                No results found.
-              </td>
+              <th>ID</th>
+              <th>Name</th>
+              {isAdmin && <th className="text-center">Action</th>}
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {currentItems.length > 0 ? (
+              currentItems.map((item) => (
+                <tr key={item[optionID]}>
+                  <td>{item[optionID]}</td>
+                  <td className="fw-semibold text-capitalize">
+                    {item[optionName]}
+                  </td>
+                  {isAdmin && (
+                    <td className="text-center">
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => deleteItem(item[optionID])}
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={isAdmin ? 3 : 2} className="text-center py-4">
+                  No results found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
       <nav className="d-flex justify-content-center mt-3">
-        <ul className="pagination">
+        <ul className="pagination pagination-sm mb-0">
           <li className="page-item">
             <button
               className="page-link"
               onClick={() => setPageCount(0)}
               disabled={pageCount === 0}
             >
-              <span aria-hidden="true">&laquo;</span>
+              &laquo;
             </button>
           </li>
-
           <li className="page-item">
             <button
               className="page-link"
-              onClick={() => setPageCount((prev) => prev - 1)}
+              onClick={() => setPageCount((p) => Math.max(0, p - 1))}
               disabled={pageCount === 0}
             >
-              Previous
+              Prev
             </button>
           </li>
-
-          <li className="page-item">
-            <button className="page-link">{pageCount + 1}</button>
+          <li className="page-item disabled">
+            <span className="page-link">{pageCount + 1}</span>
           </li>
-
           <li className="page-item">
             <button
               className="page-link"
-              onClick={() => setPageCount((prev) => prev + 1)}
+              onClick={() => setPageCount((p) => p + 1)}
               disabled={pageCount + 1 >= totalPage}
-              style={{ width: "80px" }}
             >
               Next
             </button>
           </li>
-
           <li className="page-item">
             <button
               className="page-link"
               onClick={() => setPageCount(totalPage - 1)}
               disabled={pageCount === totalPage - 1}
             >
-              <span aria-hidden="true">&raquo;</span>
+              &raquo;
             </button>
           </li>
         </ul>

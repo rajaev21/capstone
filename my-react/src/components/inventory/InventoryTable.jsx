@@ -6,8 +6,8 @@ const InventoryTable = ({ inventory, fetch, fetchLogs }) => {
   const [search, setSearch] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [oldQuantity, setOldQuantity] = useState("");
   const [pageCount, setPageCount] = useState(0);
-  console.log(role)
 
   const filteredItems =
     Array.isArray(inventory) &&
@@ -30,247 +30,235 @@ const InventoryTable = ({ inventory, fetch, fetchLogs }) => {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
-        console.log(response.data);
         if (typeof response.data === "number") {
           fetch();
           fetchLogs();
           setPrice("");
         }
-      })
-      .catch((error) => console.log(error));
+      });
   };
 
   const deleteItem = (id, quantity) => {
-    console.log("deleteItem", id, quantity);
     if (quantity <= 0) {
       const data = { action: "deleteInventory", id: id };
       axios
         .post("http://localhost/capstone/submit.php", data, {
           headers: { "Content-Type": "application/json" },
         })
-        .then((response) => {
-          console.log(response.data);
+        .then(() => {
           fetch();
           fetchLogs();
-          return;
-        })
-        .catch((error) => {
-          console.log(error);
         });
+      return;
     }
-
     alert(
       `Inventory ID #${id} cannot be deleted. Make sure the quantity of stock is 0`
     );
   };
 
   const updateQuantity = (id) => {
-    const data = { action: "updateQuantity", id: id, value: quantity };
-
+    const qty = Number(oldQuantity) + Number(quantity);
+    const data = { action: "updateQuantity", id: id, value: qty };
     axios
       .post("http://localhost/capstone/submit.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
-        console.log(response.data);
-        if (typeof response.data === "number") {
-          console.log(response);
-          fetch();
-          fetchLogs();
-          setQuantity("");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+        fetch();
+        fetchLogs();
+        setQuantity("");
+        setOldQuantity("");
       });
   };
 
   return (
     <div className="container">
-      <h6>
-        Search:{" "}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h4 className="mb-0">Inventory </h4>
         <input
           type="text"
+          className="form-control w-25"
+          placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-      </h6>
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>ID number</th>
-            <th>Brand</th>
-            <th>Type</th>
-            <th>Color</th>
-            <th>Size</th>
-            <th>Quantity</th>
-            <th>Price (PHP)</th>
+      </div>
 
-            {role == 2 || role == 1 && <th>Action</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.length > 0 &&
-            currentItems.map((item, index) => (
-              <tr key={index}>
-                <td> {item.id}</td>
-                <td> {item.brand}</td>
-                <td> {item.type}</td>
-                <td> {item.color}</td>
-                <td> {item.size.toString().toUpperCase()}</td>
-                <td> {item.qty}</td>
-                <td> {item.price == 0 ? "No price set" : item.price}</td>
-                {role == 2 || role == 1 && (
-                  <td>
-                    <p>
-                      <button
-                        type="button"
-                        class="btn btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target={`#${index}Price`}
-                      >
-                        {item.price == 0 ? "Set Price" : "Edit Price"}
-                      </button>
+      <div className="table-responsive">
+        <table className="table table-hover table-bordered align-middle">
+          <thead className="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Brand</th>
+              <th>Type</th>
+              <th>Color</th>
+              <th>Size</th>
+              <th>Quantity</th>
+              <th>Price (₱)</th>
+              {role == 2 ||
+                (role == 1 && <th className="text-center">Actions</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems.length > 0 &&
+              currentItems.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.id}</td>
+                  <td>{item.brand}</td>
+                  <td>{item.type}</td>
+                  <td>{item.color}</td>
+                  <td>{item.size.toString().toUpperCase()}</td>
+                  <td>{item.qty}</td>
+                  <td>{item.price == 0 ? "No price set" : item.price}</td>
+                  {role == 2 ||
+                    (role == 1 && (
+                      <td className="text-center">
+                        <div className="btn-sm d-flex text justify-content-center gap-2">
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target={`#${index}Price`}
+                          >
+                            <i className="bi bi-currency-dollar"></i>
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-outline-info"
+                            data-bs-toggle="modal"
+                            data-bs-target={`#${index}Quantity`}
+                            onClick={() => {
+                              setOldQuantity(item.qty);
+                            }}
+                          >
+                            <i className="bi bi-plus-circle"></i>
+                          </button>
+                          <button
+                            onClick={() => deleteItem(item.id, item.qty)}
+                            type="button"
+                            className="btn btn-outline-danger"
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </div>
 
-                      <button
-                        type="button"
-                        class="btn btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target={`#${index}Quantity`}
-                        onClick={() => setQuantity(item.qty)}
-                      >
-                        Edit Quantity
-                      </button>
-
-                      <button
-                        onClick={() => deleteItem(item.id, item.qty)}
-                        type="button"
-                        class="btn btn-danger"
-                      >
-                        Delete Item
-                      </button>
-                    </p>
-
-                    <div
-                      class="modal fade"
-                      id={`${index}Price`}
-                      tabindex="-1"
-                      aria-hidden="true"
-                    >
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">
-                              Set Price {item.id}
-                            </h5>
-                            <button
-                              type="button"
-                              class="btn-close"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"
-                            ></button>
-                          </div>
-                          <div class="modal-body">
-                            {item.price == 0 ? "Set Price: " : "Edit Price: "}
-
-                            <input
-                              type="text"
-                              name="price"
-                              value={price}
-                              onChange={(e) => setPrice(e.target.value)}
-                            />
-                          </div>
-                          <div class="modal-footer">
-                            <button
-                              type="button"
-                              class="btn btn-secondary"
-                              data-bs-dismiss="modal"
-                            >
-                              Close
-                            </button>
-                            <button
-                              type="button"
-                              class="btn btn-primary"
-                              onClick={(e) => {
-                                priceUpdate(item.id);
-                              }}
-                              data-bs-dismiss="modal"
-                            >
-                              Save changes
-                            </button>
+                        <div
+                          className="modal fade"
+                          id={`${index}Price`}
+                          tabIndex="-1"
+                          aria-hidden="true"
+                        >
+                          <div className="modal-dialog">
+                            <div className="modal-content">
+                              <div className="modal-header">
+                                <h5 className="modal-title">
+                                  Set Price #{item.id}
+                                </h5>
+                                <button
+                                  type="button"
+                                  className="btn-close"
+                                  data-bs-dismiss="modal"
+                                ></button>
+                              </div>
+                              <div className="modal-body">
+                                <input
+                                  type="number"
+                                  className="form-control"
+                                  placeholder="Enter price"
+                                  value={price}
+                                  onChange={(e) => setPrice(e.target.value)}
+                                />
+                              </div>
+                              <div className="modal-footer">
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary"
+                                  data-bs-dismiss="modal"
+                                >
+                                  Close
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={() => priceUpdate(item.id)}
+                                  data-bs-dismiss="modal"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
 
-                    {/* Edit quantity */}
-
-                    <div
-                      class="modal fade"
-                      id={`${index}Quantity`}
-                      tabindex="-1"
-                      aria-hidden="true"
-                    >
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">
-                              Edit Quantity #{item.id}
-                            </h5>
-                            <button
-                              type="button"
-                              class="btn-close"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"
-                            ></button>
-                          </div>
-                          <div class="modal-body">
-                            Edit Quantity:
-                            <input
-                              type="text"
-                              name="quantity"
-                              value={quantity}
-                              onChange={(e) => setQuantity(e.target.value)}
-                            />
-                          </div>
-                          <div class="modal-footer">
-                            <button
-                              type="button"
-                              class="btn btn-secondary"
-                              data-bs-dismiss="modal"
-                            >
-                              Close
-                            </button>
-                            <button
-                              type="button"
-                              class="btn btn-primary"
-                              onClick={(e) => updateQuantity(item.id)}
-                              data-bs-dismiss="modal"
-                            >
-                              Submit Quantity
-                            </button>
+                        <div
+                          className="modal fade"
+                          id={`${index}Quantity`}
+                          tabIndex="-1"
+                          aria-hidden="true"
+                        >
+                          <div className="modal-dialog">
+                            <div className="modal-content">
+                              <div className="modal-header">
+                                <h5 className="modal-title">
+                                  Edit Quantity #{item.id}
+                                </h5>
+                                <button
+                                  type="button"
+                                  className="btn-close"
+                                  data-bs-dismiss="modal"
+                                ></button>
+                              </div>
+                              <div className="modal-body">
+                                <p className="fw-bold">
+                                  Current Quantity: {oldQuantity}
+                                </p>
+                                <input
+                                  type="number"
+                                  className="form-control"
+                                  placeholder="Enter quantity"
+                                  value={quantity}
+                                  onChange={(e) => setQuantity(e.target.value)}
+                                />
+                              </div>
+                              <div className="modal-footer">
+                                <button
+                                  type="button"
+                                  className="btn btn-secondary"
+                                  data-bs-dismiss="modal"
+                                >
+                                  Close
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={() => updateQuantity(item.id)}
+                                  data-bs-dismiss="modal"
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </td>
-                )}
-              </tr>
-            ))}
-        </tbody>
-      </table>
+                      </td>
+                    ))}
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+
       <nav className="d-flex justify-content-center mt-3">
-        <ul className="pagination">
+        <ul className="pagination pagination-sm">
           <li className="page-item">
             <button
               className="page-link"
               onClick={() => setPageCount(0)}
               disabled={pageCount === 0}
             >
-              <span aria-hidden="true">&laquo;</span>
+              &laquo;
             </button>
           </li>
-
           <li className="page-item">
             <button
               className="page-link"
@@ -280,29 +268,26 @@ const InventoryTable = ({ inventory, fetch, fetchLogs }) => {
               Previous
             </button>
           </li>
-
-          <li className="page-item">
-            <button className="page-link">{pageCount + 1}</button>
+          <li className="page-item active">
+            <span className="page-link">{pageCount + 1}</span>
           </li>
-
           <li className="page-item">
             <button
               className="page-link"
               onClick={() => setPageCount((prev) => prev + 1)}
               disabled={pageCount + 1 >= totalPage}
-              style={{ width: "80px" }}
+              style={{ width: "70px" }}
             >
               Next
             </button>
           </li>
-
           <li className="page-item">
             <button
               className="page-link"
               onClick={() => setPageCount(totalPage - 1)}
               disabled={pageCount === totalPage - 1}
             >
-              <span aria-hidden="true">&raquo;</span>
+              &raquo;
             </button>
           </li>
         </ul>

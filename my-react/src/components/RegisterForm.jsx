@@ -60,7 +60,7 @@ const RegisterForm = () => {
         setPassword("");
         setConfirmPassword("");
         setPhonenumber("");
-        navigate("/home")
+        navigate("/home");
       }
     } catch (error) {
       alert(`Registration failed: ${error.message}`);
@@ -68,79 +68,122 @@ const RegisterForm = () => {
   };
 
   return (
-    <div>
-      <h1>Register Form</h1>
-      <form onSubmit={validateRegister}>
-        <div>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-            required
-          />
-        </div>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6 col-lg-5">
+          <div className="card shadow-sm border-0">
+            <div className="card-body p-4">
+              <h3 className="text-center mb-4 fw-bold">Create Account</h3>
+              <form onSubmit={validateRegister}>
+                <div className="mb-3">
+                  <label htmlFor="username" className="form-label">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    className="form-control"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                    required
+                  />
+                </div>
 
-        <div>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            required
-          />
-        </div>
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    className="form-control"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    required
+                  />
+                </div>
 
-        <div>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm Password"
-            required
-          />
-        </div>
+                <div className="mb-3">
+                  <label htmlFor="confirmPassword" className="form-label">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    className="form-control"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter password"
+                    required
+                  />
+                </div>
 
-        <div>
-          <input
-            type="text"
-            id="firstname"
-            value={firstname}
-            onChange={(e) => setFirstname(e.target.value)}
-            placeholder="Firstname"
-            required
-          />
-        </div>
+                <div className="row">
+                  <div className="mb-3 col">
+                    <label htmlFor="firstname" className="form-label">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      id="firstname"
+                      className="form-control"
+                      value={firstname}
+                      onChange={(e) => setFirstname(e.target.value)}
+                      placeholder="First name"
+                      required
+                    />
+                  </div>
 
-        <div>
-          <input
-            type="text"
-            id="lastname"
-            value={lastname}
-            onChange={(e) => setLastname(e.target.value)}
-            placeholder="Lastname"
-            required
-          />
-        </div>
+                  <div className="mb-3 col">
+                    <label htmlFor="lastname" className="form-label">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      id="lastname"
+                      className="form-control"
+                      value={lastname}
+                      onChange={(e) => setLastname(e.target.value)}
+                      placeholder="Last name"
+                      required
+                    />
+                  </div>
+                </div>
 
-        <div>
-          <input
-            type="number"
-            id="phonenumber"
-            value={phonenumber}
-            onChange={(e) => setPhonenumber(e.target.value)}
-            placeholder="Phone Number"
-            required
-          />
-        </div>
+                <div className="mb-4">
+                  <label htmlFor="phonenumber" className="form-label">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phonenumber"
+                    className="form-control"
+                    value={phonenumber}
+                    onChange={(e) => setPhonenumber(e.target.value)}
+                    placeholder="09xxxxxxxxx"
+                    required
+                  />
+                </div>
 
-        <div>
-          <button type="submit">Register</button>
+                <button type="submit" className="btn btn-primary w-100">
+                  Register
+                </button>
+              </form>
+
+              <div className="text-center mt-3">
+                <small>
+                  Back to options! {" "}
+                  <Link to="/settings" className="text-decoration-none">
+                    Click here
+                  </Link>
+                </small>
+              </div>
+            </div>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

@@ -9,11 +9,11 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
-import Navbar from "./components/Navbar";
 import WelcomePage from "./components/home/WelcomePage";
 import Inventory from "./components/inventory/Inventory";
 import Settings from "./components/settings/Settings";
 import Order from "./components/orders/Order";
+import Layout from "./components/Layout";
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -128,24 +128,24 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
+
           <Route
             path="/home"
             element={
-              <>
-                <Navbar />
+              <Layout>
                 <WelcomePage
                   transaction={transaction}
                   setTransaction={setTransaction}
                   fetchTransaction={fetchTransaction}
                 />
-              </>
+              </Layout>
             }
           />
+
           <Route
             path="/order"
             element={
-              <>
-                <Navbar />
+              <Layout>
                 <Order
                   brand={brand}
                   type={type}
@@ -160,14 +160,14 @@ function App() {
                   placement={placement}
                   setPlacement={setPlacement}
                 />
-              </>
+              </Layout>
             }
           />
+
           <Route
             path="/inventory"
             element={
-              <>
-                <Navbar />
+              <Layout>
                 <Inventory
                   inventory={inventory}
                   logs={logs}
@@ -180,14 +180,14 @@ function App() {
                   fetchLogs={fetchLogs}
                   fetchInventoryCheck={fetchInventoryCheck}
                 />
-              </>
+              </Layout>
             }
           />
+
           <Route
             path="/settings"
             element={
-              <>
-                <Navbar />
+              <Layout>
                 <Settings
                   brand={brand}
                   setBrand={setBrand}
@@ -202,7 +202,7 @@ function App() {
                   fetchSize={fetchSize}
                   fetchBrand={fetchBrand}
                 />
-              </>
+              </Layout>
             }
           />
         </Routes>

@@ -19,6 +19,7 @@ const Order = ({
   placement,
   setPlacement,
 }) => {
+  const [page, setPage] = useState(true);
   const [customerDetail, setCustomerDetail] = useState({
     firstname: "",
     lastname: "",
@@ -124,52 +125,63 @@ const Order = ({
               />
             </div>
             <div className="col">
-              <CustomerForm
-                customerDetail={customerDetail}
-                setCustomerDetail={setCustomerDetail}
-              />
-              {/* <OrderForm
-                    order={order}
-                    setOrder={setOrder}
-                    allBrand={brand}
-                    allType={type}
-                    allColor={color}
-                    allSize={size}
-                    inventoryCheck={inventoryCheck}
-                    setInventoryCheck={setInventoryCheck}
-                    match={match}
-                    setMatch={setMatch}
-                  /> */}
-
-              <TransansactionForm
-                transaction={transaction}
-                setTransaction={setTransaction}
-              />
-              {order.length == 0 ? (
-                <div className=""></div>
-              ) : (
-                <div className="">
-                  <CurrentOrder
-                    inventory={inventory}
-                    order={order}
-                    setOrder={setOrder}
-                  />
+              <div className="row">
+                <div className="col">
+                  <div className="fs-5 fw-bold col d-flex justify-content-end my-3">
+                    {page ? "Customer Details" : "Orders"}
+                  </div>
+                </div>
+                <div className="col d-flex justify-content-end align-items-center">
                   <button
-                    className="btn btn-success"
-                    onClick={() => addOrder()}
+                    onClick={() => setPage((p) => !p)}
+                    className="btn btn-info"
                   >
-                    {" "}
-                    Submit Order{" "}
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => window.location.reload()}
-                  >
-                    {" "}
-                    Cancel Order{" "}
+                    {page ? "Next" : "Previous"}
                   </button>
                 </div>
+              </div>
+              {page ? (
+                <div className="">
+                  <CustomerForm
+                    customerDetail={customerDetail}
+                    setCustomerDetail={setCustomerDetail}
+                  />
+
+                  <TransansactionForm
+                    transaction={transaction}
+                    setTransaction={setTransaction}
+                  />
+                </div>
+              ) : (
+                <div className="">
+                  {order.length == 0 ? (
+                    <div className="fs-5 fw-bold text-center my-3">
+                      No order selected
+                    </div>
+                  ) : (
+                    <div className="">
+                      <CurrentOrder
+                        inventory={inventory}
+                        order={order}
+                        setOrder={setOrder}
+                      />
+                    </div>
+                  )}
+                </div>
               )}
+              <div className="my-3">
+                <button className="btn btn-success" onClick={() => addOrder()}>
+                  {" "}
+                  Submit Order{" "}
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => window.location.reload()}
+                >
+                  {" "}
+                  Cancel Order{" "}
+                </button>
+              </div>
             </div>
           </div>
         ) : (

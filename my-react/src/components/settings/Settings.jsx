@@ -26,7 +26,6 @@ const Settings = ({
         <div className="row my-5">
           <div className="col card">
             <div className="card-body">
-              <h4 className="card-title text-center">Brands</h4>
               <Option
                 option={brand}
                 setOption={setBrand}
@@ -38,7 +37,6 @@ const Settings = ({
 
           <div className="col card">
             <div className="card-body">
-              <h4 className="card-title text-center">Types</h4>
               <Option
                 option={type}
                 setOption={setType}
@@ -50,7 +48,6 @@ const Settings = ({
 
           <div className="col card">
             <div className="card-body">
-              <h4 className="card-title text-center">Colors</h4>
               <Option
                 option={color}
                 setOption={setColor}
@@ -62,7 +59,6 @@ const Settings = ({
 
           <div className="col card">
             <div className="card-body">
-              <h4 className="card-title text-center">Sizes</h4>
               <Option
                 option={size}
                 setOption={setSize}
