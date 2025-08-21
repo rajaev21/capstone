@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const Option = ({ option, setOption, name, fetch }) => {
-  const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
   const optionID = `${name}_id`;
   const optionName = `${name}_name`;
   const [search, setSearch] = useState("");
   const [pageCount, setPageCount] = useState(0);
   const role = localStorage.getItem("role");
+  const [hex, setHex] = useState("#ffffff");
+  const [image, setImage] = useState(null);
 
   const filteredItems = Array.isArray(option)
     ? option.filter((item) =>
@@ -25,6 +26,13 @@ const Option = ({ option, setOption, name, fetch }) => {
 
   const isAdmin = role === "1" || role === "2";
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
   function addOption(e) {
     e.preventDefault();
     const value = e.target.optionName.value.trim().toLowerCase();
@@ -32,14 +40,23 @@ const Option = ({ option, setOption, name, fetch }) => {
       alert(`${value} already exists`);
       return;
     }
+    if (option.some((item) => item.hex === value)) {
+      alert(`${value} already exist`);
+      return;
+    }
 
+    const data = { table: name, value, action: "insertOption" };
+
+    if (optionName === "color_name") {
+      data.hex = hex;
+    }
+    
+    console.log(data)
     if (value) {
       axios
-        .post(
-          "http://localhost/capstone/submit.php",
-          { table: name, value, action: "insertOption" },
-          { headers: { "Content-Type": "application/json" } }
-        )
+        .post("http://localhost/capstone/submit.php", data, {
+          headers: { "Content-Type": "application/json" },
+        })
         .then((res) => {
           if (typeof res.data !== "number") {
             alert("Error in data");
@@ -51,6 +68,8 @@ const Option = ({ option, setOption, name, fetch }) => {
         .catch((err) => console.error("Error adding option:", err));
 
       e.target.reset();
+      setImage(null);
+      setHex("#ffffff");
     }
   }
 
@@ -74,21 +93,20 @@ const Option = ({ option, setOption, name, fetch }) => {
 
   return (
     <div className="p-3">
-      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="fw-bold">{capitalizedName}s</h4>
+        <h4 className="fw-bold text-capitalize">{name}</h4>
         {isAdmin && (
           <button
             className="btn btn-primary btn-sm shadow-sm d-flex align-items-center"
             data-bs-toggle="modal"
             data-bs-target={`#modal-${name}`}
           >
-            <i class="bi bi-plus"></i> Add {capitalizedName}
+            <i class="bi bi-plus"></i> Add{" "}
+            <span className="text-capitalize">{name}</span>
           </button>
         )}
       </div>
 
-      {/* Modal */}
       {isAdmin && (
         <div
           className="modal fade"
@@ -96,23 +114,33 @@ const Option = ({ option, setOption, name, fetch }) => {
           tabIndex="-1"
           aria-labelledby={`modalLabel-${name}`}
           aria-hidden="true"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
         >
-          <div className="modal-dialog modal-dialog-centered">
+          <div
+            className={`modal-dialog modal-dialog-centered ${
+              image && "modal-xl"
+            }`}
+          >
             <div className="modal-content shadow">
               <form onSubmit={addOption}>
                 <div className="modal-header border-0">
-                  <h5 className="modal-title fw-bold">
-                    Add New {capitalizedName}
+                  <h5 className="modal-title fw-bold text-capitalize">
+                    Add New {name}
                   </h5>
                   <button
                     type="button"
                     className="btn-close"
                     data-bs-dismiss="modal"
+                    onClick={() => {
+                      setImage(null);
+                      setHex("#ffffff");
+                    }}
                   ></button>
                 </div>
                 <div className="modal-body">
-                  <label className="form-label fw-semibold">
-                    {capitalizedName} Name
+                  <label className="form-label fw-semibold text-capitalize">
+                    {name} Name :
                   </label>
                   <input
                     type="text"
@@ -121,12 +149,62 @@ const Option = ({ option, setOption, name, fetch }) => {
                     autoFocus
                     required
                   />
+                  {name === "color" && (
+                    <div className="row my-3 align-items-start">
+                      <div className={`${image ? "col-md-6" : "col"}`}>
+                        <label className="form-label fw-semibold text-capitalize">
+                          Pick color {name} :
+                        </label>
+                        <div className="input-group mb-3">
+                          <input
+                            type="color"
+                            name="color"
+                            className="form-control form-control-color"
+                            style={{ maxWidth: "60px" }}
+                            value={hex}
+                            onChange={(e) => setHex(e.target.value)}
+                            required
+                          />
+                          <span className="form-control input-group-text fw-bold text-uppercase">
+                            {hex}
+                          </span>
+                        </div>
+
+                        <label className="form-label fw-semibold text-capitalize">
+                          Pick image for color picker :
+                        </label>
+                        <input
+                          type="file"
+                          name="image"
+                          accept="image/*"
+                          className="form-control"
+                          onChange={handleFileChange}
+                          required
+                        />
+                      </div>
+                      {image && (
+                        <div className="col-md-6 text-center">
+                          <p className="fw-bold">Preview:</p>
+                          <img
+                            src={URL.createObjectURL(image)}
+                            alt="preview"
+                            className="img-thumbnail"
+                            style={{ maxWidth: "100%", height: "auto" }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="modal-footer border-0">
                   <button
                     type="button"
                     className="btn btn-light"
                     data-bs-dismiss="modal"
+                    onClick={() => {
+                      setImage(null);
+                      setHex("#ffffff");
+                    }}
                   >
                     Cancel
                   </button>
@@ -140,7 +218,6 @@ const Option = ({ option, setOption, name, fetch }) => {
         </div>
       )}
 
-      {/* Search */}
       <div className="input-group mb-3 shadow-sm">
         <span className="input-group-text bg-light border-0">
           <i class="bi bi-search"></i>
@@ -148,13 +225,12 @@ const Option = ({ option, setOption, name, fetch }) => {
         <input
           type="text"
           className="form-control border-0"
-          placeholder={`Search ${capitalizedName}s...`}
+          placeholder={`Search ${name}s...`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
-      {/* Table */}
       <div className="table-responsive shadow-sm rounded">
         <table className="table table-hover align-middle mb-0">
           <thead className="table-primary">
@@ -195,7 +271,6 @@ const Option = ({ option, setOption, name, fetch }) => {
         </table>
       </div>
 
-      {/* Pagination */}
       <nav className="d-flex justify-content-center mt-3">
         <ul className="pagination pagination-sm mb-0">
           <li className="page-item">

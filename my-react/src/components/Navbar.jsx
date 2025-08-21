@@ -21,9 +21,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
       <div className="container-fluid">
-        {/* Offcanvas toggle button - only visible on mobile */}
         <button
           className="btn btn-outline-secondary me-3 d-lg-none"
           type="button"

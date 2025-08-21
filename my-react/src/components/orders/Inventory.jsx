@@ -21,7 +21,7 @@ const TestOrderForm = ({ inventory, order, setOrder }) => {
     setNewInventory(inventory);
   }, []);
 
-  const addOrder = (item, index) => {
+  const addOrder = (item) => {
     setOrder((prev) => [...prev, { ...item, qty: 1 }]);
   };
 

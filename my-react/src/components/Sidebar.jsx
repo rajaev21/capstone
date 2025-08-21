@@ -23,6 +23,11 @@ const Sidebar = () => {
           Options
         </Link>
       </li>
+      <li>
+        <Link className="nav-link text-dark" to="/test">
+          Test
+        </Link>
+      </li>
     </ul>
   );
 };

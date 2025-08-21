@@ -280,6 +280,18 @@ class Database
         $this->conn->commit();
         return $result;
     }
+    
+    public function insertColor($value, $hex)
+    {
+        $query = "insert into color (`color_name`, `hex` ) values (?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("ss", $value, $hex);
+        $stmt->execute();
+        $result = $stmt->insert_id;
+        $stmt->close();
+        $this->conn->commit();
+        return $result;
+    }
 
     public function deleteRowWithID($table, $column, $id)
     {
@@ -694,7 +706,12 @@ function insertShirtOption($db, $data)
 {
     $table = $data["table"];
     $value = $data["value"];
-    $result = $db->insertOption($table, $value);
+    $hex = $data["hex"] ?? null;
+    if($hex){
+        $result = $db->insertColor($value, $hex);
+    } else {
+        $result = $db->insertOption($table, $value);
+    }
     echo json_encode($result);
 }
 

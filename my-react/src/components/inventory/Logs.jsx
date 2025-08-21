@@ -60,7 +60,6 @@ const Logs = ({ logs }) => {
         </table>
       </div>
 
-      {/* Pagination */}
       <nav className="d-flex justify-content-center mt-3">
         <ul className="pagination">
           <li className={`page-item ${pageCount === 0 ? "disabled" : ""}`}>

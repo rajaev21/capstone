@@ -8,17 +8,14 @@ const Layout = ({ children }) => {
 
       <div className="container-fluid">
         <div className="row">
-          {/* Sidebar visible on lg and above */}
           <div className="col-lg-2 d-none d-lg-block bg-light border-end p-0 vh-100">
             <Sidebar />
           </div>
 
-          {/* Main content */}
           <div className="col-lg-10 col-12 p-4">{children}</div>
         </div>
       </div>
 
-      {/* Offcanvas Sidebar for mobile */}
       <div
         className="offcanvas offcanvas-start d-lg-none"
         tabIndex="-1"

@@ -14,6 +14,7 @@ import Inventory from "./components/inventory/Inventory";
 import Settings from "./components/settings/Settings";
 import Order from "./components/orders/Order";
 import Layout from "./components/Layout";
+import Test from "./components/test/Inventory";
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -202,6 +203,14 @@ function App() {
                   fetchSize={fetchSize}
                   fetchBrand={fetchBrand}
                 />
+              </Layout>
+            }
+          />
+          <Route
+            path="/test"
+            element={
+              <Layout>
+                <Test inventory={inventory} color={color} />
               </Layout>
             }
           />
