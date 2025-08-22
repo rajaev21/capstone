@@ -15,6 +15,8 @@ import Settings from "./components/settings/Settings";
 import Order from "./components/orders/Order";
 import Layout from "./components/Layout";
 import Test from "./components/test/Inventory";
+import Stocks from "./components/charts/Stocks";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -211,6 +213,14 @@ function App() {
             element={
               <Layout>
                 <Test inventory={inventory} color={color} />
+              </Layout>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <Layout>
+                <Dashboard inventory={inventory} color={color} />
               </Layout>
             }
           />

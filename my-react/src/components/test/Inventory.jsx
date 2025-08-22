@@ -123,7 +123,7 @@ const Test = ({ inventory, color }) => {
                     </div>
                   </div>
                   <div className="col">
-                    <div className="fs-3 fw-bold text-center text-uppercase">{selected.color}</div>
+                    <div className="fs-3 fw-bold text-center text-uppercase">{selected.color ? selected.color : "select a color to see available stocks"}</div>
                     <table className="table table-bordered">
                       <thead>
                         <tr>

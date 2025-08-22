@@ -8,22 +8,27 @@ const Sidebar = () => {
           Home
         </Link>
       </li>
-      <li>
+      <li className="nav-item">
+        <Link className="nav-link text-dark" to="/dashboard">
+          Dashboard
+        </Link>
+      </li>
+      <li className="nav-item">
         <Link className="nav-link text-dark" to="/order">
           Order
         </Link>
       </li>
-      <li>
+      <li className="nav-item">
         <Link className="nav-link text-dark" to="/inventory">
           Inventory
         </Link>
       </li>
-      <li>
+      <li className="nav-item"> 
         <Link className="nav-link text-dark" to="/settings">
           Options
         </Link>
       </li>
-      <li>
+      <li className="nav-item">
         <Link className="nav-link text-dark" to="/test">
           Test
         </Link>
