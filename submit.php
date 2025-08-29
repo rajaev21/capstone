@@ -550,6 +550,7 @@ class Database
         }
         $marks = implode(", ", $marksArray);
         $values = implode(", ", $values);
+        $vars =implode("", $vars);
 
         $query = "INSERT INTO $insert ($column) VALUES ($marks)";
         $stmt = $this->conn->prepare($query);
@@ -706,7 +707,6 @@ function deleteBrandType($db, $data)
     $color_id = $data['color']['color_id'] ?? null;
     $size_id = $data['size']['size_id'] ?? null;
 
-
     $whereclause = array();
     if ($brand_id) {
         array_push($whereclause, "brand = $brand_id");
@@ -818,16 +818,20 @@ function updateQuantity($db, $data)
     array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
     $inventory = $db->getInventoryID($whereclause);
 
-    $prevQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+    // $prevQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
     $result = $db->updateInventory($inventory->inventory_id, $value);
-    $newQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
-    if ($result) {
-        $addHistory = array();
-        $changedQty = $prevQty + $value;
-
-        array_push($addHistory, "action = add", "previous_qty = $prevQty", "changed_qty = $changedQty", "new_qty = $newQty");
-    }
-    echo json_encode($prevQty);
+    // $newQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+    
+    // if ($result) {
+    //     $addHistory = array();
+    //     $changedQty = $prevQty + $value;
+    //     $insert = "logs";
+    //     $column = array();
+    //     $values = array();
+    //     array_push($column, "detail", "inventory_id", "new_value", "old_value", "timestamp");
+    //     $db->insertCustom($insert, $column, $values);
+    // }
+    echo json_encode($result);
 }
 
 function deleteInventory($db, $data)

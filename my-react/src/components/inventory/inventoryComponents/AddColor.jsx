@@ -99,7 +99,6 @@ const AddColor = ({
   };
 
   function reset() {
-    setImage(null);
     setHex("#ffffff");
     setAddInput("");
     fetchInventory();
@@ -115,7 +114,7 @@ const AddColor = ({
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
-        <div className={`modal-dialog ${image && "modal-xl"}`}>
+        <div className="modal-dialog modal-xl">
           <div className="modal-content">
             <div className="modal-header">
               <h1

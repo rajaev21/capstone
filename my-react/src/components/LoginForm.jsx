@@ -12,7 +12,7 @@ const LoginForm = () => {
     const token = localStorage.getItem("isLoggedIn");
     if (token === "true") {
       setIsLoggedIn(true);
-      navigate("/home");
+      navigate("/dashboard");
     }
     console.log(isLoggedIn);
   }, [isLoggedIn]);

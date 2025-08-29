@@ -33,6 +33,7 @@
 
 optional:
     make a function that changes the date for demo purposes
+    edit color hex
 
 needed: 
 when save dont reload call fetch inventory
