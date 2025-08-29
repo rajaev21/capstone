@@ -1,16 +1,33 @@
 import { useState } from "react";
 
-const Logs = ({ logs }) => {
+const History = ({ logs }) => {
   const [pageCount, setPageCount] = useState(0);
+  const [search, setSearch] = useState("");
   const itemsPerPage = 15;
   const start = pageCount * itemsPerPage;
   const end = start + itemsPerPage;
-  const currentItems = logs.slice(start, end);
-  const totalPage = Math.ceil(logs.length / itemsPerPage);
 
+  const filteredItems =
+    Array.isArray(logs) &&
+    logs.filter((item) =>
+      Object.values(item).some((val) =>
+        String(val).toLowerCase().includes(search.toLowerCase())
+      )
+    );
+
+  const currentItems = Array.isArray(filteredItems) && filteredItems.slice(start, end);
+  const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4"> Activity Logs</h2>
+    <div className="mt-4">
+      <h2 className="mb-4">History</h2>
+
+      <input
+        type="text"
+        className="form-control w-25"
+        placeholder="Search..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
       <div className="table-responsive" style={{ maxHeight: "70vh" }}>
         <table className="table table-hover table-bordered align-middle">
@@ -27,16 +44,7 @@ const Logs = ({ logs }) => {
           <tbody>
             {Array.isArray(currentItems) && currentItems.length > 0 ? (
               currentItems.map((log) => {
-                const dateObj = new Date(log.timestamp * 1000);
-                const date = dateObj.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                });
-                const time = dateObj.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                console.log(log);
 
                 return (
                   <tr key={log.id}>
@@ -44,8 +52,8 @@ const Logs = ({ logs }) => {
                     <td className="text-muted">{log.inventory_id}</td>
                     <td className="text-danger">{log.old_value}</td>
                     <td className="text-success">{log.new_value}</td>
-                    <td>{date}</td>
-                    <td>{time}</td>
+                    <td></td>
+                    <td></td>
                   </tr>
                 );
               })
@@ -112,4 +120,4 @@ const Logs = ({ logs }) => {
   );
 };
 
-export default Logs;
+export default History;

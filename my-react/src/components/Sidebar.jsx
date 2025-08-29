@@ -4,13 +4,13 @@ const Sidebar = () => {
   return (
     <ul className="nav nav-pills flex-column mb-auto">
       <li className="nav-item">
-        <Link className="nav-link text-dark" to="/home">
-          Home
+        <Link className="nav-link text-dark" to="/dashboard">
+          Dashboard
         </Link>
       </li>
       <li className="nav-item">
-        <Link className="nav-link text-dark" to="/dashboard">
-          Dashboard
+        <Link className="nav-link text-dark" to="/transaction">
+          Transactions
         </Link>
       </li>
       <li className="nav-item">
@@ -21,16 +21,6 @@ const Sidebar = () => {
       <li className="nav-item">
         <Link className="nav-link text-dark" to="/inventory">
           Inventory
-        </Link>
-      </li>
-      <li className="nav-item"> 
-        <Link className="nav-link text-dark" to="/settings">
-          Options
-        </Link>
-      </li>
-      <li className="nav-item">
-        <Link className="nav-link text-dark" to="/test">
-          Test
         </Link>
       </li>
     </ul>

@@ -1,6 +1,7 @@
 import Stocks from "./charts/Stocks";
-
-const Dashboard = ({ inventory, color }) => {
+import History from "./History";
+import Notification from "../Notification";
+const Dashboard = ({ inventory, color, logs }) => {
   return (
     <section className="container">
       <div class="card p-0">
@@ -30,6 +31,10 @@ const Dashboard = ({ inventory, color }) => {
             <div class="card-body">This is some text within a card body.</div>
           </div>
         </div>
+      </div>
+
+      <div className="m-2">
+        <History logs={logs} />
       </div>
     </section>
   );

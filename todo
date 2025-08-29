@@ -1,6 +1,8 @@
 <!-- fix submit order date to unix and start log (ongoing) -->
 <!-- get the available quantity and remove to available -->
 
+₱
+
     -a design window with design ids
     when order was made make it so it shows what design was ordered and
     in transaction table make a button to view the orders and design
@@ -31,3 +33,13 @@
 
 optional:
     make a function that changes the date for demo purposes
+
+needed: 
+when save dont reload call fetch inventory
+
+history:
+total shirt that came that day
+changes in inventory like add size, add price
+
+analytics:
+total shirt direct buy over supplier delivery

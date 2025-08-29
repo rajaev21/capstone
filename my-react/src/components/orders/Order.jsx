@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CustomerForm from "./CustomerForm";
 import TransansactionForm from "./TransansactionForm";
-import TestOrderForm from "./Inventory";
 import CurrentOrder from "./CurrentOrder";
+import NewInventory from "./NewInventory";
+import Inventory from "../inventory/Inventory";
 
 const Order = ({
   inventory,
@@ -44,7 +45,6 @@ const Order = ({
         user_id: account.user_id,
       }));
     }
-    console.log(inventoryCheck);
   }, []);
 
   const addOrder = () => {
@@ -82,23 +82,8 @@ const Order = ({
       .then((response) => {
         console.log(response.data);
         alert("Order submitted successfully");
-        setOrder([
-          {
-            brand: "",
-            type: "",
-            color: "",
-            size: "",
-            qty: "",
-          },
-        ]);
-        setCustomerDetail({
-          firstname: "",
-          lastname: "",
-          phonenumber: "",
-          facebook: "",
-          gmail: "",
-          address: "",
-        });
+        setOrder([{}]);
+        setCustomerDetail({});
         setTransaction({
           user_id: "",
           deadline: "",
@@ -111,85 +96,66 @@ const Order = ({
       });
   };
 
+  console.log(order);
+
   return (
     <>
-      <div className="container">
-        {placement.length > 0 ? (
-          <div className="row">
-            <div className="col">
-              <TestOrderForm
+      {placement.length > 0 ? (
+        <div className="">
+          <div className="row row-cols-2 gap-3 vh-100">
+            <div className="card col-8">
+              <NewInventory
+                inventory={inventory}
+                brand={brand}
+                type={type}
+                color={color}
+                size={size}
+                setOrder={setOrder}
+                order={order}
+              />
+            </div>
+            <div className="card col-3 ">
+              <CustomerForm
+                customerDetail={customerDetail}
+                setCustomerDetail={setCustomerDetail}
+              />
+
+              <TransansactionForm
+                transaction={transaction}
+                setTransaction={setTransaction}
+              />
+
+              <CurrentOrder
                 inventory={inventory}
                 order={order}
                 setOrder={setOrder}
-                placement={placement}
               />
-            </div>
-            <div className="col">
-              <div className="row">
-                <div className="col">
-                  <div className="fs-5 fw-bold col d-flex justify-content-end my-3">
-                    {page ? "Customer Details" : "Orders"}
-                  </div>
-                </div>
-                <div className="col d-flex justify-content-end align-items-center">
+              {order.length > 0 && (
+                <div className="d-flex my-3 justify-content-evenly">
                   <button
-                    onClick={() => setPage((p) => !p)}
-                    className="btn btn-info"
+                    className="btn btn-success"
+                    onClick={() => addOrder()}
                   >
-                    {page ? "Next" : "Previous"}
+                    {" "}
+                    Submit Order{" "}
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => window.location.reload()}
+                  >
+                    {" "}
+                    Cancel Order{" "}
                   </button>
                 </div>
-              </div>
-              {page ? (
-                <div className="">
-                  <CustomerForm
-                    customerDetail={customerDetail}
-                    setCustomerDetail={setCustomerDetail}
-                  />
-
-                  <TransansactionForm
-                    transaction={transaction}
-                    setTransaction={setTransaction}
-                  />
-                </div>
-              ) : (
-                <div className="">
-                  {order.length == 0 ? (
-                    <div className="fs-5 fw-bold text-center my-3">
-                      No order selected
-                    </div>
-                  ) : (
-                    <div className="">
-                      <CurrentOrder
-                        inventory={inventory}
-                        order={order}
-                        setOrder={setOrder}
-                      />
-                    </div>
-                  )}
-                </div>
               )}
-              <div className="my-3">
-                <button className="btn btn-success" onClick={() => addOrder()}>
-                  {" "}
-                  Submit Order{" "}
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => window.location.reload()}
-                >
-                  {" "}
-                  Cancel Order{" "}
-                </button>
-              </div>
             </div>
           </div>
-        ) : (
-          <div className="spinner-border m-5" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="spinner-border m-5" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      )}
     </>
   );
 };

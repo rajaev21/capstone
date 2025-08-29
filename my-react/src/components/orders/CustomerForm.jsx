@@ -8,75 +8,83 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
       [name]: value,
     }));
   };
+  console.log(customerDetail);
   return (
     <>
       {customerDetail && (
-        <div>
-          Firstname:
-          <div className="input-group input-group-sm">
-            <label className="input-group-text"><i class="bi bi-person"></i></label>
-            <input
-            className="form-control"
-              type="text"
-              name="firstname"
-              value={customerDetail.firstname}
-              onChange={e => handleCustomerFormChange(e)}
-            />
+        <div className="p-1">
+          <div className="input-group input-group-sm mb-3">
+            <span className="input-group-text">
+              <i className="bi bi-person"></i>
+            </span>
+            <div className="form-floating">
+              <input
+                className="form-control"
+                type="text"
+                name="firstname"
+                id="firstname"
+                placeholder="Enter Firstname"
+                value={customerDetail.firstname}
+                onChange={(e) => handleCustomerFormChange(e)}
+              />
+              <label htmlFor="firstname">Enter Firstname</label>
+            </div>
           </div>
-          Lastname:
-          <div className="input-group input-group-sm">
-            <label className="input-group-text"><i class="bi bi-person"></i></label>
-            <input
-            className="form-control"
-              type="text"
-              name="lastname"
-              value={customerDetail.lastname}
-              onChange={e => handleCustomerFormChange(e)}
-            />
+          <div className="input-group input-group-sm mb-3">
+            <span className="input-group-text">
+              <i class="bi bi-person"></i>
+            </span>
+            <div className="form-floating">
+              <input
+                className="form-control"
+                type="text"
+                name="lastname"
+                id="lastname"
+                placeholder="Enter Lastname"
+                value={customerDetail.lastname}
+                onChange={(e) => handleCustomerFormChange(e)}
+              />
+              <label htmlFor="lastname">Enter Lastname</label>
+            </div>
           </div>
-          Phone number: 
-          <div className="input-group input-group-sm">
-            <label className="input-group-text"><i class="bi bi-telephone"></i></label>
-            <input
-            className="form-control"
-              type="number"
-              name="phonenumber"
-              value={customerDetail.phonenumber}
-              onChange={e => handleCustomerFormChange(e)}
-            />
-          </div >
-          Facebook:
-          <div className="input-group input-group-sm">
-            <label className="input-group-text"><i class="bi bi-facebook"></i></label>
-            <input
-            className="form-control"
-              type="text"
-              name="facebook"
-              value={customerDetail.facebook}
-              onChange={e => handleCustomerFormChange(e)}
-            />
+          <div className="input-group input-group-sm mb-3">
+            <span className="input-group-text">
+              <i class="bi bi-telephone"></i>
+            </span>
+            <div className="form-floating">
+              <input
+                className="form-control"
+                type="number"
+                name="phonenumber"
+                id="phonenumber"
+                placeholder="phonenumber"
+                value={customerDetail.phonenumber}
+                onChange={(e) => handleCustomerFormChange(e)}
+                onKeyDown={(e) => {
+                  if (e.key === "-" || e.key === "+") {
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <label htmlFor="phonenumber">Enter Phonenumber</label>
+            </div>
           </div>
-          Gmail:
-          <div className="input-group input-group-sm">
-            <label className="input-group-text"><i class="bi bi-google"></i></label>
-            <input
-            className="form-control"
-              type="email"
-              name="gmail"
-              value={customerDetail.gmail}
-              onChange={e => handleCustomerFormChange(e)}
-            />
-          </div>
-          Address:
-          <div className="input-group input-group-sm">
-            <label className="input-group-text"><i class="bi bi-map"></i></label>
-            <input
-            className="form-control"
-              type="text"
-              name="address"
-              value={customerDetail.address}
-              onChange={e => handleCustomerFormChange(e)}
-            />
+          <div className="input-group input-group-sm mb-3">
+            <span className="input-group-text">
+              <i className="bi bi-geo-alt"></i>
+            </span>
+            <div className="form-floating">
+              <input
+                className="form-control"
+                type="text"
+                name="address"
+                id="address"
+                placeholder="Enter Firstname"
+                value={customerDetail.address}
+                onChange={(e) => handleCustomerFormChange(e)}
+              />
+              <label htmlFor="address">Enter Address</label>
+            </div>
           </div>
         </div>
       )}

@@ -8,7 +8,7 @@ const WelcomePage = ({ transaction, setTransaction, fetchTransaction }) => {
   const id = paramID.get("id");
 
   const goto = (id) => {
-    navigate(`/home?id=${id}`);
+    navigate(`/transaction?id=${id}`);
   };
 
   return (
@@ -26,10 +26,12 @@ const WelcomePage = ({ transaction, setTransaction, fetchTransaction }) => {
           {id ? (
             <CustomerDetails id={id} />
           ) : (
-              <div className="d-flex justify-content-center">
-                <div className="text-center fs-3 fw-bold">Click view more to view Order Details</div>
+            <div className="d-flex justify-content-center">
+              <div className="text-center fs-3 fw-bold">
+                Click view more to view Order Details
               </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
     </div>

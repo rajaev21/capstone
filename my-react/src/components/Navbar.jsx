@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Notification from "./Notification";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -36,9 +37,13 @@ const Navbar = () => {
           FABRIK
         </Link>
 
-        <button onClick={logout} className="btn btn-danger ms-auto">
-          Logout
-        </button>
+        <div className="nav-item d-flex">
+          <Notification />
+          
+          <button onClick={logout} className="btn btn-danger ms-auto">
+            Logout
+          </button>
+        </div>
       </div>
     </nav>
   );

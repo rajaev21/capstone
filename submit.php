@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header('Content-Type: application/json');
@@ -105,43 +105,32 @@ class Database
         return $result;
     }
 
-    public function insertDesign($designName)
-    {
-        $query = "INSERT INTO design (design_name) VALUES (?)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("s", $designName);
-        $stmt->execute();
-        $result = $stmt->insert_id;
-        $stmt->close();
-        return $result;
-    }
-
     public function getTransaction()
     {
         $query = "SELECT 
-            cd.first_name as firstname,
-            cd.last_name as lastname,
-            cd.phone_number as phonenumber,
-            cd.facebook as facebook,
-            cd.gmail as gmail,
-            cd.address as address,
+            cd.first_name AS firstname,
+            cd.last_name AS lastname,
+            cd.phone_number AS phonenumber,
+            cd.facebook AS facebook,
+            cd.gmail AS gmail,
+            cd.address AS address,
 
-            u.firstname as user_firstname,
-            u.lastname as user_lastname,
+            u.firstname AS user_firstname,
+            u.lastname AS user_lastname,
 
-            td.deadline as deadline,
-            td.note as note,
-            td.order_date as order_date,
-            td.td_id as transaction_id,
+            DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%M %d, %Y') AS deadline,
+            td.note AS note,
+            DATE_FORMAT(FROM_UNIXTIME(td.order_date), '%M %d, %Y') AS order_date,
+            td.td_id AS transaction_id,
 
-            s.status_name as status
-            
+            s.status_name AS status
             FROM transaction_detail td
-            join customer_detail cd on cd.cd_id = td.customer_id
-            join user u on u.user_id = td.user_id
-            join status s on s.status_id = td.status
-            order by status desc, deadline desc
-            ";
+            JOIN customer_detail cd ON cd.cd_id = td.customer_id
+            JOIN user u ON u.user_id = td.user_id
+            JOIN status s ON s.status_id = td.status
+            ORDER BY td.deadline DESC";
+
+
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -161,11 +150,13 @@ class Database
         return $result;
     }
 
-    public function insertInventory($brand, $type, $color, $size, $qty)
+    public function insertInventory($column, $value)
     {
-        $query = "INSERT INTO inventory (brand, `type`, color, `size`, qty) VALUES (?, ?, ?, ?, ?)";
+        $column = implode(",", $column);
+        $value = implode(",", $value);
+
+        $query = "INSERT INTO inventory ($column) VALUES ($value)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("iiiii", $brand, $type, $color, $size, $qty);
         $stmt->execute();
         $result = $stmt->insert_id;
         $stmt->close();
@@ -184,21 +175,46 @@ class Database
 
     public function getInventory()
     {
-        $query = "Select 
-        i.inventory_id as id,
-        b.brand_name as brand, 
-        t.type_name as type,
-        c.color_name as color,
-        s.size_name as size,
-        i.qty as qty,
-        i.price as price
-        
-        FROM inventory i
-        inner join brand b on i.brand = b.brand_id
-        inner join type t on i.type = t.type_id
-        inner join color c on i.color = c.color_id
-        inner join size s on i.size = s.size_id
-        order by i.inventory_id desc";
+        $query = "SELECT 
+        i.inventory_id AS id, 
+        b.brand_name AS brand, 
+        t.type_name AS type, 
+        c.color_name AS color, 
+        s.size_name AS size, 
+        i.qty AS qty, 
+        i.price AS price
+        FROM inventory i 
+        INNER JOIN brand b ON i.brand = b.brand_id 
+        INNER JOIN type t ON i.type = t.type_id 
+        INNER JOIN color c ON i.color = c.color_id 
+        INNER JOIN size s ON i.size = s.size_id 
+        WHERE i.price != 0 AND i.qty != 0
+        ORDER BY i.inventory_id DESC;";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $result;
+    }
+
+    public function getAllInventory()
+    {
+        $query = "SELECT 
+                i.inventory_id AS id,
+                COALESCE(b.brand_name, null) AS brand, 
+                COALESCE(t.type_name, null) AS type,
+                COALESCE(c.color_name, null) AS color,
+                COALESCE(s.size_name, null) AS size,
+                i.qty AS qty,
+                i.price AS price
+
+                FROM inventory i
+                LEFT JOIN brand b ON i.brand = b.brand_id
+                LEFT JOIN type t ON i.type = t.type_id
+                LEFT JOIN color c ON i.color = c.color_id
+                LEFT JOIN size s ON i.size = s.size_id
+                ORDER BY i.inventory_id DESC";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -236,26 +252,19 @@ class Database
         return $result;
     }
 
-    public function addQuantity($cd_id, $qty)
+    public function updateInventory($id, $value)
     {
-        $query = "UPDATE inventory SET qty = qty + ? WHERE inventory_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ii", $qty, $cd_id);
-        $stmt->execute();
-        $result = $stmt->affected_rows;
-        $stmt->close();
-        return $result;
-    }
-
-    public function updateInventoryWithIDandValue($id, $value)
-    {
-        $query = "UPDATE inventory SET qty = ? WHERE inventory_id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("ii", $value, $id);
-        $stmt->execute();
-        $result = $stmt->affected_rows;
-        $stmt->close();
-        return $result;
+        try {
+            $query = "UPDATE inventory SET qty = qty + ? WHERE inventory_id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("ii", $value, $id);
+            $stmt->execute();
+            $result = $stmt->affected_rows;
+            $stmt->close();
+            return $result;
+        } catch (Exception $e) {
+            return ($e);
+        }
     }
 
     public function getAll($table)
@@ -280,7 +289,7 @@ class Database
         $this->conn->commit();
         return $result;
     }
-    
+
     public function insertColor($value, $hex)
     {
         $query = "insert into color (`color_name`, `hex` ) values (?, ?)";
@@ -501,22 +510,60 @@ class Database
 
         return $response;
     }
+
+    public function getInventoryID($whereclause)
+    {
+        $whereclause = implode(" AND ", $whereclause);
+        $query = "SELECT inventory_id FROM `inventory` WHERE $whereclause";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $data = $stmt->get_result();
+        $result = $data->fetch_object();
+
+        return $result;
+    }
+
+    public function selectCustom($select, $from, $whereclause)
+    {
+        $select = implode(", ", $select);
+        $whereclause = implode("AND", $whereclause);
+        $query = "SELECT $select FROM `$from` WHERE $whereclause";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $data = $stmt->get_result();
+        $result = $data->fetch_object();
+
+        return $result;
+    }
+    public function insertCustom($insert, $column, $values)
+    {
+        $column = implode(", ", $column);
+        $marksArray = array();
+        $vars = array();
+        foreach ($values as $value) {
+            array_push($marksArray, "?");
+            if (is_numeric($value)) {
+                array_push($vars, "i");
+            } else {
+                array_push($vars, "s");
+            }
+        }
+        $marks = implode(", ", $marksArray);
+        $values = implode(", ", $values);
+
+        $query = "INSERT INTO $insert ($column) VALUES ($marks)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param($vars, $values);
+        $stmt->execute();
+        $result = $stmt->insert_id;
+        $stmt->close();
+        $this->conn->commit();
+        return $result;
+    }
 }
 
 $db = new Database("localhost", "root", "", "fabrik");
 $unixNow = strtotime("now");
-
-// $result = $db->checkStatus();
-// if (count($result) > 0) {
-//     foreach ($result as $row) {
-//         if ($row['deadline'] < $unixNow) {
-//             $id = $row['td_id'];
-//             $table = "transaction_detail";
-//             $status = 5;
-//             $db->updateStatus($id, $table, $status);
-//         }
-//     }
-// }
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if (isset($_GET['action'])) {
@@ -532,6 +579,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 break;
             case 'getInventory':
                 $result = $db->getInventory();
+                echo json_encode($result);
+                break;
+            case 'getAllInventory':
+                $result = $db->getAllInventory();
                 echo json_encode($result);
                 break;
             case 'getLogs':
@@ -591,9 +642,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'submitOrder':
             submitOrder($db, $data, $unixNow);
             break;
-        case 'submitInventory':
-            submitInventory($db, $data, $unixNow);
-            break;
+        // case 'submitInventory':
+        //     submitInventory($db, $data, $unixNow);
+        //     break;
         case 'saveSettings':
             saveSetting($db, $data);
             break;
@@ -609,7 +660,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'deleteInventory':
             deleteInventory($db, $data);
             break;
-        case 'updateQuantity':
+        case 'addQuantity':
             updateQuantity($db, $data);
             break;
         case 'setStatus':
@@ -618,10 +669,112 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'finishOrder':
             finishOrder($db, $data);
             break;
+        case 'insertBrandType':
+            insertBrandType($db, $data);
+            break;
+        case 'insertBrandTypeColor':
+            insertBrandType($db, $data);
+            break;
+        case 'insertBrandTypeColorSize':
+            insertBrandType($db, $data);
+            break;
+        case 'deleteBrand':
+            deleteBrand($db, $data);
+            break;
+        case 'deleteType':
+            deleteBrandType($db, $data);
+            break;
+        case 'deleteColor':
+            deleteBrandType($db, $data);
+            break;
+        case 'deleteSize':
+            deleteBrandType($db, $data);
+            break;
         default:
             echo json_encode(['message' => 'Invalid action']);
             break;
     }
+}
+
+function doHistory() {}
+
+function deleteBrandType($db, $data)
+{
+    $action = $data['action'];
+    $brand_id = $data['brand']['brand_id'] ?? null;
+    $type_id = $data['type']['type_id'] ?? null;
+    $color_id = $data['color']['color_id'] ?? null;
+    $size_id = $data['size']['size_id'] ?? null;
+
+
+    $whereclause = array();
+    if ($brand_id) {
+        array_push($whereclause, "brand = $brand_id");
+    }
+    if ($type_id) {
+        array_push($whereclause, "type = $type_id");
+    }
+    if ($color_id) {
+        array_push($whereclause, "color = $color_id");
+    }
+    if ($size_id) {
+        array_push($whereclause, "size = $size_id");
+    }
+
+    $inventory = $db->getInventoryID($whereclause);
+
+    if ($inventory) {
+        $result = $db->deleteRowWithID("inventory", "inventory_id", $inventory->inventory_id);
+
+        //inventory_id
+        //remove
+        //0
+        //0
+        //0
+        //user_id
+        //$text = reason item was no longer available
+
+        if ($action === "deleteType") {
+            $db->deleteRowWithID("type", "type_id", $type_id);
+        }
+        if ($action === "deleteColor") {
+            $db->deleteRowWithID("color", "color_id", $color_id);
+        }
+        if ($action === "deleteSize") {
+            $db->deleteRowWithID("size", "size_id", $size_id);
+        }
+    }
+
+    echo json_encode($result);
+}
+
+function deleteBrand($db, $data)
+{
+    $id = $data['id'];
+    $result = $db->deleteRowWithID("brand", "brand_id", $id);
+    echo json_encode($result);
+}
+
+function insertBrandType($db, $data)
+{
+    $action = $data['action'];
+
+    $column = array();
+    $value = array();
+    if ($action == "insertBrandType") {
+        array_push($column, 'brand', 'type');
+        array_push($value, $data['brand'], $data['type']);
+    } elseif ($action == "insertBrandTypeColor") {
+        array_push($column, 'brand', 'type', 'color');
+        array_push($value, $data['brand'], $data['type'], $data['color']);
+    } elseif ($action == "insertBrandTypeColorSize") {
+        array_push($column, 'brand', 'type', 'color', 'size');
+        array_push($value, $data['brand'], $data['type'], $data['color'], $data['size']);
+    }
+
+    $result = $db->insertInventory($column, $value);
+
+    echo json_encode($result);
 }
 
 function finishOrder($db, $data)
@@ -655,10 +808,26 @@ function setStatus($db, $data)
 
 function updateQuantity($db, $data)
 {
-    $id = $data['id'];
-    $value = $data['value'];
-    $result = $db->updateInventoryWithIDandValue($id, $value);
-    echo json_encode($result);
+    $brand_id = $data['brand'];
+    $type_id = $data['type'];
+    $color_id = $data['color'];
+    $size_id = $data['size'];
+    $option = $data['option'];
+    $value = intval($data['value']);
+    $whereclause = array();
+    array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
+    $inventory = $db->getInventoryID($whereclause);
+
+    $prevQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+    $result = $db->updateInventory($inventory->inventory_id, $value);
+    $newQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+    if ($result) {
+        $addHistory = array();
+        $changedQty = $prevQty + $value;
+
+        array_push($addHistory, "action = add", "previous_qty = $prevQty", "changed_qty = $changedQty", "new_qty = $newQty");
+    }
+    echo json_encode($prevQty);
 }
 
 function deleteInventory($db, $data)
@@ -670,26 +839,17 @@ function deleteInventory($db, $data)
 
 function setPrice($db, $data)
 {
+    $brand_id = $data['brand'];
+    $type_id = $data['type'];
+    $color_id = $data['color'];
+    $size_id = $data['size'];
     $value = $data['value'];
-    $id = $data['id'];
-    $result = $db->insertPrice($value, $id);
-    if ($result > 0) {
-        $inventory = $db->selectInventoryWithID($id);
-        if ($inventory) {
-            foreach ($inventory as $item) {
-                $brand = $item['brand'];
-                $type = $item['type'];
-                $color = $item['color'];
-                $size = $item['size'];
-                $qty = $item['qty'];
-                $price = $item['price'];
-            }
-            $logResult = $db->insertLog($brand, $type, $color, $size, $qty, "Set Price", date('H:i:s'), date('Y-m-d'));
-            if ($logResult) {
-                echo json_encode($logResult);
-            }
-        }
-    }
+    $whereclause = array();
+    array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
+
+    $inventory_id = $db->getInventoryID($whereclause);
+
+    $result = $db->insertPrice($value, $inventory_id->inventory_id);
     echo json_encode($result);
 }
 
@@ -705,14 +865,36 @@ function deleteOption($db, $data)
 function insertShirtOption($db, $data)
 {
     $table = $data["table"];
-    $value = $data["value"];
+    $val = $data["value"];
     $hex = $data["hex"] ?? null;
-    if($hex){
-        $result = $db->insertColor($value, $hex);
+    $brand = $data['brand'] ?? null;
+    $type = $data['type'] ?? null;
+    $color = $data['color'] ?? null;
+
+    $column = array();
+    $value = array();
+
+    if ($hex) {
+        $returned_id = $db->insertColor($val, $hex);
     } else {
-        $result = $db->insertOption($table, $value);
+        $returned_id = $db->insertOption($table, $val);
     }
-    echo json_encode($result);
+
+    if ($table === "type" && $returned_id) {
+        array_push($column, 'brand', 'type');
+        array_push($value, $brand, $returned_id);
+        $returned_id = $db->insertInventory($column, $value);
+    } elseif ($table === "color" && $returned_id) {
+        array_push($column, 'brand', 'type', 'color');
+        array_push($value, $brand, $type, $returned_id);
+        $returned_id = $db->insertInventory($column, $value);
+    } elseif ($table === "size" && $returned_id) {
+        array_push($column, 'brand', 'type', 'color', 'size');
+        array_push($value, $brand, $type, $color, $returned_id);
+        $returned_id = $db->insertInventory($column, $value);
+    }
+
+    echo json_encode($returned_id);
 }
 
 function saveSetting($db, $data)
@@ -815,29 +997,33 @@ function submitOrder($db, $data, $unixNow)
     echo json_encode($result);
 }
 
-function  submitInventory($db, $data, $unixNow)
-{
-    foreach ($data['form'] as $form) {
-        $brand = $form['brand'];
-        $type = $form['type'];
-        $color = $form['color'];
-        $size = $form['size'];
-        $qty = $form['qty'];
-        $printType = $form['printType'];
-        $existing = $db->existingInventory($brand, $type, $color, $size, $printType);
+// function  submitInventory($db, $data, $unixNow)
+// {
+//     foreach ($data['form'] as $form) {
+//         $brand = $form['brand'];
+//         $type = $form['type'];
+//         $color = $form['color'];
+//         $size = $form['size'];
+//         $qty = $form['qty'];
+//         $printType = $form['printType'];
+//         $existing = $db->existingInventory($brand, $type, $color, $size, $printType);
 
-        if ($existing) {
-            foreach ($existing as $item) {
-                $inventory_id = $item['inventory_id'];
-                $old_value = $item['qty'];
-                $new_value = $old_value + $qty;
-                $result = $db->addQuantity($inventory_id, $qty);
-                $result = $db->insertLog("Add Quantity", $inventory_id, $new_value, $old_value, $unixNow);
-            }
-        } else {
-            $cd_id = $db->insertInventory($brand, $type, $color, $size, $qty);
-            $result = $db->insertLog("Add Inventory", $cd_id, 0, 0, $unixNow);
-        }
-        echo json_encode($result);
-    }
-}
+//         if ($existing) {
+//             foreach ($existing as $item) {
+//                 $inventory_id = $item['inventory_id'];
+//                 $old_value = $item['qty'];
+//                 $new_value = $old_value + $qty;
+//                 $result = $db->addQuantity($inventory_id, $qty);
+//                 $result = $db->insertLog("Add Quantity", $inventory_id, $new_value, $old_value, $unixNow);
+//             }
+//         } else {
+//             $column = array();
+//             $value = array();
+//             array_push($column, 'brand', 'type', 'color', 'size', 'qty');
+//             array_push($value, $brand, $type, $color, $size, $qty);
+//             $cd_id = $db->insertInventory($column, $value);
+//             $result = $db->insertLog("Add Inventory", $cd_id, 0, 0, $unixNow);
+//         }
+//         echo json_encode($result);
+//     }
+// }

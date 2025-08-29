@@ -9,17 +9,16 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
-import WelcomePage from "./components/home/WelcomePage";
-import Inventory from "./components/inventory/Inventory";
+import WelcomePage from "./components/transactions/WelcomePage";
 import Settings from "./components/settings/Settings";
 import Order from "./components/orders/Order";
 import Layout from "./components/Layout";
-import Test from "./components/test/Inventory";
-import Stocks from "./components/charts/Stocks";
-import Dashboard from "./components/Dashboard";
+import Inventory from "./components/inventory/Inventory";
+import Dashboard from "./components/dashboard/Dashboard";
 
 function App() {
   const [inventory, setInventory] = useState({});
+  const [allInventory, setAllInventory] = useState({});
   const [logs, setLogs] = useState({});
   const [brand, setBrand] = useState({});
   const [color, setColor] = useState({});
@@ -37,6 +36,7 @@ function App() {
 
   useEffect(() => {
     fetchInventory();
+    fetchAllInventory();
     fetchLogs();
     fetchBrand();
     fetchColor();
@@ -45,6 +45,8 @@ function App() {
     fetchTransaction();
     fetchPlacement();
   }, []);
+  const sendNotification = Array.isArray(inventory) ? inventory.filter((item) => item.qty < 31) : [];
+  console.log(sendNotification);
 
   const fetchTransaction = () => {
     axios
@@ -73,6 +75,17 @@ function App() {
       .get("http://localhost/capstone/submit.php?action=getInventory")
       .then((response) => {
         setInventory(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error!", error);
+      });
+  };
+
+  const fetchAllInventory = () => {
+    axios
+      .get("http://localhost/capstone/submit.php?action=getAllInventory")
+      .then((response) => {
+        setAllInventory(response.data);
       })
       .catch((error) => {
         console.error("There was an error!", error);
@@ -127,13 +140,13 @@ function App() {
   };
   return (
     <>
-      {Array.isArray(transaction) ? (
+      {Array.isArray(inventory) ? (
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
 
           <Route
-            path="/home"
+            path="/transaction"
             element={
               <Layout>
                 <WelcomePage
@@ -168,26 +181,6 @@ function App() {
           />
 
           <Route
-            path="/inventory"
-            element={
-              <Layout>
-                <Inventory
-                  inventory={inventory}
-                  logs={logs}
-                  setLogs={setLogs}
-                  brand={brand}
-                  type={type}
-                  color={color}
-                  size={size}
-                  fetchInventory={fetchInventory}
-                  fetchLogs={fetchLogs}
-                  fetchInventoryCheck={fetchInventoryCheck}
-                />
-              </Layout>
-            }
-          />
-
-          <Route
             path="/settings"
             element={
               <Layout>
@@ -209,10 +202,21 @@ function App() {
             }
           />
           <Route
-            path="/test"
+            path="/inventory"
             element={
               <Layout>
-                <Test inventory={inventory} color={color} />
+                <Inventory
+                  inventory={allInventory}
+                  brand={brand}
+                  type={type}
+                  color={color}
+                  size={size}
+                  fetchInventory={fetchAllInventory}
+                  fetchBrand={fetchBrand}
+                  fetchType={fetchType}
+                  fetchColor={fetchColor}
+                  fetchSize={fetchSize}
+                />
               </Layout>
             }
           />
@@ -220,7 +224,7 @@ function App() {
             path="/dashboard"
             element={
               <Layout>
-                <Dashboard inventory={inventory} color={color} />
+                <Dashboard inventory={inventory} color={color} logs={logs} />
               </Layout>
             }
           />

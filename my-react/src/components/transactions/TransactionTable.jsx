@@ -1,5 +1,14 @@
 import { useState } from "react";
-const TransactionTable = ({ transaction, setTransaction, fetchTransaction, encrypt, decrypt, goto, deleteOrder, }) => {
+const TransactionTable = ({
+  transaction,
+  setTransaction,
+  fetchTransaction,
+  encrypt,
+  decrypt,
+  goto,
+  deleteOrder,
+}) => {
+  console.log(transaction);
   const [search, setSearch] = useState("");
   const [pageCount, setPageCount] = useState(0);
   const filteredItems =
@@ -12,21 +21,11 @@ const TransactionTable = ({ transaction, setTransaction, fetchTransaction, encry
   const itemsPerPage = 15;
   const start = pageCount * itemsPerPage;
   const end = start + itemsPerPage;
-  const currentItems = filteredItems.slice(start, end);
+  const currentItems = filteredItems.length
+    ? filteredItems.slice(start, end)
+    : [];
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
 
-  function unixToDate(unix) {
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-    const date = new Date(unix * 1000);
-    const yy = date.getFullYear();
-    const mm = months[date.getMonth()];
-    const dd = date.getDate();
-
-    const format = `${mm} ${dd}, ${yy}`;
-
-    return format;
-  }
   function capitalize(str) {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -60,8 +59,8 @@ const TransactionTable = ({ transaction, setTransaction, fetchTransaction, encry
               <td>
                 {capitalize(item.firstname)} {capitalize(item.lastname)}
               </td>
-              <td>{unixToDate(item.order_date)}</td>
-              <td>{unixToDate(item.deadline)}</td>
+              <td>{item.order_date}</td>
+              <td>{item.deadline}</td>
               {/* <td>{item.order_id}</td> */}
               <td>{item.status}</td>
               <td>
@@ -107,7 +106,7 @@ const TransactionTable = ({ transaction, setTransaction, fetchTransaction, encry
               className="page-link"
               onClick={() => setPageCount((prev) => prev + 1)}
               disabled={pageCount + 1 >= totalPage}
-              style={{width:"80px"}}
+              style={{ width: "80px" }}
             >
               Next
             </button>

@@ -21,10 +21,6 @@ const TestOrderForm = ({ inventory, order, setOrder }) => {
     setNewInventory(inventory);
   }, []);
 
-  const addOrder = (item) => {
-    setOrder((prev) => [...prev, { ...item, qty: 1 }]);
-  };
-
   function inOrder(id) {
     return order.some((item) => item.id === id);
   }
@@ -45,7 +41,7 @@ const TestOrderForm = ({ inventory, order, setOrder }) => {
           </div>
           <div className="col d-flex justify-content-end">
             <button
-            className="btn btn-danger"
+              className="btn btn-danger"
               onClick={() => {
                 setOrder([]);
               }}
