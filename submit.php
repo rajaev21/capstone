@@ -813,7 +813,7 @@ function updateQuantity($db, $data)
     $color_id = $data['color'];
     $size_id = $data['size'];
     $option = $data['option'];
-    $value = intval($data['value']);
+    $value = $data['value'];
     $whereclause = array();
     array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
     $inventory = $db->getInventoryID($whereclause);
