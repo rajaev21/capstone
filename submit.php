@@ -473,8 +473,7 @@ class Database
     function sendFinishOrder($message, $phonenumber)
     {
 
-        $clean = preg_replace('/^0?9/', '', $phonenumber);
-        $recipient = '+63' . $clean;
+        $recipient = cleanPhoneNumber($phonenumber);
 
         $BASE_URL = "https://api.textbee.dev/api/v1";
         $API_KEY = "f79ea1de-a93f-454d-a2c1-c5548a2d9ecf";
@@ -550,7 +549,7 @@ class Database
         }
         $marks = implode(", ", $marksArray);
         $values = implode(", ", $values);
-        $vars =implode("", $vars);
+        $vars = implode("", $vars);
 
         $query = "INSERT INTO $insert ($column) VALUES ($marks)";
         $stmt = $this->conn->prepare($query);
@@ -821,7 +820,7 @@ function updateQuantity($db, $data)
     // $prevQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
     $result = $db->updateInventory($inventory->inventory_id, $value);
     // $newQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
-    
+
     // if ($result) {
     //     $addHistory = array();
     //     $changedQty = $prevQty + $value;
@@ -1031,3 +1030,32 @@ function submitOrder($db, $data, $unixNow)
 //         echo json_encode($result);
 //     }
 // }
+
+
+function cleanPhoneNumber($phonenumber)
+{
+    // Remove any non-numeric characters first
+    $phonenumber = preg_replace('/\D/', '', $phonenumber);
+
+    // If number starts with +63, keep it
+    if (strpos($phonenumber, '63') === 0) {
+        return '+' . $phonenumber;
+    }
+
+    // If number starts with 0, remove it and add +63
+    if (strpos($phonenumber, '0') === 0) {
+        $phonenumber = substr($phonenumber, 1);
+    }
+
+    // If number starts with 9, just add +63
+    if (strpos($phonenumber, '9') === 0) {
+        return '+63' . $phonenumber;
+    }
+
+    // If number is already in correct format but without '+'
+    if (strpos($phonenumber, '63') === 0) {
+        return '+' . $phonenumber;
+    }
+
+    return '+63' . $phonenumber;
+}

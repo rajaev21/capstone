@@ -45,6 +45,7 @@ const Order = ({
         user_id: account.user_id,
       }));
     }
+    fetchInventory()
   }, []);
 
   const addOrder = () => {
