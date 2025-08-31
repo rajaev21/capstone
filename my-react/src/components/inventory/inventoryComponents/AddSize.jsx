@@ -92,6 +92,7 @@ const AddSize = ({
     setAddInput("");
     fetchSize();
     fetchInventory();
+    addInput("")
   }
 
   return (

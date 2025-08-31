@@ -1,5 +1,4 @@
 import Stocks from "./charts/Stocks";
-import History from "./History";
 import Notification from "../Notification";
 const Dashboard = ({ inventory, color, logs }) => {
   return (
@@ -34,7 +33,6 @@ const Dashboard = ({ inventory, color, logs }) => {
       </div>
 
       <div className="m-2">
-        <History logs={logs} />
       </div>
     </section>
   );

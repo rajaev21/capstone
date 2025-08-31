@@ -6,7 +6,7 @@
     -a design window with design ids
     when order was made make it so it shows what design was ordered and
     in transaction table make a button to view the orders and design
-    
+
     -make a sure it logs everything
     order
     price edit
@@ -17,36 +17,43 @@
     types add
     colors add
     sizes add
-    
+
     -log pagination
-    
+
     <!-- -transaction table on dashbaord order by date that shows the ff orders, transaction details, design ID, order date, deadline, view transaction details button, that directs to the page that shows  -->
-    
+
     -function to cancel the order made
 
-	-do register on settings page
+    -do register on settings page
     -order should not be allowed when price isnt set
     -make a button per order to set finish or not
     -make a separate table for voided order
     -if unix time now is greater than time deadline update status to delayed. if button clicked is finished then finish
 
-
+    in a case where an order was canceled it will ask 
 
     edit color hex
     if s its small
     if xs its extra small
     if one size exist in inventory it wont reflect in invetory but will reflect on order as long as the item is one
     if transaction finish put confirmation
+    if order is cancel return the inventory
+    input if customer paid fully or partial
+    stock alert if low stocks
+    add order 
+    customer input for price per print in order
 
 optional:
-    make a function that changes the date for demo purposes
+make a function that changes the date for demo purposes
 
-needed: 
+needed:
 when save dont reload call fetch inventory
 
 history:
 total shirt that came that day
 changes in inventory like add size, add price
+inventory changes when order is placed
+if item is damaged reasons if replaced or not
 
 analytics:
 total shirt direct buy over supplier delivery

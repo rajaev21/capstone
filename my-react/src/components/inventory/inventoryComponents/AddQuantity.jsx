@@ -13,7 +13,6 @@ const AddQuantity = ({
   const [addInput, setAddInput] = useState("");
   const [totalCost, setTotalCost] = useState("");
   const [optionInput, setOptionInput] = useState("");
-  const optionName = `${title}_name`;
   const data = {};
 
   function checkValidation() {
@@ -46,27 +45,25 @@ const AddQuantity = ({
     if (optionInput === "directPurchase") {
       if (totalCostValue === "") {
         alert("Insert total cost");
+        setAddInput(value);
+        setOptionInput("directPurchase");
         return;
       }
-      data.action = "addQuantity";
-      data.value = value;
-      data.brand = brand_id;
-      data.color = color_id;
-      data.type = type_id;
-      data.size = size_id;
-      data.option = optionInput;
+      data.remarks = "direct purchase";
     }
 
     if (optionInput === "supplierDelivery") {
-      data.action = "addQuantity";
-      data.value = value;
-      data.table = title;
-      data.brand = brand_id;
-      data.color = color_id;
-      data.type = type_id;
-      data.size = size_id;
-      data.option = optionInput;
+      data.remarks = "supplier deliver";
     }
+
+    data.action = "addQuantity";
+    data.value = value;
+    data.brand = brand_id;
+    data.color = color_id;
+    data.type = type_id;
+    data.size = size_id;
+    data.detail = "quantity added";
+
     console.log(data);
     insertData();
   }
@@ -175,7 +172,7 @@ const AddQuantity = ({
                 className="form-control"
                 id="add"
                 onKeyDown={(e) => {
-                  if (e.key === "-" || e.key === "+") {
+                  if (e.key === "-" || e.key === "+" || e.key === "e") {
                     e.preventDefault();
                   }
                 }}
@@ -215,7 +212,6 @@ const AddQuantity = ({
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
-                onClick={() => reset()}
               ></button>
             </div>
             <div className="modal-body">
@@ -251,10 +247,8 @@ const AddQuantity = ({
               <button
                 type="button"
                 className="btn btn-primary"
-                data-bs-dismiss="modal"
                 onClick={() => {
                   checkValidation();
-                  reset();
                 }}
               >
                 Save changes

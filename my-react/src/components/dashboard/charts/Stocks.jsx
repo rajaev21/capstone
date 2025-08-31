@@ -59,7 +59,7 @@ const Stocks = ({ inventory, color }) => {
 
   return (
     <section>
-      <h2>Brands</h2>
+      <div className="fs-3 fw-bold">Brands</div>
       <ul className="nav nav-tabs mb-3">
         {brandChoices.map((item) => (
           <li className="nav-item">

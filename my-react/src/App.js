@@ -15,6 +15,7 @@ import Order from "./components/orders/Order";
 import Layout from "./components/Layout";
 import Inventory from "./components/inventory/Inventory";
 import Dashboard from "./components/dashboard/Dashboard";
+import History from "./components/history/History";
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -27,6 +28,7 @@ function App() {
   const [inventoryCheck, setInventoryCheck] = useState({});
   const [transaction, setTransaction] = useState({});
   const [placement, setPlacement] = useState({});
+  const [status, setStatus] = useState({});
 
   useEffect(() => {
     if (window.location.pathname === "/") {
@@ -35,6 +37,8 @@ function App() {
   }, []);
 
   useEffect(() => {
+    fetchStatus();
+    setStatus();
     fetchInventory();
     fetchAllInventory();
     fetchLogs();
@@ -45,9 +49,35 @@ function App() {
     fetchTransaction();
     fetchPlacement();
   }, []);
-  const sendNotification = Array.isArray(inventory) ? inventory.filter((item) => item.qty < 31) : [];
+  const sendNotification = Array.isArray(inventory)
+    ? inventory.filter((item) => item.qty < 31)
+    : [];
+
+  const notify = () => {
+    axios
+      .get("http://localhost/capstone/submit.php?action=notify")
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("There was na error", error);
+      });
+  };
+
+  Array.isArray(sendNotification) && notify();
+
   console.log(sendNotification);
 
+  const fetchStatus = () => {
+    axios
+      .get("http://localhost/capstone/submit.php?action=getStatus")
+      .then((response) => {
+        setStatus(response.data);
+      })
+      .catch((error) => {
+        console.error("There was na error", error);
+      });
+  };
   const fetchTransaction = () => {
     axios
       .get("http://localhost/capstone/submit.php?action=getTransaction")
@@ -150,9 +180,13 @@ function App() {
             element={
               <Layout>
                 <WelcomePage
+                  status={status}
                   transaction={transaction}
                   setTransaction={setTransaction}
                   fetchTransaction={fetchTransaction}
+                  inventory={inventory}
+                  brand={brand}
+                  color={color}
                 />
               </Layout>
             }
@@ -181,27 +215,6 @@ function App() {
           />
 
           <Route
-            path="/settings"
-            element={
-              <Layout>
-                <Settings
-                  brand={brand}
-                  setBrand={setBrand}
-                  color={color}
-                  setColor={setColor}
-                  size={size}
-                  setSize={setSize}
-                  type={type}
-                  setType={setType}
-                  fetchColor={fetchColor}
-                  fetchType={fetchType}
-                  fetchSize={fetchSize}
-                  fetchBrand={fetchBrand}
-                />
-              </Layout>
-            }
-          />
-          <Route
             path="/inventory"
             element={
               <Layout>
@@ -225,6 +238,19 @@ function App() {
             element={
               <Layout>
                 <Dashboard inventory={inventory} color={color} logs={logs} />
+              </Layout>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <Layout>
+                <History
+                  inventory={allInventory}
+                  logs={logs}
+                  fetchInventory={fetchInventory}
+                  fetchLogs={fetchLogs}
+                />
               </Layout>
             }
           />

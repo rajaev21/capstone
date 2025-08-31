@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-const History = ({ logs }) => {
+const Logs = ({ logs }) => {
   const [pageCount, setPageCount] = useState(0);
   const [search, setSearch] = useState("");
-  const itemsPerPage = 15;
+  const itemsPerPage = 10;
   const start = pageCount * itemsPerPage;
   const end = start + itemsPerPage;
 
@@ -15,45 +15,59 @@ const History = ({ logs }) => {
       )
     );
 
-  const currentItems = Array.isArray(filteredItems) && filteredItems.slice(start, end);
+  const currentItems =
+    Array.isArray(filteredItems) && filteredItems.slice(start, end);
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
+
   return (
-    <div className="mt-4">
-      <h2 className="mb-4">History</h2>
-
-      <input
-        type="text"
-        className="form-control w-25"
-        placeholder="Search..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div className="table-responsive" style={{ maxHeight: "70vh" }}>
+    <div className="container mt-4">
+      <div className="row">
+        <div className="fs-3 fw-bold mb-0 col">History</div>
+        <input
+          type="text"
+          className="form-control w-25 mb-2"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+      <div className="table-responsive">
         <table className="table table-hover table-bordered align-middle">
           <thead className="table-light sticky-top">
             <tr>
+              <th>ID</th>
               <th>Detail</th>
               <th>Inventory ID</th>
+              <th>Brand</th>
+              <th>Type</th>
+              <th>Color</th>
+              <th>Size</th>
               <th>Old Value</th>
               <th>New Value</th>
+              <th>Changed Value</th>
               <th>Date</th>
               <th>Time</th>
+              <th>Remarks</th>
             </tr>
           </thead>
           <tbody>
             {Array.isArray(currentItems) && currentItems.length > 0 ? (
               currentItems.map((log) => {
-                console.log(log);
-
                 return (
                   <tr key={log.id}>
+                    <td>{log.id}</td>
                     <td>{log.detail}</td>
                     <td className="text-muted">{log.inventory_id}</td>
+                    <td className="">{log.brand}</td>
+                    <td className="">{log.type}</td>
+                    <td className="">{log.color}</td>
+                    <td className="">{log.size}</td>
                     <td className="text-danger">{log.old_value}</td>
                     <td className="text-success">{log.new_value}</td>
-                    <td></td>
-                    <td></td>
+                    <td>{log.changed_value}</td>
+                    <td>{log.date}</td>
+                    <td>{log.time}</td>
+                    <td>{log.remarks}</td>
                   </tr>
                 );
               })
@@ -120,4 +134,4 @@ const History = ({ logs }) => {
   );
 };
 
-export default History;
+export default Logs;

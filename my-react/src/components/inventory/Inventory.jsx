@@ -10,6 +10,7 @@ import AddSize from "./inventoryComponents/AddSize";
 import AddQuantity from "./inventoryComponents/AddQuantity";
 import DeleteSize from "./inventoryComponents/DeleteSize";
 import AddPrice from "./inventoryComponents/AddPrice";
+import Return from "./inventoryComponents/Return";
 
 const Inventory = ({
   inventory,
@@ -404,9 +405,23 @@ const Inventory = ({
                                                       height: "40px",
                                                     }}
                                                   >
-                                                    <span className="fs-6">
+                                                    <span className="fs-6" style={{ color: "#f1f9faff" }}>
                                                       ₱
                                                     </span>
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    className="btn btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#return"
+                                                    onClick={() =>
+                                                      setSelected((prev) => ({
+                                                        ...prev,
+                                                        size: item.size,
+                                                      }))
+                                                    }
+                                                  >
+                                                    <i className="bi bi-arrow-left"></i>
                                                   </button>
                                                 </div>
                                               </td>
@@ -509,6 +524,15 @@ const Inventory = ({
       />
       <AddQuantity
         title={"quantity"}
+        selected={selected}
+        brands={brand}
+        types={type}
+        colors={color}
+        sizes={size}
+        fetchInventory={fetchInventory}
+      />
+      <Return
+        title={"return"}
         selected={selected}
         brands={brand}
         types={type}

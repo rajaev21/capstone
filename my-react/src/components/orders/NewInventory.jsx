@@ -78,17 +78,7 @@ const NewInventory = ({ inventory, brand, color, setOrder, order }) => {
 
   return (
     <section>
-      <div className="fs-3 fw-bold">
-        Brands
-        <button
-          type="button"
-          className="btn btn-transparent"
-          data-bs-toggle="modal"
-          data-bs-target="#brand"
-        >
-          <i className="bi bi-plus-circle"></i>
-        </button>
-      </div>
+      <div className="fs-3 fw-bold">Brands</div>
       <ul className="nav nav-tabs mb-3">
         {Array.isArray(brand) &&
           brand.map((brand, index) => (

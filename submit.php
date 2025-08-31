@@ -128,7 +128,7 @@ class Database
             JOIN customer_detail cd ON cd.cd_id = td.customer_id
             JOIN user u ON u.user_id = td.user_id
             JOIN status s ON s.status_id = td.status
-            ORDER BY td.deadline DESC";
+            ORDER BY td.deadline ASC";
 
 
 
@@ -165,13 +165,35 @@ class Database
 
     public function getLogs()
     {
-        $query = "SELECT * FROM logs order by timestamp desc";
+        $query = "SELECT 
+                l.id AS id, 
+                l.detail AS detail, 
+                l.inventory_id AS inventory_id, 
+                COALESCE(b.brand_name, 'no brand') AS brand, 
+                COALESCE(t.type_name, 'no type') AS type, 
+                COALESCE(c.color_name, 'no color') AS color, 
+                COALESCE(s.size_name, 'no size') AS size, 
+                l.new_value AS new_value, 
+                l.old_value AS old_value, 
+                l.changed_value AS changed_value, 
+                DATE_FORMAT(FROM_UNIXTIME(l.timestamp), '%h:%i %p') AS time, 
+                DATE_FORMAT(FROM_UNIXTIME(l.timestamp), '%M %d %Y') AS date,
+                l.remarks AS remarks
+              FROM logs l 
+              INNER JOIN inventory i ON l.inventory_id = i.inventory_id 
+              INNER JOIN brand b ON i.brand = b.brand_id 
+              INNER JOIN type t ON i.type = t.type_id 
+              INNER JOIN color c ON i.color = c.color_id 
+              INNER JOIN size s ON i.size = s.size_id 
+              ORDER BY l.timestamp DESC;";
+
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
         return $result;
     }
+
 
     public function getInventory()
     {
@@ -223,24 +245,6 @@ class Database
         return $result;
     }
 
-    public function insertLog($detail, $inventory_id, $new_value, $old_value, $unixNow)
-    {
-        $this->conn->begin_transaction();
-        try {
-            $query = "insert into logs (`detail`, `inventory_id`, `new_value`, `old_value`, `timestamp`) values (?, ?, ?, ?, ?)";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("siiis", $detail, $inventory_id, $new_value, $old_value, $unixNow);
-            $stmt->execute();
-            $result = $stmt->insert_id;
-            $stmt->close();
-            $this->conn->commit();
-            return $result;
-        } catch (Exception $e) {
-            $this->conn->rollback();
-            return false;
-        }
-    }
-
     public function existingInventory($brand, $type, $color, $size,)
     {
         $query = "SELECT inventory_id, qty FROM inventory where brand = ? and type = ? and color = ? and size = ?";
@@ -256,6 +260,21 @@ class Database
     {
         try {
             $query = "UPDATE inventory SET qty = qty + ? WHERE inventory_id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bind_param("ii", $value, $id);
+            $stmt->execute();
+            $result = $stmt->affected_rows;
+            $stmt->close();
+            return $result;
+        } catch (Exception $e) {
+            return ($e);
+        }
+    }
+
+    public function returnItem($id, $value)
+    {
+        try {
+            $query = "UPDATE inventory SET qty = qty - ? WHERE inventory_id = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param("ii", $value, $id);
             $stmt->execute();
@@ -381,7 +400,8 @@ class Database
         o.order_id as order_id,
         td.td_id as transaction_id,
         td.note as note,
-        td.customer_id as customer_id
+        td.customer_id as customer_id,
+         DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%Y-%m-%d') as deadline
         
         FROM transaction_detail td 
         join customer_detail cd on cd.cd_id = td.customer_id 
@@ -522,10 +542,22 @@ class Database
         return $result;
     }
 
+    public function selectCustomFetchAll($select, $from, $whereclause)
+    {
+        $select = implode(" , ", $select);
+        $whereclause = implode(" AND ", $whereclause);
+        $query = "SELECT $select FROM `$from` WHERE $whereclause";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $data = $stmt->get_result();
+        $result = $data->fetch_all(MYSQLI_ASSOC);
+
+        return $result;
+    }
     public function selectCustom($select, $from, $whereclause)
     {
-        $select = implode(", ", $select);
-        $whereclause = implode("AND", $whereclause);
+        $select = implode(" , ", $select);
+        $whereclause = implode(" AND ", $whereclause);
         $query = "SELECT $select FROM `$from` WHERE $whereclause";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -534,31 +566,29 @@ class Database
 
         return $result;
     }
-    public function insertCustom($insert, $column, $values)
+    public function insertLogs($detail, $inventory_id, $newValue, $oldValue, $changedValue, $timestamp, $remarks)
     {
-        $column = implode(", ", $column);
-        $marksArray = array();
-        $vars = array();
-        foreach ($values as $value) {
-            array_push($marksArray, "?");
-            if (is_numeric($value)) {
-                array_push($vars, "i");
-            } else {
-                array_push($vars, "s");
-            }
-        }
-        $marks = implode(", ", $marksArray);
-        $values = implode(", ", $values);
-        $vars = implode("", $vars);
 
-        $query = "INSERT INTO $insert ($column) VALUES ($marks)";
+        $query = "INSERT INTO `logs` (`detail`, `inventory_id`, `new_value`, `old_value`, `changed_value`, `timestamp`, `remarks`) 
+        VALUES (?,?,?,?,?,?,?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param($vars, $values);
+        $stmt->bind_param("siiiiis", $detail, $inventory_id, $newValue, $oldValue, $changedValue, $timestamp, $remarks);
         $stmt->execute();
         $result = $stmt->insert_id;
         $stmt->close();
         $this->conn->commit();
         return $result;
+    }
+
+    public function setCustom($table, $values, $whereclause)
+    {
+        $whereclause = implode(" AND ", $whereclause);
+        $values = implode(" , ", $values);
+        $query = "UPDATE $table SET $values WHERE $whereclause";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->affected_rows;
     }
 }
 
@@ -571,6 +601,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         switch ($action) {
             case 'getCustomer':
                 $result = $db->getCustomer();
+                echo json_encode($result);
+                break;
+            case 'getStatus':
+                $result = $db->getAll("status");
                 echo json_encode($result);
                 break;
             case 'getTransaction':
@@ -642,9 +676,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'submitOrder':
             submitOrder($db, $data, $unixNow);
             break;
-        // case 'submitInventory':
-        //     submitInventory($db, $data, $unixNow);
-        //     break;
         case 'saveSettings':
             saveSetting($db, $data);
             break;
@@ -660,11 +691,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'deleteInventory':
             deleteInventory($db, $data);
             break;
+        case 'returnItem':
+            updateQuantity($db, $data, $unixNow);
+            break;
         case 'addQuantity':
-            updateQuantity($db, $data);
+            updateQuantity($db, $data, $unixNow);
             break;
         case 'setStatus':
-            setStatus($db, $data);
+            setStatus($db, $data, $unixNow);
             break;
         case 'finishOrder':
             finishOrder($db, $data);
@@ -690,13 +724,117 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         case 'deleteSize':
             deleteBrandType($db, $data);
             break;
+        case 'setTransactionStatus':
+            setTransactionExpired($db, $data);
+            break;
+        case 'addOrder':
+            addOrder($db, $data, $unixNow);
+            break;
+        case 'cancelTransaction':
+            cancelTransaction($db, $data, $unixNow);
+            break;
+        case 'extendDeadline':
+            extendDeadline($db, $data);
+            break;
         default:
             echo json_encode(['message' => 'Invalid action']);
             break;
     }
 }
 
-function doHistory() {}
+function extendDeadline($db, $data)
+{
+    $transactionID = $data['transactionID'];
+    $deadline = $data['deadline'];
+    $table = "transaction_detail";
+    $values = ["deadline = $deadline"];
+    $whereclause = ["td_id = $transactionID"];
+    $result = $db->setCustom($table, $values, $whereclause);
+
+    echo json_encode($result);
+}
+
+function cancelTransaction($db, $data, $unixNow)
+{
+    $transactionID = $data['transactionID'];
+    $phonenumber = $data['phonenumber'];
+    $firstname = $data['firstname'];
+    $lastname = $data['lastname'];
+    $db->setCustom("transaction_detail", ["status = 4"], ["td_id = $transactionID"]);
+    $orders = $db->selectCustomFetchAll(["brand", "type", "color", "size", "quantity"], "orders", ["transaction_id = $transactionID", "(status = 1 OR status = 2)"]);
+    $detail = "cancel transaction";
+    $note = "$transactionID transaction cancelled";
+
+    foreach ($orders as $order) {
+        $qty = $order['quantity'];
+        $inventoryID = $db->selectCustom(["inventory_id"], "inventory", ["brand = " . $order['brand'], "type = " . $order['type'], "color = " . $order['color'], "size = " . $order['size']]);
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventoryID->inventory_id"]);
+        $order = $db->setCustom("inventory", ["qty = qty + $qty"], ["inventory_id = $inventoryID->inventory_id"]);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventoryID->inventory_id"]);
+        $result = $db->insertLogs($detail, $inventoryID->inventory_id, $newValue->qty, $oldValue->qty, $qty, $unixNow, $note);
+    }
+
+    if ($result) {
+        $fullname =  $firstname . " " . $lastname;
+        $message = "Hi $fullname! This is FABRIK SALES JARO , your order is ready for pickup. You can collect it at your our store during business hours. Thank you for shopping with us!";
+        $db->sendFinishOrder($message, $phonenumber);
+    }
+    echo json_encode($result);
+}
+
+function addOrder($db, $data, $unixNow)
+{
+    $transactionID = $data['transactionID'];
+    $orders = $data['order'];
+
+    foreach ($orders as $order) {
+
+        $brand = $db->getSubTableID("brand", $order['brand']);
+        $type = $db->getSubTableID("type", $order['type']);
+        $size = $db->getSubTableID("size", $order['size']);
+        $color = $db->getSubTableID("color", $order['color']);
+        $quantity = $order['qty'];
+        $order_id = $order['id'];
+        $design_id = null;
+        $brand_id = $brand[0]["brand_id"];
+        $type_id = $type[0]["type_id"];
+        $color_id = $color[0]["color_id"];
+        $size_id = $size[0]["size_id"];
+
+        $whereclause = array();
+        array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
+        $inventory = $db->getInventoryID($whereclause);
+
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $affected_row = $db->subtractInventory($order_id, $quantity);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $note = "additional order to $transactionID";
+        if ($affected_row) {
+            $result = $db->insertOrder($brand_id, $type_id, $size_id, $color_id, $quantity, $transactionID, $design_id, 2);
+            $logs = $db->insertLogs("Add Order", $inventory->inventory_id, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
+        } else {
+            echo json_encode(['message' => 'Not enough inventory']);
+            return;
+        }
+    }
+    echo json_encode($logs);
+}
+
+function setTransactionExpired($db, $data)
+{
+    $id = $data['id'];
+    $table = $data['table'];
+    $status = $data['status'];
+
+    $values = array();
+    $whereclause = array();
+
+    array_push($values, "status = $status");
+    array_push($whereclause, "td_id = $id");
+
+    $result = $db->setCustom($table, $values, $whereclause);
+    echo json_encode(["updated_rows" => $result]);
+}
 
 function deleteBrandType($db, $data)
 {
@@ -760,6 +898,7 @@ function insertBrandType($db, $data)
 
     $column = array();
     $value = array();
+
     if ($action == "insertBrandType") {
         array_push($column, 'brand', 'type');
         array_push($value, $data['brand'], $data['type']);
@@ -794,43 +933,60 @@ function finishOrder($db, $data)
     echo json_encode($result);
 }
 
-function setStatus($db, $data)
+function setStatus($db, $data, $unixNow)
 {
     $id = $data['id'];
     $table = $data['table'];
     $status = $data['status'];
+    $title = $data['title'];
 
     $result = $db->updateStatus($id, $table, $status);
+
+    if ($result && ($title === "cancel" || $title === "reorder")) {
+        $qty = $data['qty'];
+        $orderType = $db->selectCustom(["brand", "type", "color", "size"], $table, ["order_id = $id"]);
+        $inventory = $db->selectCustom(["inventory_id"], "inventory", ["brand = $orderType->brand", "type = $orderType->type", "color = $orderType->color", "size = $orderType->size"]);
+
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $title == "cancel" ? $db->updateInventory($inventory->inventory_id, $qty) : $db->returnItem($inventory->inventory_id, $qty);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $note = $title == "cancel" ? "order cancel" : "item reorder";
+        $detail = $title == "cancel" ? "void order" : "reorder";
+        $result = $db->insertLogs($detail, $inventory->inventory_id, $newValue->qty, $oldValue->qty, $qty, $unixNow, $note);
+    }
 
     echo json_encode($result);
 }
 
-function updateQuantity($db, $data)
+
+function updateQuantity($db, $data, $unixNow)
 {
+    $action = $data['action'];
     $brand_id = $data['brand'];
     $type_id = $data['type'];
     $color_id = $data['color'];
     $size_id = $data['size'];
-    $option = $data['option'];
+    $remarks = $data['remarks'];
     $value = $data['value'];
+    $detail = $data['detail'];
     $whereclause = array();
     array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
     $inventory = $db->getInventoryID($whereclause);
 
-    // $prevQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
-    $result = $db->updateInventory($inventory->inventory_id, $value);
-    // $newQty = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+    $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+    if ($action === "returnItem") {
+        $result = $db->returnItem($inventory->inventory_id, $value);
+    } else {
+        $result = $db->updateInventory($inventory->inventory_id, $value);
+    }
+    $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
 
-    // if ($result) {
-    //     $addHistory = array();
-    //     $changedQty = $prevQty + $value;
-    //     $insert = "logs";
-    //     $column = array();
-    //     $values = array();
-    //     array_push($column, "detail", "inventory_id", "new_value", "old_value", "timestamp");
-    //     $db->insertCustom($insert, $column, $values);
-    // }
-    echo json_encode($result);
+    if ($result) {
+        $timestamp = $unixNow;
+        $changedValue = $value;
+        $insertCustom = $db->insertLogs($detail, $inventory->inventory_id, $newValue->qty, $oldValue->qty, $changedValue, $timestamp, $remarks);
+    }
+    echo json_encode($insertCustom);
 }
 
 function deleteInventory($db, $data)
@@ -963,22 +1119,12 @@ function submitOrder($db, $data, $unixNow)
     $user_id = $data['transaction']['user_id'];
     $order_deadline = strtotime($data['transaction']['deadline']);
     $note = $data['transaction']['note'];
-    // $printType = $data['transaction']['printType'];
 
-
-    $cd_id = $db->selectCustomerWithNumber(substr($phonenumber, 1));
-
-    if (!$cd_id) {
-        $cd_id = $db->insertCustomerDetail($firstname, $lastname, $phonenumber, $facebook, $gmail, $address);
-    } else {
-        foreach ($cd_id as $item) {
-            $cd_id = $item['cd_id'];
-        }
-    }
-
+    $cd_id = $db->insertCustomerDetail($firstname, $lastname, $phonenumber, $facebook, $gmail, $address);
     $td_id = $db->insertTransaction($cd_id, 1, $user_id, $order_deadline, $note, $unixNow);
 
     foreach ($data['order'] as $order) {
+
         $brand = $db->getSubTableID("brand", $order['brand']);
         $type = $db->getSubTableID("type", $order['type']);
         $size = $db->getSubTableID("size", $order['size']);
@@ -986,73 +1132,48 @@ function submitOrder($db, $data, $unixNow)
         $quantity = $order['qty'];
         $order_id = $order['id'];
         $design_id = null;
+        $brand_id = $brand[0]["brand_id"];
+        $type_id = $type[0]["type_id"];
+        $color_id = $color[0]["color_id"];
+        $size_id = $size[0]["size_id"];
 
+        $whereclause = array();
+        array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
+        $inventory = $db->getInventoryID($whereclause);
+
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
         $affected_row = $db->subtractInventory($order_id, $quantity);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+
         if ($affected_row) {
-            $result = $db->insertOrder($brand[0]["brand_id"], $type[0]["type_id"], $size[0]["size_id"], $color[0]["color_id"], $quantity, $td_id, $design_id, 1);
+            $result = $db->insertOrder($brand_id, $type_id, $size_id, $color_id, $quantity, $td_id, $design_id, 2);
+
+
+            $logs = $db->insertLogs("order", $inventory->inventory_id, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
         } else {
             echo json_encode(['message' => 'Not enough inventory']);
             return;
         }
-        // $existing = $db->existingInventory($brand, $type, $color, $size);
-        // $result = $db->insertLog("Add Quantity", $inventory_id, $new_value, $old_value, $unixNow);
     }
-    echo json_encode($result);
+    echo json_encode($logs);
 }
-
-// function  submitInventory($db, $data, $unixNow)
-// {
-//     foreach ($data['form'] as $form) {
-//         $brand = $form['brand'];
-//         $type = $form['type'];
-//         $color = $form['color'];
-//         $size = $form['size'];
-//         $qty = $form['qty'];
-//         $printType = $form['printType'];
-//         $existing = $db->existingInventory($brand, $type, $color, $size, $printType);
-
-//         if ($existing) {
-//             foreach ($existing as $item) {
-//                 $inventory_id = $item['inventory_id'];
-//                 $old_value = $item['qty'];
-//                 $new_value = $old_value + $qty;
-//                 $result = $db->addQuantity($inventory_id, $qty);
-//                 $result = $db->insertLog("Add Quantity", $inventory_id, $new_value, $old_value, $unixNow);
-//             }
-//         } else {
-//             $column = array();
-//             $value = array();
-//             array_push($column, 'brand', 'type', 'color', 'size', 'qty');
-//             array_push($value, $brand, $type, $color, $size, $qty);
-//             $cd_id = $db->insertInventory($column, $value);
-//             $result = $db->insertLog("Add Inventory", $cd_id, 0, 0, $unixNow);
-//         }
-//         echo json_encode($result);
-//     }
-// }
-
 
 function cleanPhoneNumber($phonenumber)
 {
-    // Remove any non-numeric characters first
     $phonenumber = preg_replace('/\D/', '', $phonenumber);
 
-    // If number starts with +63, keep it
     if (strpos($phonenumber, '63') === 0) {
         return '+' . $phonenumber;
     }
 
-    // If number starts with 0, remove it and add +63
     if (strpos($phonenumber, '0') === 0) {
         $phonenumber = substr($phonenumber, 1);
     }
 
-    // If number starts with 9, just add +63
     if (strpos($phonenumber, '9') === 0) {
         return '+63' . $phonenumber;
     }
 
-    // If number is already in correct format but without '+'
     if (strpos($phonenumber, '63') === 0) {
         return '+' . $phonenumber;
     }

@@ -4,7 +4,6 @@ import CustomerForm from "./CustomerForm";
 import TransansactionForm from "./TransansactionForm";
 import CurrentOrder from "./CurrentOrder";
 import NewInventory from "./NewInventory";
-import Inventory from "../inventory/Inventory";
 
 const Order = ({
   inventory,
@@ -12,15 +11,9 @@ const Order = ({
   type,
   color,
   size,
-  inventoryCheck,
-  setInventoryCheck,
-  fetchInventoryCheck,
   fetchInventory,
-  fetchLogs,
   placement,
-  setPlacement,
 }) => {
-  const [page, setPage] = useState(true);
   const [customerDetail, setCustomerDetail] = useState({
     firstname: "",
     lastname: "",
@@ -61,6 +54,10 @@ const Order = ({
       alert("Please fill phone number.");
       return;
     }
+    if (customerDetail.phonenumber.length != 11) {
+      alert("Please double check the number.");
+      return;
+    }
     if (transaction.user_id === "") {
       alert("Please fill transaction id.");
       return;
@@ -76,6 +73,7 @@ const Order = ({
 
     const data = { action: "submitOrder", transaction, customerDetail, order };
 
+    console.log(data)
     axios
       .post("http://localhost/capstone/submit.php", data, {
         headers: { "Content-Type": "application/json" },
@@ -83,13 +81,6 @@ const Order = ({
       .then((response) => {
         console.log(response.data);
         alert("Order submitted successfully");
-        setOrder([{}]);
-        setCustomerDetail({});
-        setTransaction({
-          user_id: "",
-          deadline: "",
-          note: "",
-        });
         window.location.reload();
       })
       .catch((error) => {
@@ -116,6 +107,7 @@ const Order = ({
               />
             </div>
             <div className="card col-3 ">
+              <div className="fs-5 fw-semibold text-center">Order</div>
               <CustomerForm
                 customerDetail={customerDetail}
                 setCustomerDetail={setCustomerDetail}

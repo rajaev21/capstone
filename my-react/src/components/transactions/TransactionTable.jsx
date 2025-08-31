@@ -1,14 +1,5 @@
 import { useState } from "react";
-const TransactionTable = ({
-  transaction,
-  setTransaction,
-  fetchTransaction,
-  encrypt,
-  decrypt,
-  goto,
-  deleteOrder,
-}) => {
-  console.log(transaction);
+const TransactionTable = ({ transaction, goto, title }) => {
   const [search, setSearch] = useState("");
   const [pageCount, setPageCount] = useState(0);
   const filteredItems =
@@ -18,7 +9,7 @@ const TransactionTable = ({
         String(val).toLowerCase().includes(search.toLowerCase())
       )
     );
-  const itemsPerPage = 15;
+  const itemsPerPage = 5;
   const start = pageCount * itemsPerPage;
   const end = start + itemsPerPage;
   const currentItems = filteredItems.length
@@ -31,15 +22,18 @@ const TransactionTable = ({
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
   return (
-    <div className="">
-      <h6>
-        Search:{" "}
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </h6>
+    <div className="card p-3">
+      <div className="row row-cols-2">
+        <div className="fs-3 fw-bold text-capitalize">{title}</div>
+        <h6>
+          Search:{" "}
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </h6>
+      </div>
       <table className="table table-striped table-bordered">
         <thead>
           <tr>
@@ -61,14 +55,13 @@ const TransactionTable = ({
               </td>
               <td>{item.order_date}</td>
               <td>{item.deadline}</td>
-              {/* <td>{item.order_id}</td> */}
               <td>{item.status}</td>
               <td>
                 <button
                   className="btn btn-primary btn-sm"
                   onClick={() => goto(item.transaction_id)}
                 >
-                  View more
+                  <i className="bi bi-eye"></i>
                 </button>
               </td>
             </tr>
