@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 const InventoryTable = ({ inventory }) => {
   const [search, setSearch] = useState("");

@@ -1,6 +1,9 @@
 import React from "react";
 
-const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
+const CustomerForm = ({
+  customerDetail,
+  setCustomerDetail,
+}) => {
   const handleCustomerFormChange = (e) => {
     const { name, value } = e.target;
     setCustomerDetail((prev) => ({
@@ -8,11 +11,11 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
       [name]: value,
     }));
   };
-  console.log(customerDetail);
   return (
     <>
       {customerDetail && (
         <div className="p-1">
+          <div className="fs-5 text-center">Customer details</div>
           <div className="input-group input-group-sm mb-3">
             <span className="input-group-text">
               <i className="bi bi-person"></i>
@@ -27,12 +30,12 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
                 value={customerDetail.firstname}
                 onChange={(e) => handleCustomerFormChange(e)}
               />
-              <label htmlFor="firstname">Enter Firstname</label>
+              <label htmlFor="firstname"> Firstname (required)</label>
             </div>
           </div>
           <div className="input-group input-group-sm mb-3">
             <span className="input-group-text">
-              <i class="bi bi-person"></i>
+              <i className="bi bi-person"></i>
             </span>
             <div className="form-floating">
               <input
@@ -44,12 +47,12 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
                 value={customerDetail.lastname}
                 onChange={(e) => handleCustomerFormChange(e)}
               />
-              <label htmlFor="lastname">Enter Lastname</label>
+              <label htmlFor="lastname"> Lastname</label>
             </div>
           </div>
           <div className="input-group input-group-sm mb-3">
             <span className="input-group-text">
-              <i class="bi bi-telephone"></i>
+              <i className="bi bi-telephone"></i>
             </span>
             <div className="form-floating">
               <input
@@ -66,7 +69,7 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
                   }
                 }}
               />
-              <label htmlFor="phonenumber">Enter Phonenumber</label>
+              <label htmlFor="phonenumber"> Phonenumber (required)</label>
             </div>
           </div>
           <div className="input-group input-group-sm mb-3">
@@ -83,7 +86,7 @@ const CustomerForm = ({ customerDetail, setCustomerDetail }) => {
                 value={customerDetail.address}
                 onChange={(e) => handleCustomerFormChange(e)}
               />
-              <label htmlFor="address">Enter Address</label>
+              <label htmlFor="address"> Address</label>
             </div>
           </div>
         </div>

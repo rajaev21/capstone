@@ -1,37 +1,43 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "datatables.net-bs5";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { Link, useLocation } from "react-router-dom";
 
-const Notification = () => {
+const Notification = ({ inventory }) => {
+  const paramID = new URLSearchParams(useLocation().search);
+  const lowStocks = Array.isArray(inventory)
+    ? inventory.filter((item) => item.qty < 31)
+    : [];
   return (
-    <ul class="navbar-nav">
-      <li class="nav-item dropstart">
+    <ul className="navbar-nav me-3">
+      <li className="nav-item dropstart">
         <button
-          class="btn btn-transparent btn-lg"
+          className="btn btn-transparent"
           data-bs-toggle="dropdown"
           aria-expanded="false"
+          style={{ border: "0px" }}
+          disabled={lowStocks < 1}
         >
           <i className="bi bi-bell-fill"></i>
+          <span className="position-absolute top-0 start-0 translate-middle badge rounded-pill text-bg-secondary">
+            {lowStocks.length > 0 && lowStocks.length}
+          </span>
         </button>
-        <ul class="dropdown-menu ">
-          <li>
-            <a class="dropdown-item" href="#">
-              Action
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#">
-              Another action
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="#">
-              Something else here
-            </a>
-          </li>
+        <ul className="dropdown-menu ">
+          {lowStocks?.map((item, index) => {
+            return (
+              <li key={index} className="nav-item">
+                <Link
+                  className="nav-link text-dark"
+                  onClick={() =>
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 500)
+                  }
+                  to={`/inventory?id=${item.id}`}
+                >
+                  Low stock ID: {item.id}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </li>
     </ul>

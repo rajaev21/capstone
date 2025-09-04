@@ -1,38 +1,21 @@
-import Stocks from "./charts/Stocks";
-import Notification from "../Notification";
-const Dashboard = ({ inventory, color, logs }) => {
+import CustomerSales from "./charts/CustomerSales";
+const Dashboard = ({}) => {
   return (
     <section className="container">
-      <div class="card p-0">
-        <div class="card-body ">
-          <Stocks inventory={inventory} color={color} />
+      <div class="p-0 d-flex flex-column gap-2">
+        <div className="div">
+          4 clickable cards for pending tasks, monthly earnings, annual earnings
         </div>
-      </div>
-      <hr />
-      <div className="row row-cols-2 gap-2">
-        <div className="col p-0">
-          <div class="card p-0">
-            <div class="card-body">This is some text within a card body.</div>
-          </div>
-        </div>
-        <div className="col p-0">
-          <div class="card">
-            <div class="card-body">This is some text within a card body.</div>
-          </div>
-        </div>
-        <div className="col p-0">
-          <div class="card">
-            <div class="card-body">This is some text within a card body.</div>
-          </div>
-        </div>
-        <div className="col p-0">
-          <div class="card">
-            <div class="card-body">This is some text within a card body.</div>
-          </div>
-        </div>
-      </div>
+        {/* if clicked show linechart of earnings on that timeframe */}
 
-      <div className="m-2">
+        {/* top customer by quantity and sales */}
+        <div className="container">
+          <div className="col card">
+            <CustomerSales />
+          </div>
+        </div>
+
+        <div class="card ">{/* line chart for each item sales */}</div>
       </div>
     </section>
   );

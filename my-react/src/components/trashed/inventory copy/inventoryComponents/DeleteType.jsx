@@ -1,31 +1,22 @@
 import axios from "axios";
 
-const DeleteColor = ({
+const DeleteType = ({
   selected,
   brands,
   types,
-  colors,
   fetchInventory,
-  fetchColor,
-  setSelected,
+  fetchType,
+  closeCollapse,
 }) => {
   const data = {};
 
-  function deleteColor(selected, brands, types, colors) {
-    const brand =
-      Array.isArray(brands) &&
-      brands.find((item) => item.brand_name === selected.brand);
-    const type =
-      Array.isArray(types) &&
-      types.find((item) => item.type_name === selected.type);
-    const color =
-      Array.isArray(colors) &&
-      colors.find((item) => item.color_name === selected.color);
+  function deleteType(selected, brands, types) {
+    const brand = brands.find((item) => item.brand_name === selected.brand);
+    const type = types.find((item) => item.type_name === selected.type);
 
-    data.action = "deleteColor";
+    data.action = "deleteType";
     data.brand = brand;
     data.type = type;
-    data.color = color;
 
     console.log(data);
     axios
@@ -34,26 +25,26 @@ const DeleteColor = ({
       })
       .then((res) => {
         console.log(res.data);
-        reset(); 
+        reset();
       })
       .catch((err) => console.error("Error adding option:", err));
   }
 
   function reset() {
     fetchInventory();
-    fetchColor();
-    setSelected((prev) => ({ ...prev, color: "" }));
+    fetchType();
+    closeCollapse();
   }
 
   return (
     <>
       <div
         className="modal fade"
-        id="deleteColor"
+        id="deleteType"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
         tabindex="-1"
-        aria-labelledby="deleteColorLabel"
+        aria-labelledby="deleteTypeLabel"
         aria-hidden="true"
       >
         <div className="modal-dialog">
@@ -69,15 +60,15 @@ const DeleteColor = ({
             <div className="modal-footer">
               <h1
                 className="modal-title fs-5 me-auto text-capitalize"
-                id="deleteColorLabel"
+                id="deleteTypeLabel"
               >
-                delete color {selected.color} ?
+                delete type {selected.type} ?
               </h1>
               <button
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={() => deleteColor(selected, brands, types, colors)}
+                onClick={() => deleteType(selected, brands, types)}
               >
                 Yes
               </button>
@@ -96,4 +87,4 @@ const DeleteColor = ({
   );
 };
 
-export default DeleteColor;
+export default DeleteType;

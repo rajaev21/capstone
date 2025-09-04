@@ -15,6 +15,7 @@ const AddSize = ({
   const [addInput, setAddInput] = useState("");
   const [selectInput, setselectInput] = useState(true);
   const optionName = `${title}_name`;
+  const optionHex = `${title}`;
   const data = {};
 
   const newOption =
@@ -81,6 +82,7 @@ const AddSize = ({
       })
       .then((res) => {
         console.log(res.data);
+        // alert("Item inserted"); 
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
@@ -90,7 +92,7 @@ const AddSize = ({
     setAddInput("");
     fetchSize();
     fetchInventory();
-    setAddInput("")
+    addInput("")
   }
 
   return (

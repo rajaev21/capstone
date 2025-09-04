@@ -1,59 +1,47 @@
 import axios from "axios";
 import { useState } from "react";
 
-const AddSize = ({
+const AddType = ({
   title,
-  selected,
-  brands,
-  types,
-  colors,
-  sizes,
-  exsistingSize,
+  option,
+  selected_brand,
+  exsistingType,
   fetchInventory,
-  fetchSize,
+  fetchType,
+  closeCollapse,
 }) => {
   const [addInput, setAddInput] = useState("");
   const [selectInput, setselectInput] = useState(true);
   const optionName = `${title}_name`;
   const data = {};
-
   const newOption =
-    Array.isArray(exsistingSize) && Array.isArray(sizes)
-      ? sizes.filter(
-          (item) => !exsistingSize.some((size) => size.size === item.size_name)
+    Array.isArray(exsistingType) && Array.isArray(option)
+      ? option.filter(
+          (item) => !exsistingType.some((type) => type.type === item.type_name)
         )
       : [];
+
+  //if input text add input to the type table and add to the inventory
 
   function checkValidation() {
     const value = addInput.trim().toLowerCase();
     const checkDuplicate =
-      Array.isArray(sizes) && sizes.some((item) => item[optionName] === value);
-
-    var brand_id =
-      Array.isArray(brands) &&
-      brands.find((item) => item.brand_name === selected.brand).brand_id;
-    var type_id =
-      Array.isArray(types) &&
-      types.find((item) => item.type_name === selected.type).type_id;
-    var color_id =
-      Array.isArray(colors) &&
-      colors.find((item) => item.color_name === selected.color).color_id;
+      Array.isArray(option) &&
+      option.some((item) => item[optionName] === value);
 
     if (value === "") {
-      alert("Put or select a color");
+      alert("Input or select color");
       return;
     }
     if (!selectInput) {
       if (checkDuplicate) {
-        alert(`${addInput} already exist`);
+        alert(`${addInput} already exist. Please select in the option`);
         return;
       }
       data.action = "insertOption";
       data.value = value;
       data.table = title;
-      data.brand = brand_id;
-      data.color = color_id;
-      data.type = type_id;
+      data.brand = selected_brand.brand_id;
     }
 
     if (selectInput) {
@@ -61,18 +49,12 @@ const AddSize = ({
         alert(`Please select a color`);
         return;
       }
-
-      data.action = "insertBrandTypeColorSize";
-      data.brand = brand_id;
-      data.type = type_id;
-      data.color = color_id;
-      data.size = value;
+      data.action = "insertBrandType";
+      data.brand = selected_brand.brand_id;
+      data.type = value;
     }
-    // console.log(data, checkDuplicate, selectInput);
     insertData();
   }
-
-  //   console.log(title, selected, brands, types, colors, exsistingSize);
 
   function insertData() {
     axios
@@ -81,23 +63,26 @@ const AddSize = ({
       })
       .then((res) => {
         console.log(res.data);
+        // alert("Item inserted"); 
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
   }
 
   function reset() {
-    setAddInput("");
-    fetchSize();
     fetchInventory();
-    setAddInput("")
+    fetchType();
+    setAddInput("");
+    closeCollapse();
   }
+
+  // console.log(exsistingType, option, newOption);
 
   return (
     <section>
       <div
         className="modal fade"
-        id="size"
+        id={title}
         tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
@@ -105,17 +90,13 @@ const AddSize = ({
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h1
-                className="modal-title fs-5 text-capitalize"
-                id="addSizeLabel"
-              >
+              <h1 className="modal-title fs-5 text-capitalize" id={title}>
                 Add {title}
               </h1>
               <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
-                onClick={() => reset()}
               ></button>
             </div>
             <div className="modal-body">
@@ -126,7 +107,7 @@ const AddSize = ({
                     className="btn btn-secondary ms-auto"
                     onClick={() => {
                       setselectInput((prev) => !prev);
-                      reset();
+                      setAddInput("");
                     }}
                   >
                     {!selectInput
@@ -135,7 +116,6 @@ const AddSize = ({
                   </button>
                 )}
                 <hr />
-
                 {selectInput ? (
                   <div className="form-floating">
                     <select
@@ -147,11 +127,13 @@ const AddSize = ({
                     >
                       <option selected>Select</option>
                       {Array.isArray(newOption) &&
-                        newOption.map((item) => {
+                        newOption.map((item, index) => {
                           const name = `${title}_name`;
                           const itemid = `${title}_id`;
                           return (
-                            <option value={item[itemid]}>{item[name]}</option>
+                            <option key={index} value={item[itemid]}>
+                              {item[name]}
+                            </option>
                           );
                         })}
                     </select>
@@ -173,7 +155,7 @@ const AddSize = ({
                         value={addInput}
                         onChange={(e) => setAddInput(e.target.value)}
                       />
-                      <label for="add">Add {title} name </label>
+                      <label htmlFor="add">Add {title} name </label>
                     </div>
                   </div>
                 )}
@@ -197,4 +179,4 @@ const AddSize = ({
   );
 };
 
-export default AddSize;
+export default AddType;

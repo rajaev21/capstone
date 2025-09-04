@@ -1,31 +1,27 @@
 import axios from "axios";
 
-const DeleteColor = ({
+const DeleteSize = ({
   selected,
   brands,
   types,
   colors,
+  sizes,
   fetchInventory,
-  fetchColor,
-  setSelected,
+  fetchSize,
 }) => {
   const data = {};
 
-  function deleteColor(selected, brands, types, colors) {
-    const brand =
-      Array.isArray(brands) &&
-      brands.find((item) => item.brand_name === selected.brand);
-    const type =
-      Array.isArray(types) &&
-      types.find((item) => item.type_name === selected.type);
-    const color =
-      Array.isArray(colors) &&
-      colors.find((item) => item.color_name === selected.color);
+  function deleteSize(selected, brands, types) {
+    const brand = brands.find((item) => item.brand_name === selected.brand);
+    const type = types.find((item) => item.type_name === selected.type);
+    const color = colors.find((item) => item.color_name === selected.color);
+    const size = sizes.find((item) => item.size_name === selected.size);
 
-    data.action = "deleteColor";
+    data.action = "deleteSize";
     data.brand = brand;
     data.type = type;
     data.color = color;
+    data.size = size;
 
     console.log(data);
     axios
@@ -33,7 +29,7 @@ const DeleteColor = ({
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         reset(); 
       })
       .catch((err) => console.error("Error adding option:", err));
@@ -41,19 +37,18 @@ const DeleteColor = ({
 
   function reset() {
     fetchInventory();
-    fetchColor();
-    setSelected((prev) => ({ ...prev, color: "" }));
+    fetchSize();
   }
 
   return (
     <>
       <div
         className="modal fade"
-        id="deleteColor"
+        id="deleteSize"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
         tabindex="-1"
-        aria-labelledby="deleteColorLabel"
+        aria-labelledby="deleteSizeLabel"
         aria-hidden="true"
       >
         <div className="modal-dialog">
@@ -67,17 +62,14 @@ const DeleteColor = ({
               ></button>
             </div>
             <div className="modal-footer">
-              <h1
-                className="modal-title fs-5 me-auto text-capitalize"
-                id="deleteColorLabel"
-              >
-                delete color {selected.color} ?
+              <h1 className="modal-title fs-5 me-auto " id="deleteSizeLabel">
+                Delete size {selected.size} ?
               </h1>
               <button
                 type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={() => deleteColor(selected, brands, types, colors)}
+                onClick={() => deleteSize(selected, brands, types)}
               >
                 Yes
               </button>
@@ -96,4 +88,4 @@ const DeleteColor = ({
   );
 };
 
-export default DeleteColor;
+export default DeleteSize;

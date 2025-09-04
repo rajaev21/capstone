@@ -12,15 +12,15 @@ const OrderDetails = ({ inventory, order, setOrder }) => {
 
   function valueCheck(index, e, id) {
     const { value } = e.target;
-    const isOver = newInventory.some(
-      (item) => item.qty < Number(value) && item.id === Number(id)
+    const isOver = newInventory.find(
+      (item) => id === item.id && value > item.qty
     );
 
     if (Number(value) < 1) {
       alert("Order cant be less than 1.");
       setOrder((prev) => {
         const arr = [...prev];
-        arr[index] = { ...arr[index], qty: 1 };
+        arr[index] = { ...arr[index], orderQty: 1 };
         return arr;
       });
       return;
@@ -29,7 +29,7 @@ const OrderDetails = ({ inventory, order, setOrder }) => {
       alert("The order amount is more than what's in stock.");
       setOrder((prev) => {
         const arr = [...prev];
-        arr[index] = { ...arr[index], qty: 1 };
+        arr[index] = { ...arr[index], orderQty: isOver.qty };
         return arr;
       });
       return;
@@ -41,7 +41,7 @@ const OrderDetails = ({ inventory, order, setOrder }) => {
 
     setOrder((prev) => {
       const arr = [...prev];
-      arr[index] = { ...arr[index], qty: value };
+      arr[index] = { ...arr[index], orderQty: value };
       return arr;
     });
   }
@@ -70,14 +70,14 @@ const OrderDetails = ({ inventory, order, setOrder }) => {
                       className="form-control"
                       onBlur={(e) => valueCheck(index, e, item.id)}
                       type="number"
-                      value={item.qty}
+                      value={item.orderQty}
                       onChange={(e) => {
                         qtyChange(index, e, item.id);
                       }}
                     />
                   </div>
                 </td>
-                <td className="text-center">{item.qty * item.price}</td>
+                <td className="text-center">{item.orderQty * item.price}</td>
                 <td>
                   <button
                     className="btn btn-danger"

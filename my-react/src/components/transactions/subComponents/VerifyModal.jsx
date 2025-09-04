@@ -1,8 +1,14 @@
-const VerifyModal = ({ title, orderID, status, setDone, orderStatus, orderQty }) => {
+const VerifyModal = ({
+  title,
+  orderID,
+  status,
+  setDone,
+  orderQty,
+}) => {
   return (
     <div
       class="modal fade"
-      id={`modal${orderID}${orderStatus}`}
+      id={`modal${orderID}${status}`}
       data-bs-backdrop="static"
       data-bs-keyboard="false"
       tabindex="-1"
@@ -27,7 +33,7 @@ const VerifyModal = ({ title, orderID, status, setDone, orderStatus, orderQty })
               class="btn btn-primary"
               data-bs-dismiss="modal"
               onClick={() => {
-                setDone(orderID, orderStatus, orderQty, title);
+                setDone(orderID, status, orderQty, title);
               }}
             >
               Yes

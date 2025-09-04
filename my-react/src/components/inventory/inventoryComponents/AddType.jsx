@@ -62,8 +62,7 @@ const AddType = ({
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
-        console.log(res.data);
-        alert("Item inserted");
+        console.log(res.data); 
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
@@ -83,7 +82,7 @@ const AddType = ({
       <div
         className="modal fade"
         id={title}
-        tabindex="-1"
+        tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
@@ -127,15 +126,17 @@ const AddType = ({
                     >
                       <option selected>Select</option>
                       {Array.isArray(newOption) &&
-                        newOption.map((item) => {
+                        newOption.map((item, index) => {
                           const name = `${title}_name`;
                           const itemid = `${title}_id`;
                           return (
-                            <option value={item[itemid]}>{item[name]}</option>
+                            <option key={index} value={item[itemid]}>
+                              {item[name]}
+                            </option>
                           );
                         })}
                     </select>
-                    <label for="floatingSelect">
+                    <label htmlFor="floatingSelect">
                       Select an existing {title} here
                     </label>
                   </div>
@@ -153,7 +154,7 @@ const AddType = ({
                         value={addInput}
                         onChange={(e) => setAddInput(e.target.value)}
                       />
-                      <label for="add">Add {title} name </label>
+                      <label htmlFor="add">Add {title} name </label>
                     </div>
                   </div>
                 )}

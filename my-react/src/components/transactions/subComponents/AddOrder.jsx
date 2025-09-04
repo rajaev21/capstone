@@ -3,9 +3,21 @@ import { useState } from "react";
 import NewInventory from "../../orders/NewInventory";
 import OrderDetails from "./OrderDetails";
 
-const AddOrder = ({ inventory, brand, color, transactionID }) => {
+const AddOrder = ({
+  inventory,
+  brand,
+  color,
+  transactionID,
+  printPrice,
+  design,
+}) => {
   const [order, setOrder] = useState([]);
+  const [discount, setDiscount] = useState("");
   const data = {};
+  const grandTotal = order.reduce(
+    (sum, item) => sum + item.orderQty * (item.price + Number(printPrice)),
+    0
+  );
 
   function addOrder() {
     if (order.length === 0) {
@@ -16,6 +28,9 @@ const AddOrder = ({ inventory, brand, color, transactionID }) => {
     data.action = "addOrder";
     data.transactionID = transactionID;
     data.order = order;
+    data.printPrice = printPrice;
+    data.discount = discount;
+    data.design = design;
     console.log(data);
 
     axios
@@ -24,14 +39,12 @@ const AddOrder = ({ inventory, brand, color, transactionID }) => {
       })
       .then((response) => {
         console.log(response.data);
-        alert("Order submitted successfully");
         window.location.reload();
       })
       .catch((error) => {
         console.error("There was an error submitting the order!", error);
       });
   }
-
   return (
     <div
       class="modal fade"
@@ -65,7 +78,9 @@ const AddOrder = ({ inventory, brand, color, transactionID }) => {
                 />
               </div>
               <div className="col-4">
-                <div className="fs-5">Transaction ID: {transactionID} </div>
+                <div className="fs-6">Transaction ID: {transactionID} </div>
+                <div className="fs-6">Print price : {printPrice} </div>
+                <div className="fs-6">Print design : {design} </div>
                 {order.length > 0 && (
                   <OrderDetails
                     inventory={inventory}
@@ -73,23 +88,44 @@ const AddOrder = ({ inventory, brand, color, transactionID }) => {
                     setOrder={setOrder}
                   />
                 )}
+
+                <div class="input-group input-group-sm mb-3">
+                  <span class="input-group-text" id="basic-addon1">
+                    Discount :
+                  </span>
+                  <input
+                    type="number"
+                    class="form-control"
+                    placeholder="Discount"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "-" || e.key === "+" || e.key === "e") {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                </div>
+                <div className="fs-5">
+                  Grand total : {grandTotal - discount}
+                </div>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="btn btn-danger"
               data-bs-dismiss="modal"
             >
-              Close
+              <i className="bi bi-x"></i>
             </button>
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-success"
               onClick={() => addOrder()}
             >
-              Add Order
+              <i className="bi bi-check"></i>
             </button>
           </div>
         </div>

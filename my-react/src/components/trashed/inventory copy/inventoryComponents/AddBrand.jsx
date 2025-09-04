@@ -36,6 +36,7 @@ const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
       })
       .then((res) => {
         console.log(res.data);
+        // alert("Item inserted");
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));

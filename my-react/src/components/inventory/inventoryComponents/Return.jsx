@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 
 const Return = ({
+  inventory,
   title,
   selected,
   brands,
@@ -15,8 +16,14 @@ const Return = ({
   const data = {};
 
   function checkValidation() {
-    const value = addInput.replace(/\D+/g, "").trim();
-
+    var value = addInput.replace(/\D+/g, "").trim();
+    const selectedInventory = inventory.find(
+      (item) =>
+        item.brand === selected.brand &&
+        item.type === selected.type &&
+        item.color === selected.color &&
+        item.size === selected.size
+    );
     var brand_id =
       Array.isArray(brands) &&
       brands.find((item) => item.brand_name === selected.brand).brand_id;
@@ -35,7 +42,13 @@ const Return = ({
       return;
     }
     if (remarks === "") {
-      alert("Enter remarks");
+      alert("Enter for return reason");
+      return;
+    }
+    if (selectedInventory.qty < value) {
+      alert("Cannot return more than available stock!");
+      setAddInput(String(selectedInventory.qty));
+      return;
     }
 
     data.action = "returnItem";
@@ -45,9 +58,9 @@ const Return = ({
     data.type = type_id;
     data.size = size_id;
     data.remarks = remarks;
-    data.detail = "return item"
+    data.detail = "return item";
 
-    console.log(data);
+    console.log(addInput);
     insertData();
   }
 
@@ -58,7 +71,6 @@ const Return = ({
       })
       .then((res) => {
         console.log(res.data);
-        alert("Item inserted");
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
@@ -75,7 +87,7 @@ const Return = ({
       <div
         className="modal fade"
         id="return"
-        tabindex="-1"
+        tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
@@ -118,7 +130,7 @@ const Return = ({
                       value={addInput}
                       onChange={(e) => setAddInput(e.target.value)}
                     />
-                    <label for="add">Enter Quantity</label>
+                    <label htmlFor="add">Enter Quantity</label>
                   </div>
                 </div>
 
@@ -136,7 +148,7 @@ const Return = ({
                       value={remarks}
                       onChange={(e) => setRemarks(e.target.value)}
                     ></textarea>
-                    <label for="floatingTextarea2">
+                    <label htmlFor="floatingTextarea2">
                       Enter reason for return
                     </label>
                   </div>

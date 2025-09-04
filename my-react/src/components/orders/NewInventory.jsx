@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { Collapse } from "bootstrap";
+import DirectBuy from "./DirectBuy";
+import { useLocation } from "react-router-dom";
 
-const NewInventory = ({ inventory, brand, color, setOrder, order }) => {
+const NewInventory = ({ inventory, color, setOrder, order }) => {
+  const paramID = new URLSearchParams(useLocation().search);
+  const location = useLocation();
   const [selected, setSelected] = useState({});
+
+  const brands = Array.isArray(inventory)
+    ? inventory.filter(
+        (t, index, self) =>
+          index === self.findIndex((item) => item.brand === t.brand)
+      )
+    : [];
 
   const filteredBrands = Array.isArray(inventory)
     ? inventory.filter((x) => x.brand === selected.brand)
@@ -69,7 +80,7 @@ const NewInventory = ({ inventory, brand, color, setOrder, order }) => {
   }
 
   const addOrder = (item) => {
-    setOrder((prev) => [...prev, { ...item, qty: 1 }]);
+    setOrder((prev) => [...prev, { ...item, orderQty: 1 }]);
   };
 
   function inOrder(id) {
@@ -80,19 +91,19 @@ const NewInventory = ({ inventory, brand, color, setOrder, order }) => {
     <section>
       <div className="fs-3 fw-bold">Brands</div>
       <ul className="nav nav-tabs mb-3">
-        {Array.isArray(brand) &&
-          brand.map((brand, index) => (
+        {Array.isArray(brands) &&
+          brands.map((brand, index) => (
             <li key={index} className="nav-item">
               <a
                 href="#"
                 className="text-capitalize nav-link fs-4"
                 data-bs-toggle="tab"
                 onClick={() => {
-                  setSelected({ brand: brand.brand_name, type: "" });
+                  setSelected({ brand: brand.brand, type: "" });
                   closeCollapse();
                 }}
               >
-                {brand.brand_name}
+                {brand.brand}
               </a>
             </li>
           ))}
@@ -200,13 +211,14 @@ const NewInventory = ({ inventory, brand, color, setOrder, order }) => {
                                 </thead>
                                 <tbody>
                                   {sizes.map((item) => {
+                                    console.log(item);
                                     return (
                                       <tr>
                                         <td>{item.size}</td>
                                         <td>{item.qty}</td>
                                         <td>₱{item.price}</td>
                                         <td>
-                                          <div className="d-grid gap-2">
+                                          <div className="d-flex gap-2 justify-content-center">
                                             <button
                                               className="btn btn-primary"
                                               onClick={() => addOrder(item)}
@@ -214,6 +226,19 @@ const NewInventory = ({ inventory, brand, color, setOrder, order }) => {
                                             >
                                               <i className="bi bi-cart"></i>
                                             </button>
+                                            {location.pathname === "/order" && (
+                                              <>
+                                                <button
+                                                  type="button"
+                                                  class="btn btn-secondary"
+                                                  data-bs-toggle="modal"
+                                                  data-bs-target="#directBuy"
+                                                >
+                                                  <i className="bi bi-cash"></i>
+                                                </button>
+                                                <DirectBuy item={item} />
+                                              </>
+                                            )}
                                           </div>
                                         </td>
                                       </tr>

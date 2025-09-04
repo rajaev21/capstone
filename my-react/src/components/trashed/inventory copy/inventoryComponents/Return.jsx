@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 
-const AddPrice = ({
+const Return = ({
+  inventory,
   title,
   selected,
   brands,
@@ -11,12 +12,18 @@ const AddPrice = ({
   fetchInventory,
 }) => {
   const [addInput, setAddInput] = useState("");
-  const optionName = `${title}_name`;
+  const [remarks, setRemarks] = useState("");
   const data = {};
 
   function checkValidation() {
-    const value = addInput.replace(/\D+/g, "").trim().toLowerCase();
-
+    var value = addInput.replace(/\D+/g, "").trim();
+    const selectedInventory = inventory.find(
+      (item) =>
+        item.brand === selected.brand &&
+        item.type === selected.type &&
+        item.color === selected.color &&
+        item.size === selected.size
+    );
     var brand_id =
       Array.isArray(brands) &&
       brands.find((item) => item.brand_name === selected.brand).brand_id;
@@ -31,21 +38,31 @@ const AddPrice = ({
       sizes.find((item) => item.size_name === selected.size).size_id;
 
     if (value === "") {
-      alert("Please input price");
+      alert("Insert Quantity");
+      return;
+    }
+    if (remarks === "") {
+      alert("Enter for return reason");
+      return;
+    }
+    if (selectedInventory.qty < value) {
+      alert("Cannot return more than available stock!");
+      setAddInput(String(selectedInventory.qty));
       return;
     }
 
-    data.action = "setPrice";
+    data.action = "returnItem";
+    data.value = value;
     data.brand = brand_id;
+    data.color = color_id;
     data.type = type_id;
     data.size = size_id;
-    data.color = color_id;
-    data.value = value;
-    console.log(data);
+    data.remarks = remarks;
+    data.detail = "return item";
+
+    console.log(addInput);
     insertData();
   }
-
-  //   console.log(title, selected, brands, types, colors, exsistingSize);
 
   function insertData() {
     axios
@@ -54,6 +71,7 @@ const AddPrice = ({
       })
       .then((res) => {
         console.log(res.data);
+        // alert("Item inserted");
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
@@ -61,15 +79,16 @@ const AddPrice = ({
 
   function reset() {
     setAddInput("");
-    fetchInventory("");
+    setRemarks("");
+    fetchInventory();
   }
 
   return (
     <section>
       <div
         className="modal fade"
-        id="price"
-        tabindex="-1"
+        id="return"
+        tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
@@ -78,26 +97,25 @@ const AddPrice = ({
             <div className="modal-header">
               <h1
                 className="modal-title fs-5 text-capitalize"
-                id="addPriceLabel"
+                id="addColorLabel"
               >
-                Add {title}
+                Return item
               </h1>
               <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
-                onClick={() => reset()}
               ></button>
             </div>
             <div className="modal-body">
               {/* body */}
               <section>
+                <div className="fs-5 fw-bold text-center mb-3">
+                  Return Damage Item
+                </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text text-capitalize fs-5">
-                    {title}
-                  </span>
-                  <span className="input-group-text text-capitalize fs-5">
-                    ₱
+                    Return :
                   </span>
                   <div className="form-floating">
                     <input
@@ -105,7 +123,7 @@ const AddPrice = ({
                       className="form-control"
                       id="add"
                       onKeyDown={(e) => {
-                        if (e.key === "-" || e.key === "+") {
+                        if (e.key === "-" || e.key === "+" || e.key === "e") {
                           e.preventDefault();
                         }
                       }}
@@ -113,7 +131,27 @@ const AddPrice = ({
                       value={addInput}
                       onChange={(e) => setAddInput(e.target.value)}
                     />
-                    <label for="add">Set {title} </label>
+                    <label htmlFor="add">Enter Quantity</label>
+                  </div>
+                </div>
+
+                <div className="input-group mb-3">
+                  <span className="input-group-text text-capitalize fs-5">
+                    Reason :
+                  </span>
+                  <div class="form-floating">
+                    <textarea
+                      class="form-control"
+                      placeholder="Leave a comment here"
+                      id="floatingTextarea2"
+                      name="remarks"
+                      style={{ height: "100px" }}
+                      value={remarks}
+                      onChange={(e) => setRemarks(e.target.value)}
+                    ></textarea>
+                    <label htmlFor="floatingTextarea2">
+                      Enter reason for return
+                    </label>
                   </div>
                 </div>
               </section>
@@ -123,8 +161,9 @@ const AddPrice = ({
               <button
                 type="button"
                 className="btn btn-primary"
-                data-bs-dismiss="modal"
-                onClick={() => checkValidation()}
+                onClick={() => {
+                  checkValidation();
+                }}
               >
                 Save changes
               </button>
@@ -136,4 +175,4 @@ const AddPrice = ({
   );
 };
 
-export default AddPrice;
+export default Return;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import CustomerForm from "./CustomerForm";
 import TransansactionForm from "./TransansactionForm";
@@ -13,21 +13,25 @@ const Order = ({
   size,
   fetchInventory,
   placement,
+  customers,
+  setCustomers,
 }) => {
+  const [quickOrder, setQuickOrder] = useState(false);
+  const [printPrice, setPrintPrice] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [order, setOrder] = useState([]);
   const [customerDetail, setCustomerDetail] = useState({
     firstname: "",
     lastname: "",
     phonenumber: "",
-    facebook: "",
-    gmail: "",
     address: "",
   });
-  const [order, setOrder] = useState([]);
   const [transaction, setTransaction] = useState({
     user_id: "",
     deadline: "",
     note: "",
     placement: "",
+    design: "",
   });
 
   useEffect(() => {
@@ -38,29 +42,27 @@ const Order = ({
         user_id: account.user_id,
       }));
     }
-    fetchInventory()
+    fetchInventory();
   }, []);
 
   const addOrder = () => {
-    if (customerDetail.firstname === "") {
-      alert("Please fill firstname.");
-      return;
-    }
-    if (customerDetail.lastname === "") {
-      alert("Please fill lastname.");
-      return;
-    }
-    if (customerDetail.phonenumber === "") {
-      alert("Please fill phone number.");
-      return;
-    }
-    if (customerDetail.phonenumber.length != 11) {
-      alert("Please double check the number.");
-      return;
-    }
-    if (transaction.user_id === "") {
-      alert("Please fill transaction id.");
-      return;
+    if (!quickOrder) {
+      if (customerDetail.firstname === "") {
+        alert("Please fill firstname.");
+        return;
+      }
+      if (customerDetail.phonenumber === "") {
+        alert("Please fill phone number.");
+        return;
+      }
+      if (customerDetail.phonenumber.length != 11) {
+        alert("Phone must be 11 digits");
+        return;
+      }
+      if (transaction.user_id === "") {
+        alert("Please fill transaction id.");
+        return;
+      }
     }
     if (transaction.deadline === "") {
       alert("Please set a deadline.");
@@ -70,26 +72,45 @@ const Order = ({
       alert("Please set orders.");
       return;
     }
+    if (printPrice === "") {
+      alert("Please set print price.");
+      return;
+    }
+    if (printPrice === "0") {
+      setPrintPrice("");
+      alert("Print price cant be 0");
+      return;
+    }
+    if (discount === "0") {
+      setDiscount("");
+      alert("discount is 0 please double check");
+      return;
+    }
 
-    const data = { action: "submitOrder", transaction, customerDetail, order };
+    const data = {
+      quickOrder,
+      action: "submitOrder",
+      transaction,
+      customerDetail,
+      order,
+      printPrice,
+      discount,
+    };
 
-    console.log(data)
+    console.log(data);
     axios
       .post("http://localhost/capstone/submit.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
         console.log(response.data);
-        alert("Order submitted successfully");
         window.location.reload();
       })
       .catch((error) => {
         console.error("There was an error submitting the order!", error);
       });
   };
-
-  console.log(order);
-
+  console.log(customers);
   return (
     <>
       {placement.length > 0 ? (
@@ -104,43 +125,88 @@ const Order = ({
                 size={size}
                 setOrder={setOrder}
                 order={order}
+                printPrice={printPrice}
               />
             </div>
             <div className="card col-3 ">
-              <div className="fs-5 fw-semibold text-center">Order</div>
-              <CustomerForm
-                customerDetail={customerDetail}
-                setCustomerDetail={setCustomerDetail}
-              />
-
-              <TransansactionForm
-                transaction={transaction}
-                setTransaction={setTransaction}
-              />
-
-              <CurrentOrder
-                inventory={inventory}
-                order={order}
-                setOrder={setOrder}
-              />
-              {order.length > 0 && (
-                <div className="d-flex my-3 justify-content-evenly">
-                  <button
-                    className="btn btn-success"
-                    onClick={() => addOrder()}
-                  >
-                    {" "}
-                    Submit Order{" "}
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => window.location.reload()}
-                  >
-                    {" "}
-                    Cancel Order{" "}
-                  </button>
+              <div className="d-flex justify-content-center flex-column">
+                <div className="form-check my-3">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    value={quickOrder}
+                    id="checkDefault"
+                    checked={quickOrder}
+                    onClick={() => setQuickOrder((prev) => !prev)}
+                  />
+                  <label className="form-check-label" htmlFor="checkDefault">
+                    Click here for quick order
+                  </label>
                 </div>
-              )}
+                <select
+                  className="form-select"
+                  onChange={(e) => {
+                    const selected = customers[e.target.value];
+                    setCustomerDetail({
+                      firstname: selected.first_name,
+                      lastname: selected.last_name,
+                      phonenumber: selected.phone_number,
+                      address: selected.address,
+                    });
+                  }}
+                >
+                  {Array.isArray(customers) &&
+                    customers.map((item, i) => {
+                      const fullname = `${item.first_name} ${item.last_name}`;
+                      return (
+                        <option key={i} value={i}>
+                          {fullname}
+                        </option>
+                      );
+                    })}
+                </select>
+              </div>
+              <>
+                <>
+                  {!quickOrder && (
+                    <CustomerForm
+                      customerDetail={customerDetail}
+                      setCustomerDetail={setCustomerDetail}
+                    />
+                  )}
+                  <TransansactionForm
+                    transaction={transaction}
+                    setTransaction={setTransaction}
+                  />
+                  <CurrentOrder
+                    inventory={inventory}
+                    order={order}
+                    setOrder={setOrder}
+                    printPrice={printPrice}
+                    setPrintPrice={setPrintPrice}
+                    discount={discount}
+                    setDiscount={setDiscount}
+                  />
+                  {order.length > 0 && (
+                    <div className="d-flex my-3 justify-content-evenly">
+                      <button
+                        className="btn btn-success"
+                        onClick={() => addOrder()}
+                      >
+                        {" "}
+                        Submit Order{" "}
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => window.location.reload()}
+                      >
+                        {" "}
+                        Cancel Order{" "}
+                      </button>
+                    </div>
+                  )}
+                </>
+              </>
             </div>
           </div>
         </div>

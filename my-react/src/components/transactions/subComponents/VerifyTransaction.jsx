@@ -21,9 +21,9 @@ const VerifyTransaction = ({ transactionID, finishOrder, customerID }) => {
             ></button>
           </div>
           <div className="modal-body">
-            Clicking the "Yes" button will send an SMS notification to
-            the registered customer's phone number, informing them that their
-            order is ready for pickup.
+            Clicking the "Yes" button will send an SMS notification to the
+            registered customer's phone number, informing them that their order
+            is ready for pickup.
           </div>
           <div className="modal-footer">
             <button

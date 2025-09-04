@@ -61,11 +61,11 @@ class Database
         return $result;
     }
 
-    public function insertOrder($InventoryID, $quantity, $td_id, $status, $total, $designName)
+    public function insertOrder($brand, $type, $size, $color, $quantity, $td_id, $status, $total, $designName)
     {
-        $query = "INSERT INTO orders (`inventory_id`, `quantity`, `transaction_id`, `status`, `total`, `design_name`) VALUES (?,?,?,?,?,?)";
+        $query = "INSERT INTO orders (`brand`, `type`, `color`, `size`, `quantity`, `transaction_id`, `status`, `total`, `design_name`) VALUES (?,?,?,?,?,?,?,?,?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("iiiiis", $InventoryID, $quantity, $td_id, $status, $total, $designName);
+        $stmt->bind_param("iiiiiiiis", $brand, $type,  $color, $size, $quantity, $td_id, $status, $total, $designName);
         $stmt->execute();
         $result = $stmt->insert_id;
         $stmt->close();
@@ -75,19 +75,23 @@ class Database
     public function getTransaction()
     {
         $query = "SELECT 
-        CONCAT(COALESCE(cd.first_name, ''), ' ', COALESCE(cd.last_name, '')) AS fullname, 
-        CONCAT(u.firstname, ' ', u.lastname) AS created_by,
-        DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%M %d, %Y') AS deadline,
-        DATE_FORMAT(FROM_UNIXTIME(td.order_date), '%M %d, %Y') AS order_date,
-        td.td_id AS transaction_id,
-        s.status_name AS status,
-        td.discount as discount
+            COALESCE(cd.first_name, '') AS firstname,
+            COALESCE(cd.last_name, '') AS lastname,
+             COALESCE(cd.phone_number, '') AS phonenumber,
+             COALESCE(cd.address, '') AS address,
+            u.firstname AS user_firstname,
+            u.lastname AS user_lastname,
+            DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%M %d, %Y') AS deadline,
+            td.note AS note,
+            DATE_FORMAT(FROM_UNIXTIME(td.order_date), '%M %d, %Y') AS order_date,
+            td.td_id AS transaction_id,
+            s.status_name AS status
 
-        FROM transaction_detail td
-        JOIN customer_detail cd ON cd.cd_id = td.customer_id
-        JOIN user u ON u.user_id = td.user_id
-        JOIN status s ON s.status_id = td.status
-        ORDER BY td.deadline ASC;";
+            FROM transaction_detail td
+            JOIN customer_detail cd ON cd.cd_id = td.customer_id
+            JOIN user u ON u.user_id = td.user_id
+            JOIN status s ON s.status_id = td.status
+            ORDER BY td.deadline ASC";
 
 
 
@@ -98,12 +102,9 @@ class Database
         return $result;
     }
 
-    public function getCustomers()
+    public function getCustomer()
     {
-        $query = "SELECT *
-            FROM customer_detail
-            WHERE phone_number IS NOT NULL AND phone_number != ''
-            GROUP BY phone_number";
+        $query = "SELECT * FROM customer_detail";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -173,7 +174,7 @@ class Database
         INNER JOIN color c ON i.color = c.color_id 
         INNER JOIN size s ON i.size = s.size_id 
         WHERE i.price > 0 AND i.qty > 0
-        ORDER BY i.inventory_id DESC";
+        ORDER BY i.inventory_id DESC;";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -335,39 +336,38 @@ class Database
     public function fetchCustomerOrder($id)
     {
         $query = "SELECT
-        CONCAT(COALESCE(cd.first_name, ''), ' ', COALESCE(cd.last_name, '')) AS fullname, 
-        COALESCE(cd.phone_number, '') AS phonenumber,
-        COALESCE(cd.address, '') AS address,
-        td.td_id AS transaction_id,
-        std.status_name AS transactionStatus,
-        DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%Y-%m-%d') as deadline,
-        DATE_FORMAT(FROM_UNIXTIME(td.order_date), '%M %d, %Y') AS orderDate,
-        td.note AS note,
-        td.print_price as printPrice,
-        td.subTotal ,
-        td.discount ,
-        td.grand_total ,
-        o.order_id as orderID,
-        o.quantity as quantity,
-        os.status_name as orderStatus,
-        o.total as total,
-        o.design_name as designName,
+        cd.first_name as firstname,
+        cd.last_name as lastname,
+        cd.phone_number as phonenumber,
+        cd.address as address,
         b.brand_name as brand,
-        t.type_name as type,
         c.color_name as color,
+        t.type_name as type,
         s.size_name as size,
-        o.inventory_id as inventoryID
+        o.quantity as quantity,
+        o.design_name as design,
+        td.print_price as printPrice,
+        td.subtotal as subTotal,
+        td.discount as discount,
+        td.grand_total as grandTotal,
+        o.total as orderTotal,
+        o_st.status_name as status,
+        td_st.status_name as transaction_status,
+        o.order_id as order_id,
+        td.td_id as transaction_id,
+        td.note as note,
+        td.customer_id as customer_id,
+        DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%Y-%m-%d') as deadline
         
-        FROM orders o
-        join inventory i on i.inventory_id = o.inventory_id
-        join transaction_detail td on td.td_id = o.transaction_id
-        join status std on std.status_id = td.status
-		join status os  on os.status_id  = o.status
-        join brand b on b.brand_id = i.brand
-        join type t on t.type_id = i.type
-        join color c on c.color_id = i.color
-        join size s on s.size_id = i.size
-        join customer_detail cd on cd.cd_id = td.customer_id
+        FROM transaction_detail td 
+        join customer_detail cd on cd.cd_id = td.customer_id 
+        join orders o on o.transaction_id = td.td_id
+        join brand b on b.brand_id = o.brand
+        join color c on c.color_id = o.color
+        join size s on s.size_id = o.size
+        join type t on t.type_id = o.type
+        join status o_st on o_st.status_id = o.status
+        join status td_st on td_st.status_id = td.status
         where td_id = ?";
 
         $stmt = $this->conn->prepare($query);
@@ -572,8 +572,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if (isset($_GET['action'])) {
         $action = $_GET['action'];
         switch ($action) {
-            case 'getCustomers':
-                $result = $db->getCustomers();
+            case 'getCustomer':
+                $result = $db->getCustomer();
                 echo json_encode($result);
                 break;
             case 'getStatus':
@@ -746,7 +746,7 @@ function extendDeadline($db, $data, $unixNow)
     $deadline = $data['deadline'];
     $note = $isReorder ? "reorder transaction id number $transactionID" : "deadline extention transaction id number $transactionID";
     $detail = $isReorder ? "reorder" : "deadline extention";
-    $orders = $db->selectCustomFetchAll(["*"], "orders", ["transaction_id = '$transactionID'", "status in (1,2,4)"]);
+    $orders = $db->selectCustomFetchAll(["*"], "orders", ["transaction_id = '$transactionID'", "status in (4,5)"]);
 
     if ($isDeadlineExtension) {
         $db->setCustom('transaction_detail', ["deadline = $deadline", "status = '2'"], ["td_id = '$transactionID'"]);
@@ -756,40 +756,61 @@ function extendDeadline($db, $data, $unixNow)
 
     foreach ($orders as $order) {
         $order_id = $order['order_id'];
-        $inventoryID = $order['inventory_id'];
+        $brand_id = $order['brand'];
+        $type_id = $order['type'];
+        $color_id = $order['color'];
+        $size_id = $order['size'];
         $quantity = $order['quantity'];
-        $inventory = $db->selectCustom(["*"], "inventory", ["inventory_id = '$inventoryID'"]);
+        $whereclause = array();
+        array_push($whereclause, "brand = '$brand_id'", "type = '$type_id'", "color = '$color_id'", "size = '$size_id'");
+        $inventory = $db->selectCustom(["*"], "inventory", $whereclause);
 
         if ($inventory->qty < $quantity) {
             echo json_encode("Not enough stocks for order $order_id");
             return;
         }
-        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = '$inventoryID'"]);
-        $db->returnItem($inventoryID, $quantity);
-        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = '$inventoryID'"]);
-        $db->setCustom("orders", ["status = '1'"], ["order_id = '$order_id'"]);
-        $logs = $db->insertLogs($detail, $inventoryID, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
-        echo json_encode($logs);
     }
 
     $db->setCustom('transaction_detail', ["deadline = $deadline", "status = '2'"], ["td_id = '$transactionID'"]);
+
+    foreach ($orders as $order) {
+        $order_id = $order['order_id'];
+        $brand_id = $order['brand'];
+        $type_id = $order['type'];
+        $color_id = $order['color'];
+        $size_id = $order['size'];
+        $quantity = $order['quantity'];
+        $whereclause = array();
+        array_push($whereclause, "brand = '$brand_id'", "type = '$type_id'", "color = '$color_id'", "size = '$size_id'");
+        $inventory = $db->selectCustom(["*"], "inventory", $whereclause);
+
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = '$inventory->inventory_id'"]);
+        $db->returnItem($inventory->inventory_id, $quantity);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = '$inventory->inventory_id'"]);
+
+        $result = $db->setCustom("orders", ["status = '1'"], ["order_id = '$order_id'"]);
+        $logs = $db->insertLogs($detail, $inventory->inventory_id, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
+    }
+
+    echo json_encode($logs);
 }
 
 function cancelTransaction($db, $data, $unixNow)
 {
     $transactionID = $data['transactionID'];
-    $fullname = $data['fullname'];
+    $firstname = $data['firstname'];
+    $lastname = $data['lastname'];
     $phonenumber = $data['phonenumber'];
-    $discount = $data['discount'];
 
     $db->setCustom("transaction_detail", ["status = 4"], ["td_id = $transactionID"]);
-    $orders = $db->selectCustomFetchAll(["*"], "orders", ["transaction_id = '$transactionID'", "status in (1,2)"]);
+    $orders = $db->selectCustomFetchAll(["order_id", "brand", "type", "color", "size", "quantity"], "orders", ["transaction_id = '$transactionID'", "status in (1,2)"]);
     $detail = "cancel transaction";
     $note = "$transactionID transaction cancelled";
 
-    $result = count($orders) > 0 ? removeOrders($db, $orders, $note, $detail, $unixNow, $discount) : "no orders ongoing";
+    $result = removeOrders($db, $orders, $note, $detail, $unixNow, 4);
 
-    if ($fullname) {
+    if ($result) {
+        $fullname =  $firstname . " " . $lastname;
         $message = "Hi $fullname! This is FABRIK SALES JARO , your order is ready for pickup. You can collect it at your our store during business hours. Thank you for shopping with us!";
         $db->sendFinishOrder($message, $phonenumber);
     }
@@ -814,13 +835,21 @@ function addOrder($db, $data, $unixNow)
 function setTransactionExpired($db, $data,  $unixNow)
 {
     $transactionID = $data['id'];
+    $status = $data['status'];
+    $table = $data['table'];
     $note = "transaction expired";
     $detail = "order expired";
-    $discount = $data['discount'];
 
-    $db->setCustom("transaction_detail", ["status = '5'"], ["td_id = '$transactionID'"]);
-    $orders = $db->selectCustomFetchAll(["*"], "orders", ["transaction_id = '$transactionID'", "status in (1,2)"]);
-    $result = removeOrders($db, $orders, $note, $detail, $unixNow, $discount);
+
+    $values = array();
+    $whereclause = array();
+
+    array_push($values, "status = $status");
+    array_push($whereclause, "td_id = $transactionID");
+
+    $db->setCustom($table, $values, $whereclause);
+    $orders = $db->selectCustomFetchAll(['*'], 'orders', ["transaction_id = '$transactionID'"]);
+    $result = removeOrders($db, $orders, $note, $detail, $unixNow, 5);
     echo json_encode($result);
 }
 
@@ -917,36 +946,23 @@ function setStatus($db, $data, $unixNow)
 {
     $id = $data['id'];
     $table = $data['table'];
-    $status = $data['orderStatus'];
+    $status = $data['status'];
     $title = $data['title'];
-    $InventoryID = $data['inventoryID'];
-
-    $total = $data['total'];
-    $transactionID = $data['transactionID'];
 
     $result = $db->updateStatus($id, $table, $status);
-    if ($title == "cancel") {
-        $qty = $data['qty'];
-        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $InventoryID"]);
-        $result = $db->updateInventory($InventoryID, $qty);
-        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $InventoryID"]);
-        $db->setCustom("transaction_detail", ["subtotal = subtotal - '$total'", "grand_total = grand_total - '$total'"], ["td_id = '$transactionID'"]);
-        $note =  "item voided";
-        $detail = "void order";
-    }
 
-    if ($title == "reorder") {
-        $qty = $data['qty'];
-        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $InventoryID"]);
-        $db->returnItem($InventoryID, $qty);
-        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $InventoryID"]);
-        $db->setCustom("transaction_detail", ["subtotal = subtotal + '$total'", "grand_total = grand_total + '$total'"], ["td_id = '$transactionID'"]);
-        $note = "item reorder";
-        $detail = "reorder";
-    }
 
-    if ($title == "cancel" || $title == "reorder") {
-        $result = $db->insertLogs($detail, $InventoryID, $newValue->qty, $oldValue->qty, $qty, $unixNow, $note);
+    $orderType = $db->selectCustom(["brand", "type", "color", "size"], $table, ["order_id = $id"]);
+    $inventory = $db->selectCustom(["inventory_id"], "inventory", ["brand = $orderType->brand", "type = $orderType->type", "color = $orderType->color", "size = $orderType->size"]);
+
+    if ($title === "cancel" || $title == "reorder") {
+        $qty = $data['qty'];
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $title == "cancel" ? $db->updateInventory($inventory->inventory_id, $qty) : $db->returnItem($inventory->inventory_id, $qty);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $note = $title == "cancel" ? "order cancel" : "item reorder";
+        $detail = $title == "cancel" ? "void order" : "reorder";
+        $result = $db->insertLogs($detail, $inventory->inventory_id, $newValue->qty, $oldValue->qty, $qty, $unixNow, $note);
     }
     echo json_encode($result);
 }
@@ -1158,48 +1174,58 @@ function insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $d
 {
     $totalArray = array();
     foreach ($orders as $order) {
-        $inventoryID = $order['id'];
+        $brand = $db->getSubTableID("brand", $order['brand']);
+        $type = $db->getSubTableID("type", $order['type']);
+        $size = $db->getSubTableID("size", $order['size']);
+        $color = $db->getSubTableID("color", $order['color']);
+        $order_id = $order['id'];
+        $brand_id = $brand[0]["brand_id"];
+        $type_id = $type[0]["type_id"];
+        $color_id = $color[0]["color_id"];
+        $size_id = $size[0]["size_id"];
         $quantity = $order['orderQty'];
         $price = $order['price'];
 
         $total = ($printPrice + $price) * $quantity;
 
+        $whereclause = array();
+        array_push($whereclause, "brand = '$brand_id'", "type = '$type_id'", "color = '$color_id'", "size = '$size_id'");
+        $inventory = $db->getInventoryID($whereclause);
 
-        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventoryID"]);
-        $db->returnItem($inventoryID, $quantity);
-        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventoryID"]);
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $db->returnItem($inventory->inventory_id, $quantity);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
 
-        $result = $db->insertOrder($inventoryID, $quantity, $transactionID, $status, $total, $designName);
-        $logs = $db->insertLogs($detail, $inventoryID, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
+        $result = $db->insertOrder($brand_id, $type_id, $size_id, $color_id, $quantity, $transactionID, $status, $total, $designName);
+        $logs = $db->insertLogs($detail, $inventory->inventory_id, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
         array_push($totalArray, $total);
     }
     $subTotal = array_sum($totalArray);
     $grandTotal = $subTotal - (int)$discount;
-    $resultInventory = $db->setCustom("transaction_detail", ["subtotal = subtotal + '$subTotal'", "grand_total = grand_total + '$grandTotal'"], ["td_id = '$transactionID'"]);
-    return $resultInventory;
+    $resultInventory = $db->setCustom("transaction_detail", ["subtotal = subtotal + '$subTotal'", "grand_total = '$grandTotal'"], ["td_id = '$transactionID'"]);
+    return $totalArray;
 }
 
-function removeOrders($db, $orders, $note, $detail, $unixNow, $discount)
+function removeOrders($db, $orders, $note, $detail, $unixNow, $status)
 {
-    $totalArray = array();
     foreach ($orders as $order) {
         $order_id = $order['order_id'];
-        $inventory_id = $order['inventory_id'];
-        $transactionID = $order['transaction_id'];
+        $brand_id = $order["brand"];
+        $type_id = $order["type"];
+        $color_id = $order["color"];
+        $size_id = $order["size"];
         $quantity = $order['quantity'];
-        $total = $order['total'];
 
-        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory_id"]);
-        $db->updateInventory($inventory_id, $quantity);
-        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory_id"]);
+        $whereclause = array();
+        array_push($whereclause, "brand = $brand_id", "type = $type_id", "color = $color_id", "size = $size_id");
+        $inventory = $db->getInventoryID($whereclause);
 
-        $db->setCustom("orders", ["status = '1'"], ["order_id = '$order_id'"]);
-        $logs = $db->insertLogs($detail, $inventory_id, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
-        array_push($totalArray, $total);
+        $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+        $db->updateInventory($inventory->inventory_id, $quantity);
+        $newValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventory->inventory_id"]);
+
+        $db->setCustom("orders", ["status = '$status'"], ["order_id = '$order_id'", "status in (1,2)"]);
+        $logs = $db->insertLogs($detail, $inventory->inventory_id, $newValue->qty, $oldValue->qty, $quantity, $unixNow, $note);
     }
-
-    $subTotal = array_sum($totalArray);
-    $grandTotal = $subTotal - (int)$discount;
-    $resultInventory = $db->setCustom("transaction_detail", ["subtotal = '$total'", "grand_total = '$grandTotal'"], ["td_id = '$transactionID'"]);
     return $orders;
 }

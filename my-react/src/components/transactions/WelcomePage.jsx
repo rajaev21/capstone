@@ -14,38 +14,35 @@ const WelcomePage = ({
 }) => {
   const pending =
     Array.isArray(transaction) &&
-    transaction.filter((item) => item.status === "pending");
-  // console.log(pending);
+    transaction.filter(
+      (item) => item.status === "pending" || item.status === "ongoing"
+    );
   const finished =
     Array.isArray(transaction) &&
-    transaction.filter((item) => item.status === "finished");
-
-  const expired =
-    Array.isArray(transaction) &&
-    transaction.filter((item) => item.status === "expired");
-  const voided =
-    Array.isArray(transaction) &&
-    transaction.filter((item) => item.status === "voided");
+    transaction.filter(
+      (item) => item.status !== "pending" && item.status !== "ongoing"
+    );
+  const data = {};
+  console.log(pending);
 
   Array.isArray(pending) &&
     pending.forEach((item) => {
-      const data = {};
       if (
         Math.floor(Date.now() / 1000) >
-        Math.floor(new Date(item.deadline).getTime() / 1000)
+        Math.floor(new Date(item.deadline).getTime() / 1000) + 86399
       ) {
-        data.action = "setTransactionStatus";
+        data.action = "setTransactionExpired";
         data.id = item.transaction_id;
         data.table = "transaction_detail";
-        data.status = 5;
+        data.discount = item.discount;
+        console.log(data);
         axios
           .post("http://localhost/capstone/submit.php", data, {
             headers: { "Content-Type": "application/json" },
           })
           .then((res) => {
             console.log(res.data);
-            fetchTransaction();
-            // window.location.reload();
+            window.location.reload();
           });
         console.log(data);
       }
@@ -58,19 +55,29 @@ const WelcomePage = ({
   const goto = (id) => {
     navigate(`/transaction?id=${id}`);
   };
-
+  console.log(transaction);
   return (
-    <div className="container">
+    <div className="">
       {transaction ? (
         <>
           <div className="row row-cols-2">
-            <TransactionTable
-              title={"pending"}
-              transaction={pending}
-              setTransaction={setTransaction}
-              fetchTransaction={fetchTransaction}
-              goto={goto}
-            />
+            <div className="d-flex flex-column gap-3">
+              <TransactionTable
+                title={"pending"}
+                transaction={pending}
+                setTransaction={setTransaction}
+                fetchTransaction={fetchTransaction}
+                goto={goto}
+              />
+
+              <TransactionTable
+                title={"Others"}
+                transaction={finished}
+                setTransaction={setTransaction}
+                fetchTransaction={fetchTransaction}
+                goto={goto}
+              />
+            </div>
             {id ? (
               <CustomerDetails
                 id={id}
@@ -78,6 +85,7 @@ const WelcomePage = ({
                 inventory={inventory}
                 brand={brand}
                 color={color}
+                fetchTransaction={fetchTransaction}
               />
             ) : (
               <div className="d-flex justify-content-center">
@@ -86,28 +94,6 @@ const WelcomePage = ({
                 </div>
               </div>
             )}
-            <TransactionTable
-              title={"finished"}
-              transaction={finished}
-              setTransaction={setTransaction}
-              fetchTransaction={fetchTransaction}
-              goto={goto}
-            />
-
-            <TransactionTable
-              title={"expired"}
-              transaction={expired}
-              setTransaction={setTransaction}
-              fetchTransaction={fetchTransaction}
-              goto={goto}
-            />
-            <TransactionTable
-              title={"voided"}
-              transaction={voided}
-              setTransaction={setTransaction}
-              fetchTransaction={fetchTransaction}
-              goto={goto}
-            />
           </div>
         </>
       ) : (

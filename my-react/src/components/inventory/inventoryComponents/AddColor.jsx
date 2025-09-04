@@ -85,7 +85,6 @@ const AddColor = ({
       })
       .then((res) => {
         console.log(res.data);
-        alert("Item inserted");
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
@@ -110,7 +109,7 @@ const AddColor = ({
       <div
         className="modal fade"
         id="addColor"
-        tabindex="-1"
+        tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
@@ -160,7 +159,7 @@ const AddColor = ({
                       className="form-select"
                       id="floatingSelect"
                       aria-label="Floating label select example"
-                      value={addInput}
+                      default={addInput}
                       onChange={(e) => setAddInput(e.target.value)}
                     >
                       <option selected>Select</option>
@@ -173,7 +172,7 @@ const AddColor = ({
                           );
                         })}
                     </select>
-                    <label for="floatingSelect">
+                    <label htmlFor="floatingSelect">
                       Select an existing {title} here
                     </label>
                   </div>
@@ -192,7 +191,7 @@ const AddColor = ({
                           value={addInput}
                           onChange={(e) => setAddInput(e.target.value)}
                         />
-                        <label for="add">Add {title} name </label>
+                        <label htmlFor="add">Add {title} name </label>
                       </div>
                     </div>
                     <div className={`${image ? "col-md-6" : "col"}`}>

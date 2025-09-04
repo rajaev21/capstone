@@ -1,10 +1,4 @@
-const CancelTransaction = ({
-  transactionID,
-  cancelTransaction,
-  phonenumber,
-  firstname,
-  lastname,
-}) => {
+const CancelTransaction = ({ cancelTransaction,transactionID }) => {
   return (
     <div
       class="modal fade"
@@ -33,12 +27,7 @@ const CancelTransaction = ({
               class="btn btn-primary"
               data-bs-dismiss="modal"
               onClick={() => {
-                cancelTransaction(
-                  transactionID,
-                  phonenumber,
-                  firstname,
-                  lastname
-                );
+                cancelTransaction();
               }}
             >
               Yes

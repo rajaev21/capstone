@@ -33,7 +33,7 @@ const Logs = ({ logs }) => {
       </div>
       <div className="table-responsive">
         <table className="table table-hover table-bordered align-middle">
-          <thead className="table-light sticky-top">
+          <thead>
             <tr>
               <th>ID</th>
               <th>Detail</th>
@@ -53,6 +53,7 @@ const Logs = ({ logs }) => {
           <tbody>
             {Array.isArray(currentItems) && currentItems.length > 0 ? (
               currentItems.map((log) => {
+                const increasedItem = ["cancel transaction", "quantity added"];
                 return (
                   <tr key={log.id}>
                     <td>{log.id}</td>
@@ -64,7 +65,15 @@ const Logs = ({ logs }) => {
                     <td className="">{log.size}</td>
                     <td className="text-danger">{log.old_value}</td>
                     <td className="text-success">{log.new_value}</td>
-                    <td>{log.changed_value}</td>
+                    <td
+                      className={
+                        increasedItem.includes(log.detail)
+                          ? "text-success"
+                          : "text-danger"
+                      }
+                    >
+                      {log.changed_value}
+                    </td>
                     <td>{log.date}</td>
                     <td>{log.time}</td>
                     <td>{log.remarks}</td>

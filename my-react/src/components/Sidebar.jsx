@@ -9,8 +9,8 @@ const Sidebar = () => {
         </Link>
       </li>
       <li className="nav-item">
-        <Link className="nav-link text-dark" to="/inventory">
-          Inventory
+        <Link className="nav-link text-dark" to="/order">
+          Order
         </Link>
       </li>
       <li className="nav-item">
@@ -19,8 +19,8 @@ const Sidebar = () => {
         </Link>
       </li>
       <li className="nav-item">
-        <Link className="nav-link text-dark" to="/order">
-          Order
+        <Link className="nav-link text-dark" to="/inventory">
+          Inventory
         </Link>
       </li>
       <li className="nav-item">

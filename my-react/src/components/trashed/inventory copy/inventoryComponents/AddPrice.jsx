@@ -1,33 +1,51 @@
 import axios from "axios";
 import { useState } from "react";
 
-const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
+const AddPrice = ({
+  title,
+  selected,
+  brands,
+  types,
+  colors,
+  sizes,
+  fetchInventory,
+}) => {
   const [addInput, setAddInput] = useState("");
   const optionName = `${title}_name`;
   const data = {};
 
   function checkValidation() {
-    const value = addInput.trim().toLowerCase();
-    const checkDuplicate = option.some((item) => item[optionName] === value);
+    const value = addInput.replace(/\D+/g, "").trim().toLowerCase();
 
-    console.log(checkDuplicate);
-    if (checkDuplicate) {
-      alert(`${addInput} already exist`);
+    var brand_id =
+      Array.isArray(brands) &&
+      brands.find((item) => item.brand_name === selected.brand).brand_id;
+    var type_id =
+      Array.isArray(types) &&
+      types.find((item) => item.type_name === selected.type).type_id;
+    var color_id =
+      Array.isArray(colors) &&
+      colors.find((item) => item.color_name === selected.color).color_id;
+    var size_id =
+      Array.isArray(sizes) &&
+      sizes.find((item) => item.size_name === selected.size).size_id;
+
+    if (value === "") {
+      alert("Please input price");
       return;
     }
-    data.action = "insertOption";
-    data.value = value;
-    data.table = title;
 
+    data.action = "setPrice";
+    data.brand = brand_id;
+    data.type = type_id;
+    data.size = size_id;
+    data.color = color_id;
+    data.value = value;
     console.log(data);
     insertData();
   }
 
-  function reset() {
-    fetchInventory();
-    fetchBrand();
-    setAddInput("");
-  }
+  //   console.log(title, selected, brands, types, colors, exsistingSize);
 
   function insertData() {
     axios
@@ -36,24 +54,33 @@ const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
       })
       .then((res) => {
         console.log(res.data);
+        // alert("Price set");
         reset();
       })
       .catch((err) => console.error("Error adding option:", err));
+  }
+
+  function reset() {
+    setAddInput("");
+    fetchInventory("");
   }
 
   return (
     <section>
       <div
         className="modal fade"
-        id={title}
-        tabIndex="-1"
+        id="price"
+        tabindex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h1 className="modal-title fs-5 text-capitalize" id={title}>
+              <h1
+                className="modal-title fs-5 text-capitalize"
+                id="addPriceLabel"
+              >
                 Add {title}
               </h1>
               <button
@@ -68,18 +95,26 @@ const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
               <section>
                 <div className="input-group mb-3">
                   <span className="input-group-text text-capitalize fs-5">
-                    {title} :
+                    {title}
+                  </span>
+                  <span className="input-group-text text-capitalize fs-5">
+                    ₱
                   </span>
                   <div className="form-floating">
                     <input
-                      type="text"
+                      type="number"
                       className="form-control"
                       id="add"
+                      onKeyDown={(e) => {
+                        if (e.key === "-" || e.key === "+") {
+                          e.preventDefault();
+                        }
+                      }}
                       placeholder={title}
                       value={addInput}
                       onChange={(e) => setAddInput(e.target.value)}
                     />
-                    <label htmlFor="add">Add {title} name </label>
+                    <label for="add">Set {title} </label>
                   </div>
                 </div>
               </section>
@@ -102,4 +137,4 @@ const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
   );
 };
 
-export default AddBrand;
+export default AddPrice;

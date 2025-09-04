@@ -7,14 +7,14 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "datatables.net-bs5";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-import LoginForm from "./components/LoginForm";
-import RegisterForm from "./components/RegisterForm";
-import WelcomePage from "./components/transactions/WelcomePage";
-import Order from "./components/orders/Order";
-import Layout from "./components/Layout";
-import Inventory from "./components/inventory/Inventory";
-import Dashboard from "./components/dashboard/Dashboard";
-import History from "./components/history/History";
+import LoginForm from "../LoginForm";
+import RegisterForm from "../RegisterForm";
+import WelcomePage from "../transactions/WelcomePage";
+import Order from "../orders/Order";
+import Layout from "../Layout";
+import Inventory from "../inventory/Inventory";
+import Dashboard from "../dashboard/Dashboard";
+import History from "../history/History";
 
 function App() {
   const [inventory, setInventory] = useState({});
@@ -28,7 +28,7 @@ function App() {
   const [transaction, setTransaction] = useState({});
   const [placement, setPlacement] = useState({});
   const [status, setStatus] = useState({});
-  const [customers, setCustomers] = useState({});
+
   useEffect(() => {
     if (window.location.pathname === "/") {
       window.location.replace("/login");
@@ -47,19 +47,8 @@ function App() {
     fetchType();
     fetchTransaction();
     fetchPlacement();
-    getCustomers();
   }, []);
 
-  const getCustomers = () => {
-    axios
-      .get("http://localhost/capstone/submit.php?action=getCustomers")
-      .then((response) => {
-        setCustomers(response.data);
-      })
-      .catch((error) => {
-        console.error("There was na error", error);
-      });
-  };
   const fetchStatus = () => {
     axios
       .get("http://localhost/capstone/submit.php?action=getStatus")
@@ -170,7 +159,7 @@ function App() {
           <Route
             path="/transaction"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} >
                 <WelcomePage
                   status={status}
                   transaction={transaction}
@@ -187,7 +176,7 @@ function App() {
           <Route
             path="/order"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} >
                 <Order
                   brand={brand}
                   type={type}
@@ -201,8 +190,6 @@ function App() {
                   fetchLogs={fetchLogs}
                   placement={placement}
                   setPlacement={setPlacement}
-                  customers={customers}
-                  setCustomers={setCustomers}
                 />
               </Layout>
             }
@@ -211,7 +198,7 @@ function App() {
           <Route
             path="/inventory"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} >
                 <Inventory
                   inventory={allInventory}
                   brand={brand}
@@ -230,7 +217,7 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} >
                 <Dashboard inventory={inventory} color={color} logs={logs} />
               </Layout>
             }
@@ -238,7 +225,7 @@ function App() {
           <Route
             path="/history"
             element={
-              <Layout inventory={inventory} fetchInventory={fetchInventory}>
+              <Layout inventory={inventory} fetchInventory={fetchInventory} >
                 <History
                   inventory={allInventory}
                   logs={logs}

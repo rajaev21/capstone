@@ -33,15 +33,15 @@
     in a case where an order was canceled it will ask 
 
     edit color hex
-    if s its small
-    if xs its extra small
-    if one size exist in inventory it wont reflect in invetory but will reflect on order as long as the item is one
-    if transaction finish put confirmation
     if order is cancel return the inventory
     input if customer paid fully or partial
     stock alert if low stocks
     add order 
     customer input for price per print in order
+    if page is different give 404 error page
+    if expired return orders to inventory except finished
+    if transaction expired expire all order except finished
+    if all orders are voided you should not be able to click finished button
 
 optional:
 make a function that changes the date for demo purposes
@@ -57,3 +57,6 @@ if item is damaged reasons if replaced or not
 
 analytics:
 total shirt direct buy over supplier delivery
+
+
+Top-Selling Products

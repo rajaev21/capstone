@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Notification from "./Notification";
 
-const Navbar = () => {
+const Navbar = ({ inventory, fetchInventory }) => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -20,6 +20,7 @@ const Navbar = () => {
     setIsLoggedIn(false);
     navigate("/login");
   };
+  
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">
@@ -33,13 +34,13 @@ const Navbar = () => {
           <i className="bi bi-list"></i>
         </button>
 
-        <Link className="navbar-brand fs-3 fw-bold" to="/home">
+        <Link className="navbar-brand fs-3 fw-bold" to="/dashboard">
           FABRIK
         </Link>
 
         <div className="nav-item d-flex">
-          <Notification />
-          
+          <Notification inventory={inventory} fetchInventory={fetchInventory} />
+
           <button onClick={logout} className="btn btn-danger ms-auto">
             Logout
           </button>

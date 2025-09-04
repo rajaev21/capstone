@@ -8,11 +8,10 @@ const History = ({ inventory, logs, fetchInventory, fetchLogs }) => {
     fetchInventory();
     fetchLogs();
   }, []);
-  
+
   return (
     <div className="container">
       <Logs logs={logs} />
-
       <InventoryTable inventory={inventory} />
     </div>
   );

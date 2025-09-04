@@ -16,11 +16,7 @@ const TransactionTable = ({ transaction, goto, title }) => {
     ? filteredItems.slice(start, end)
     : [];
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
-
-  function capitalize(str) {
-    if (!str) return "";
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  }
+  console.log();
   return (
     <div className="card p-3">
       <div className="row row-cols-2">
@@ -39,33 +35,36 @@ const TransactionTable = ({ transaction, goto, title }) => {
           <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Created_by</th>
             <th>OrderDate</th>
             <th>Deadline</th>
-            {/* <th>Order ID</th> */}
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {currentItems.map((item, index) => (
-            <tr key={index}>
-              <td>{item.transaction_id}</td>
-              <td>
-                {capitalize(item.firstname)} {capitalize(item.lastname)}
-              </td>
-              <td>{item.order_date}</td>
-              <td>{item.deadline}</td>
-              <td>{item.status}</td>
-              <td>
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => goto(item.transaction_id)}
-                >
-                  <i className="bi bi-eye"></i>
-                </button>
-              </td>
-            </tr>
-          ))}
+          {currentItems.map((item, index) => {
+            return (
+              <tr key={index}>
+                <td>{item.transaction_id}</td>
+                <td>
+                  {item.fullname.trim() !== "" ? item.fullname : "Quick Order"}
+                </td>
+                <td>{item.created_by}</td>
+                <td>{item.order_date}</td>
+                <td>{item.deadline}</td>
+                <td>{item.status}</td>
+                <td>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => goto(item.transaction_id, item)}
+                  >
+                    <i className="bi bi-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <nav className="d-flex justify-content-center mt-3">
