@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2025 at 08:55 PM
+-- Generation Time: Sep 06, 2025 at 04:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -226,19 +226,19 @@ CREATE TABLE `inventory` (
 --
 
 INSERT INTO `inventory` (`inventory_id`, `brand`, `type`, `color`, `size`, `qty`, `price`) VALUES
-(31, 12, 10, 43, 13, 5464, 500),
+(31, 12, 10, 43, 13, 117, 500),
 (37, 40, 9, 43, 11, 0, 50),
 (38, 40, 9, 43, 34, 101, 500),
 (39, 40, 9, 40, 34, 139, 400),
-(44, 9, 9, 43, 11, 991, 300),
-(52, 12, 10, 40, 12, 1275, 55),
-(53, 12, 10, 43, 34, 109751, 75),
-(56, 42, 9, 41, 11, 60, 52),
+(44, 9, 9, 43, 11, 291, 300),
+(52, 12, 10, 40, 12, 123, 55),
+(53, 12, 10, 43, 34, 106, 75),
+(56, 42, 9, 41, 11, 125, 52),
 (57, 42, 9, 46, 11, 0, 122),
 (58, 42, 9, 45, 11, 0, 11),
-(62, 9, 9, 47, 13, 166, 222),
+(62, 9, 9, 47, 13, 156, 222),
 (63, 9, 9, 45, 11, 61, 1),
-(64, 9, 9, 43, 13, 760, 100),
+(64, 9, 9, 43, 13, 260, 100),
 (65, 9, 9, 45, 13, 61, 1),
 (110, 9, 9, NULL, NULL, 0, 0),
 (133, 12, 9, NULL, NULL, 0, 0),
@@ -255,8 +255,8 @@ INSERT INTO `inventory` (`inventory_id`, `brand`, `type`, `color`, `size`, `qty`
 (233, 52, 14, 46, NULL, 0, 0),
 (240, 78, 1054, NULL, NULL, 0, 0),
 (241, 78, 1054, 58, NULL, 0, 0),
-(244, 78, 1054, 58, 54, 423, 300),
-(245, 78, 1054, 58, 13, 785, 200),
+(244, 78, 1054, 58, 54, 223, 300),
+(245, 78, 1054, 58, 13, 75, 200),
 (252, 12, 10, 40, 13, 0, 0),
 (269, 82, 9, NULL, NULL, 0, 0),
 (270, 82, 9, 41, NULL, 0, 0),
@@ -332,7 +332,98 @@ INSERT INTO `logs` (`id`, `detail`, `inventory_id`, `new_value`, `old_value`, `c
 (2090, 'reorder', 31, 5474, 5574, 100, '1757009376', 'reorder transaction id number 229'),
 (2091, 'transaction order', 52, 1275, 1285, 10, '1757011257', ''),
 (2092, 'transaction order', 31, 5464, 5474, 10, '1757011257', ''),
-(2093, 'transaction order', 53, 109751, 109761, 10, '1757011257', '');
+(2093, 'transaction order', 53, 109751, 109761, 10, '1757011257', ''),
+(2094, 'void order', 52, 1285, 1275, 10, '1757060291', 'item voided'),
+(2095, 'void order', 31, 5474, 5464, 10, '1757060293', 'item voided'),
+(2096, 'cancel transaction', 53, 109761, 109751, 10, '1757060314', '230 transaction cancelled'),
+(2097, 'reorder', 52, 1275, 1285, 10, '1757060332', 'reorder transaction id number 230'),
+(2098, 'reorder', 31, 5464, 5474, 10, '1757060332', 'reorder transaction id number 230'),
+(2099, 'reorder', 53, 109751, 109761, 10, '1757060332', 'reorder transaction id number 230'),
+(2100, 'order expired', 52, 1285, 1275, 10, '1757094253', 'transaction expired'),
+(2101, 'order expired', 31, 5474, 5464, 10, '1757094253', 'transaction expired'),
+(2102, 'order expired', 52, 1295, 1285, 10, '1757094253', 'transaction expired'),
+(2103, 'order expired', 53, 109761, 109751, 10, '1757094253', 'transaction expired'),
+(2104, 'order expired', 31, 5484, 5474, 10, '1757094253', 'transaction expired'),
+(2105, 'order expired', 53, 109771, 109761, 10, '1757094253', 'transaction expired'),
+(2106, 'return item', 53, 271, 109771, 109500, '1757094290', 'x'),
+(2107, 'return item', 31, 84, 5484, 5400, '1757094299', 's'),
+(2108, 'return item', 52, 95, 1295, 1200, '1757094325', '1200'),
+(2109, 'return item', 64, 260, 760, 500, '1757094556', '500'),
+(2110, 'return item', 44, 291, 991, 700, '1757094562', '700'),
+(2111, 'return item', 245, 85, 785, 700, '1757094580', '700'),
+(2112, 'return item', 244, 223, 423, 200, '1757094586', '200'),
+(2113, 'return item', 53, 71, 271, 200, '1757094622', '200'),
+(2114, 'direct order', 62, 156, 166, 10, '1757098149', 'shirt only buy no print'),
+(2115, 'direct order', 56, 55, 60, 5, '1757099364', 'shirt only buy no print'),
+(2116, 'direct order', 245, 75, 85, 10, '1757099371', 'shirt only buy no print'),
+(2117, 'quick order', 56, 45, 55, 10, '1757099420', 'quick order no customer details'),
+(2118, 'quick order', 52, 85, 95, 10, '1757099420', 'quick order no customer details'),
+(2119, 'quick order', 52, 84, 85, 1, '1757100572', 'quick order no customer details'),
+(2120, 'cancel transaction', 56, 55, 45, 10, '1757100726', '234 transaction cancelled'),
+(2121, 'cancel transaction', 52, 94, 84, 10, '1757100726', '234 transaction cancelled'),
+(2122, 'cancel transaction', 52, 95, 94, 1, '1757100739', '235 transaction cancelled'),
+(2123, 'reorder', 52, 94, 95, 1, '1757101268', 'reorder transaction id number 235'),
+(2124, 'reorder', 52, 84, 94, 10, '1757101275', 'reorder transaction id number 230'),
+(2125, 'reorder', 31, 74, 84, 10, '1757101275', 'reorder transaction id number 230'),
+(2126, 'reorder', 53, 61, 71, 10, '1757101275', 'reorder transaction id number 230'),
+(2127, 'order expired', 52, 94, 84, 10, '1757101275', 'transaction expired'),
+(2128, 'order expired', 52, 104, 94, 10, '1757101276', 'transaction expired'),
+(2129, 'order expired', 31, 84, 74, 10, '1757101275', 'transaction expired'),
+(2130, 'order expired', 31, 94, 84, 10, '1757101276', 'transaction expired'),
+(2131, 'order expired', 53, 71, 61, 10, '1757101275', 'transaction expired'),
+(2132, 'order expired', 53, 81, 71, 10, '1757101276', 'transaction expired'),
+(2133, 'order expired', 52, 114, 104, 10, '1757101276', 'transaction expired'),
+(2134, 'order expired', 52, 124, 114, 10, '1757101276', 'transaction expired'),
+(2135, 'order expired', 31, 114, 94, 10, '1757101276', 'transaction expired'),
+(2136, 'order expired', 31, 114, 104, 10, '1757101276', 'transaction expired'),
+(2137, 'order expired', 53, 91, 81, 10, '1757101276', 'transaction expired'),
+(2138, 'order expired', 53, 101, 91, 10, '1757101276', 'transaction expired'),
+(2139, 'reorder', 52, 114, 124, 10, '1757101735', 'reorder transaction id number 230'),
+(2140, 'reorder', 31, 104, 114, 10, '1757101735', 'reorder transaction id number 230'),
+(2141, 'reorder', 53, 91, 101, 10, '1757101735', 'reorder transaction id number 230'),
+(2142, 'order expired', 52, 134, 114, 10, '1757101736', 'transaction expired'),
+(2143, 'order expired', 52, 134, 114, 10, '1757101736', 'transaction expired'),
+(2144, 'order expired', 31, 114, 104, 10, '1757101736', 'transaction expired'),
+(2145, 'order expired', 31, 124, 104, 10, '1757101736', 'transaction expired'),
+(2146, 'order expired', 53, 101, 91, 10, '1757101736', 'transaction expired'),
+(2147, 'order expired', 53, 111, 101, 10, '1757101736', 'transaction expired'),
+(2148, 'reorder', 52, 124, 134, 10, '1757101803', 'reorder transaction id number 230'),
+(2149, 'reorder', 31, 114, 124, 10, '1757101803', 'reorder transaction id number 230'),
+(2150, 'reorder', 53, 101, 111, 10, '1757101803', 'reorder transaction id number 230'),
+(2151, 'order expired', 52, 134, 124, 10, '1757101829', 'transaction expired'),
+(2152, 'order expired', 52, 144, 124, 10, '1757101829', 'transaction expired'),
+(2153, 'order expired', 31, 134, 114, 10, '1757101829', 'transaction expired'),
+(2154, 'order expired', 31, 134, 114, 10, '1757101829', 'transaction expired'),
+(2155, 'order expired', 53, 111, 101, 10, '1757101829', 'transaction expired'),
+(2156, 'order expired', 53, 121, 111, 10, '1757101829', 'transaction expired'),
+(2157, 'reorder', 52, 134, 144, 10, '1757101841', 'reorder transaction id number 230'),
+(2158, 'reorder', 31, 124, 134, 10, '1757101841', 'reorder transaction id number 230'),
+(2159, 'reorder', 53, 111, 121, 10, '1757101841', 'reorder transaction id number 230'),
+(2160, 'transaction order', 52, 124, 134, 10, '1757104376', ''),
+(2161, 'transaction order', 53, 101, 111, 10, '1757104376', ''),
+(2162, 'transaction order', 31, 114, 124, 10, '1757104376', ''),
+(2163, 'quick order', 52, 114, 124, 10, '1757104903', 'quick order no customer details'),
+(2164, 'quick order', 31, 107, 114, 7, '1757104903', 'quick order no customer details'),
+(2165, 'quick order', 53, 96, 101, 5, '1757104903', 'quick order no customer details'),
+(2166, 'quick order', 52, 110, 114, 4, '1757105029', 'quick order no customer details'),
+(2167, 'quick order', 53, 91, 96, 5, '1757105029', 'quick order no customer details'),
+(2168, 'quick order', 31, 105, 107, 2, '1757105029', 'quick order no customer details'),
+(2169, 'cancel transaction', 52, 120, 110, 10, '1757105301', '236 transaction cancelled'),
+(2170, 'cancel transaction', 53, 101, 91, 10, '1757105301', '236 transaction cancelled'),
+(2171, 'cancel transaction', 31, 115, 105, 10, '1757105301', '236 transaction cancelled'),
+(2172, 'cancel transaction', 52, 124, 120, 4, '1757105306', '238 transaction cancelled'),
+(2173, 'cancel transaction', 53, 106, 101, 5, '1757105306', '238 transaction cancelled'),
+(2174, 'cancel transaction', 31, 117, 115, 2, '1757105306', '238 transaction cancelled'),
+(2175, 'cancel transaction', 52, 134, 124, 10, '1757105309', '237 transaction cancelled'),
+(2176, 'cancel transaction', 31, 124, 117, 7, '1757105309', '237 transaction cancelled'),
+(2177, 'cancel transaction', 53, 111, 106, 5, '1757105309', '237 transaction cancelled'),
+(2178, 'reorder', 52, 124, 134, 10, '1757105371', 'reorder transaction id number 237'),
+(2179, 'reorder', 31, 117, 124, 7, '1757105371', 'reorder transaction id number 237'),
+(2180, 'reorder', 53, 106, 111, 5, '1757105371', 'reorder transaction id number 237'),
+(2181, 'transaction order', 56, 45, 55, 10, '1757167126', ''),
+(2182, 'direct order', 56, 25, 45, 20, '1757167145', 'shirt only buy no print'),
+(2183, 'direct order', 52, 123, 124, 1, '1757167165', 'shirt only buy no print'),
+(2184, 'quantity added', 56, 125, 25, 100, '1757167187', 'supplier deliver');
 
 -- --------------------------------------------------------
 
@@ -361,9 +452,27 @@ INSERT INTO `orders` (`order_id`, `inventory_id`, `quantity`, `transaction_id`, 
 (277, 52, 100, 229, 3, 15500, ''),
 (278, 53, 100, 229, 3, 17500, ''),
 (279, 31, 100, 229, 3, 60000, ''),
-(280, 52, 10, 230, 2, 1550, ''),
-(281, 31, 10, 230, 2, 6000, ''),
-(282, 53, 10, 230, 2, 1750, '');
+(280, 52, 10, 230, 3, 1550, ''),
+(281, 31, 10, 230, 3, 6000, ''),
+(282, 53, 10, 230, 3, 1750, ''),
+(283, 62, 10, 231, 3, 2220, ''),
+(284, 56, 5, 232, 3, 260, ''),
+(285, 245, 10, 233, 3, 2000, ''),
+(286, 56, 10, 234, 1, 1520, ''),
+(287, 52, 10, 234, 1, 1550, ''),
+(288, 52, 1, 235, 3, 155, ''),
+(289, 52, 10, 236, 1, 1550, ''),
+(290, 53, 10, 236, 1, 1750, ''),
+(291, 31, 10, 236, 1, 6000, ''),
+(292, 52, 10, 237, 1, 1550, ''),
+(293, 31, 7, 237, 1, 4200, ''),
+(294, 53, 5, 237, 1, 875, ''),
+(295, 52, 4, 238, 1, 620, ''),
+(296, 53, 5, 238, 1, 875, ''),
+(297, 31, 2, 238, 1, 1200, ''),
+(298, 56, 10, 239, 2, 1520, ''),
+(299, 56, 20, 240, 3, 1040, ''),
+(300, 52, 1, 241, 3, 55, '');
 
 -- --------------------------------------------------------
 
@@ -482,17 +591,29 @@ CREATE TABLE `transaction_detail` (
   `print_price` int(255) NOT NULL,
   `subtotal` int(255) NOT NULL,
   `discount` int(255) NOT NULL,
-  `grand_total` int(250) NOT NULL
+  `grand_total` int(250) NOT NULL,
+  `last_updated` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `transaction_detail`
 --
 
-INSERT INTO `transaction_detail` (`td_id`, `customer_id`, `status`, `user_id`, `deadline`, `note`, `order_date`, `print_price`, `subtotal`, `discount`, `grand_total`) VALUES
-(228, 0, 3, 4, '1757001600', 'quick order no customer details', '1757007859', 100, 9300, 0, 9300),
-(229, 0, 3, 4, '1757030400', 'quick order no customer details', '1757008043', 100, 60000, 10000, 83000),
-(230, 3, 1, 4, '1757606400', '', '1757011257', 100, 9300, 500, 8800);
+INSERT INTO `transaction_detail` (`td_id`, `customer_id`, `status`, `user_id`, `deadline`, `note`, `order_date`, `print_price`, `subtotal`, `discount`, `grand_total`, `last_updated`) VALUES
+(228, 0, 3, 4, '1757001600', 'quick order no customer details', '1757007859', 100, 9300, 0, 9300, '2025-09-03 16:00:00'),
+(229, 0, 3, 4, '1757030400', 'quick order no customer details', '1757008043', 100, 60000, 10000, 83000, '2025-09-02 16:00:00'),
+(230, 3, 3, 4, '1757116800', '', '1757011257', 100, 1750, 500, 8800, '2025-09-05 20:29:40'),
+(231, 0, 3, 4, '1757098149', 'shirt only buy no print', '1757098149', 0, 2220, 100, 2120, '2025-09-03 02:13:13'),
+(232, 0, 3, 4, '1757099364', 'shirt only buy no print', '1757099364', 0, 260, 0, 260, '2025-09-03 00:25:15'),
+(233, 0, 3, 4, '1757099371', 'shirt only buy no print', '1757099371', 0, 2000, 0, 2000, '2025-09-02 23:20:25'),
+(234, 0, 4, 4, '1757692800', 'quick order no customer details', '1757099420', 100, 1550, 0, 3070, '2025-09-02 23:20:34'),
+(235, 0, 3, 4, '1757116800', 'quick order no customer details', '1757100572', 100, 155, 100, 55, '2025-09-05 20:29:53'),
+(236, 4, 4, 4, '1757606400', '', '1757104376', 100, 6000, 0, 9300, '2025-09-05 20:48:21'),
+(237, 0, 2, 4, '1757116800', 'quick order no customer details', '1757104903', 100, 875, 0, 6625, '2025-09-05 20:49:31'),
+(238, 0, 4, 4, '1757088000', 'quick order no customer details', '1757105029', 100, 1200, 0, 2695, '2025-09-05 20:48:26'),
+(239, 85, 1, 4, '1757174400', '', '1757167126', 100, 1520, 0, 1520, '2025-09-06 13:58:46'),
+(240, 0, 3, 4, '1757167145', 'shirt only buy no print', '1757167145', 0, 1040, 0, 1040, '2025-09-06 13:59:05'),
+(241, 0, 3, 4, '1757167165', 'shirt only buy no print', '1757167165', 0, 55, 0, 55, '2025-09-06 13:59:25');
 
 -- --------------------------------------------------------
 
@@ -688,13 +809,13 @@ ALTER TABLE `inventory`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2094;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2185;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=283;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=301;
 
 --
 -- AUTO_INCREMENT for table `print`
@@ -730,7 +851,7 @@ ALTER TABLE `status`
 -- AUTO_INCREMENT for table `transaction_detail`
 --
 ALTER TABLE `transaction_detail`
-  MODIFY `td_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=231;
+  MODIFY `td_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=242;
 
 --
 -- AUTO_INCREMENT for table `type`

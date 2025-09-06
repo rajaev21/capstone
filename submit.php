@@ -156,6 +156,77 @@ class Database
         return $result;
     }
 
+    public function getDeadlineToday()
+    {
+        $query = "SELECT COUNT(td_id) AS transactionDeadline
+                FROM transaction_detail
+                WHERE DATE_FORMAT(FROM_UNIXTIME(deadline), '%Y-%m-%d') = CURDATE()
+                AND status IN (1,2)";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_object();
+        $stmt->close();
+        return $result;
+    }
+    public function getWeeklyOrders()
+    {
+        $query = "SELECT 
+            WEEKDAY(DATE(FROM_UNIXTIME(td.order_date))) as dayOftheWeek,
+            SUM(o.quantity) AS quantity, 
+            DATE(FROM_UNIXTIME(td.order_date)) AS order_date
+            FROM transaction_detail td
+            JOIN orders o 
+            ON td.td_id = o.transaction_id
+            GROUP BY DATE(FROM_UNIXTIME(td.order_date))";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $result;
+    }
+    public function getOrdersFinishedToday()
+    {
+        $query = "SELECT sum(o.quantity) as quantity
+                FROM transaction_detail td
+                join orders o on td.td_id = o.transaction_id
+                WHERE DATE(last_updated) = CURDATE() and o.status = 3";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_object();
+        $stmt->close();
+        return $result;
+    }
+    public function getOrdersToday()
+    {
+        $query = "SELECT SUM(o.quantity) AS quantity
+                FROM transaction_detail td
+                JOIN orders o ON td.td_id = o.transaction_id
+                WHERE DATE(FROM_UNIXTIME(td.order_date)) = CURDATE();
+                ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_object();
+        $stmt->close();
+        return $result;
+    }
+
+    public function getTasksToday()
+    {
+        $query = "SELECT count(td_id) AS transactions
+                FROM transaction_detail
+                WHERE status in (1,2)";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_object();
+        $stmt->close();
+        return $result;
+    }
+
 
     public function getInventory()
     {
@@ -543,26 +614,6 @@ class Database
         $stmt->execute();
         return $stmt->affected_rows;
     }
-    public function getCustomerSalesQty()
-    {
-
-        $query = "SELECT 
-            CONCAT(cd.first_name, ' ', cd.last_name) AS fullname, 
-            SUM(o.quantity) AS totalQuantity, 
-            SUM(td.grand_total) AS grandTotal
-            FROM transaction_detail td
-            JOIN orders o ON td.td_id = o.transaction_id
-            JOIN customer_detail cd ON cd.cd_id = td.customer_id
-            WHERE td.customer_id != 0
-            GROUP BY cd.cd_id, fullname
-            ORDER BY grandTotal DESC
-            LIMIT 5";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        $data = $stmt->get_result();
-        $result = $data->fetch_all(MYSQLI_ASSOC);
-        return $result;
-    }
 }
 
 $db = new Database("localhost", "root", "", "fabrik");
@@ -574,6 +625,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         switch ($action) {
             case 'getCustomers':
                 $result = $db->getCustomers();
+                echo json_encode($result);
+                break;
+            case 'getWeeklyOrders':
+                $result = $db->getWeeklyOrders();
+                echo json_encode($result);
+                break;
+            case 'getDeadlineToday':
+                $result = $db->getDeadlineToday();
+                echo json_encode($result);
+                break;
+            case 'getOrdersFinishedToday':
+                $result = $db->getOrdersFinishedToday();
+                echo json_encode($result);
+                break;
+            case 'getTasksToday':
+                $result = $db->getTasksToday();
+                echo json_encode($result);
+                break;
+            case 'getOrdersToday':
+                $result = $db->getOrdersToday();
                 echo json_encode($result);
                 break;
             case 'getStatus':
@@ -618,10 +689,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 break;
             case 'getInventoryCheck':
                 $result = $db->getAll("inventory");
-                echo json_encode($result);
-                break;
-            case 'getCustomerSalesQty':
-                $result = $db->getCustomerSalesQty();
                 echo json_encode($result);
                 break;
             case 'getCustomerDetails':

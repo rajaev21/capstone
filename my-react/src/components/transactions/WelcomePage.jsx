@@ -69,7 +69,7 @@ const WelcomePage = ({
                 fetchTransaction={fetchTransaction}
                 goto={goto}
               />
-
+              <hr />
               <TransactionTable
                 title={"Others"}
                 transaction={finished}

@@ -110,6 +110,15 @@ const Order = ({
         console.error("There was an error submitting the order!", error);
       });
   };
+
+  function reset() {
+    setCustomerDetail({
+      firstname: "",
+      lastname: "",
+      phonenumber: "",
+      address: "",
+    });
+  }
   console.log(customers);
   return (
     <>
@@ -137,7 +146,10 @@ const Order = ({
                     value={quickOrder}
                     id="checkDefault"
                     checked={quickOrder}
-                    onClick={() => setQuickOrder((prev) => !prev)}
+                    onClick={() => {
+                      setQuickOrder((prev) => !prev);
+                      reset();
+                    }}
                   />
                   <label className="form-check-label" htmlFor="checkDefault">
                     Click here for quick order
@@ -154,6 +166,7 @@ const Order = ({
                       address: selected.address,
                     });
                   }}
+                  disabled={quickOrder}
                 >
                   {Array.isArray(customers) &&
                     customers.map((item, i) => {

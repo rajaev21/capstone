@@ -27,7 +27,6 @@ const CustomerSales = ({}) => {
         setCustomers([["Name", "Grand Total", "Quantity"], ...rows]);
       });
   }, []);
-  console.log(customers);
   return (
     <section>
       <Chart

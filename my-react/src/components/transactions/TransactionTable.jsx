@@ -18,7 +18,7 @@ const TransactionTable = ({ transaction, goto, title }) => {
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
   console.log();
   return (
-    <div className="card p-3">
+    <div className="">
       <div className="row row-cols-2">
         <div className="fs-3 fw-bold text-capitalize">{title}</div>
         <h6>
