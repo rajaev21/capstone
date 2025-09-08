@@ -144,18 +144,6 @@ const CustomerDetails = ({
       });
   }
 
-  // const allOrderVoided =
-  //         Array.isArray(details) &&
-  //         details.every((item) => item.orderStatus === "voided");
-  //       console.log(allOrderVoided);
-  //       if (allOrderVoided) {
-  //         cancelTransaction(
-  //           details[0].transaction_id,
-  //           details[0].phonenumber,
-  //           details[0].fullname
-  //         );
-  //       }
-
   console.log(details);
 
   return (
@@ -175,7 +163,7 @@ const CustomerDetails = ({
                     data-bs-target={`#reorder${details[0].transaction_id}`}
                     onClick={() => setIsReorder(false)}
                   >
-                    Extend order <i className="bi bi-calendar"></i>
+                    Extend deadline <i className="bi bi-calendar"></i>
                   </button>
                   <Reorder
                     title={"extend"}
@@ -204,6 +192,9 @@ const CustomerDetails = ({
                 </p>
                 <p className="card-text mb-1 col">
                   <strong>Deadline:</strong> {details[0].deadline}
+                </p>
+                <p className="card-text mb-1 col">
+                  <strong>Design:</strong> {details[0].designName}
                 </p>
               </div>
               <hr />

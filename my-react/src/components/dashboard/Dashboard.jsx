@@ -3,21 +3,12 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import OrderData from "./OrderData";
 const Dashboard = ({}) => {
-  const [data, setData] = useState({
-    selectedDate: new Date().toISOString().split("T")[0],
-  });
-  const today = new Date().toLocaleDateString("en-US", {
-    timeZone: "Asia/Manila", // force PH timezone
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  });
+  const [data, setData] = useState({});
   useEffect(() => {
     getOrdersToday();
     getTasksToday();
     getOrdersFinishedToday();
     getDeadlineToday();
-    getWeeklyOrders();
   }, []);
   function getOrdersFinishedToday() {
     axios
@@ -32,6 +23,7 @@ const Dashboard = ({}) => {
         console.error("There was na error", error);
       });
   }
+
   function getOrdersToday() {
     axios
       .get("http://localhost/capstone/submit.php?action=getOrdersToday")
@@ -71,21 +63,7 @@ const Dashboard = ({}) => {
         console.error("There was na error", error);
       });
   }
-  function getWeeklyOrders() {
-    axios
-      .get("http://localhost/capstone/submit.php?action=getWeeklyOrders")
-      .then((response) => {
-        setData((prev) => ({
-          ...prev,
-          weeklyOrders: response.data,
-        }));
-      })
-      .catch((error) => {
-        console.error("There was na error", error);
-      });
-  }
 
-  console.log(data);
   return (
     <section className="container">
       <div className="p-0 gap-2">
@@ -112,13 +90,13 @@ const Dashboard = ({}) => {
           </Link>
           <div className="text-center card" style={{ width: "13em" }}>
             <span className="fw-bold" style={{ fontSize: "4em" }}>
-              {data.ordersToday}
+              {data.ordersToday ? data.ordersToday : 0}
             </span>
             <div className="fs-5 p-2 text-capitalize">orders made</div>
           </div>
           <div className="text-center card" style={{ width: "13em" }}>
             <span className="fw-bold" style={{ fontSize: "4em" }}>
-              {data.ordersFinished}
+              {data.ordersFinished ? data.ordersFinished : 0}
             </span>
             <div className="fs-5 p-2 text-capitalize">orders finished</div>
           </div>
@@ -133,7 +111,7 @@ const Dashboard = ({}) => {
         Tapus total order Muna Ang report tanan lang order butang mo.. 
         top customer by quantity and sales */}
 
-        <OrderData data={data} setData={setData} />
+        <OrderData />
 
         <div className="card ">{/* line chart for each item sales */}</div>
       </div>

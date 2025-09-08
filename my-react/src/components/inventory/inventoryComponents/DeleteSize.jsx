@@ -29,6 +29,7 @@ const DeleteSize = ({
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
+        console.log(res.data)
         reset(); 
       })
       .catch((err) => console.error("Error adding option:", err));

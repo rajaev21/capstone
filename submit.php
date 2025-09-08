@@ -169,16 +169,61 @@ class Database
         $stmt->close();
         return $result;
     }
-    public function getWeeklyOrders()
+    public function getWeeklyOrders($day)
     {
-        $query = "SELECT 
-            WEEKDAY(DATE(FROM_UNIXTIME(td.order_date))) as dayOftheWeek,
-            SUM(o.quantity) AS quantity, 
-            DATE(FROM_UNIXTIME(td.order_date)) AS order_date
-            FROM transaction_detail td
-            JOIN orders o 
-            ON td.td_id = o.transaction_id
-            GROUP BY DATE(FROM_UNIXTIME(td.order_date))";
+        $query = "select 
+                date(from_unixtime(td.order_date)) as order_date, 
+                sum(o.quantity) as quantity,
+                WEEKDAY(DATE(FROM_UNIXTIME(td.order_date))) as weekday
+
+                from transaction_detail td
+                join orders o on td.td_id = o.transaction_id
+                where week(date(from_unixtime(td.order_date))) = week('$day')
+                group by DATE(FROM_UNIXTIME(td.order_date))
+                order by order_date";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $result;
+    }
+    public function getMonthOrder($year)
+    {
+        $query = "select 
+                date(from_unixtime(td.order_date)) as order_date, 
+                sum(o.quantity) as quantity,
+                monthname(DATE(FROM_UNIXTIME(td.order_date))) as monthname,
+                month(DATE(FROM_UNIXTIME(td.order_date))) as month
+
+                from transaction_detail td
+                join orders o on td.td_id = o.transaction_id
+                where year(date(from_unixtime(td.order_date))) = $year
+                group by monthname(DATE(FROM_UNIXTIME(td.order_date)))
+                order by order_date";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $result;
+    }
+
+    public function topSales()
+    {
+        $query = "select 
+				sum(o.quantity) as quantity,
+				i.inventory_id as inventory_id,
+                concat(b.brand_name, ' ', t.type_name,' ', c.color_name,' ', s.size_name) as inventory_name
+                
+                from orders o
+                join inventory i on o.inventory_id = i.inventory_id
+                join brand b on i.brand = b.brand_id
+                join type t on i.type = t.type_id
+                join color c on i.color = c.color_id
+                join size s on i.size = s.size_id
+                group by i.inventory_id
+                order by quantity DESC limit 5;";
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -356,17 +401,13 @@ class Database
 
     public function deleteRowWithID($table, $column, $id)
     {
-        try {
-            $query = "delete FROM `$table` where `$column` = ?";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->affected_rows;
-            $stmt->close();
-            return $result;
-        } catch (Exception $e) {
-            return (["message" => 'fk']);
-        }
+        $query = "delete FROM `$table` where `$column` = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->affected_rows;
+        $stmt->close();
+        return $result;
     }
 
     public function insertPrice($value, $id)
@@ -627,8 +668,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
                 $result = $db->getCustomers();
                 echo json_encode($result);
                 break;
+            case 'topSales':
+                $result = $db->topSales();
+                echo json_encode($result);
+                break;
+            case 'getMonthOrder':
+                $year = $_GET['year'];
+                $result = $db->getMonthOrder($year);
+                echo json_encode($result);
+                break;
             case 'getWeeklyOrders':
-                $result = $db->getWeeklyOrders();
+                $day = $_GET['day'];
+                $result = $db->getWeeklyOrders($day);
                 echo json_encode($result);
                 break;
             case 'getDeadlineToday':

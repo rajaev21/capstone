@@ -112,7 +112,6 @@ const Inventory = ({
       size: lowStocks.size,
     });
   }
-  console.log("colors", inventory);
   return (
     <section onClick={() => navigate(useLocation.pathname)}>
       <div className="fs-3 fw-bold">

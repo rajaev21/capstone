@@ -2,37 +2,40 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Chart } from "react-google-charts";
 
-const CustomerSales = ({}) => {
-  const [customers, setCustomers] = useState([
-    ["Name", "Grand Total", "Quantity"],
-    ["c1", 1000, 400],
-  ]);
+const TopItemSales = () => {
+  const [data, setData] = useState([["Item", "Quantity"]]);
+
   const options = {
-    chart: {
-      title: "Company Performance",
-      subtitle: "Sales and Expenses over the Years",
-    },
-    legend: { position: "bottom" },
+    title: "Top Item Sales",
+    subtitle: "Best-selling items and their quantities",
+
+    legend: { position: "none" },
   };
 
   useEffect(() => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getCustomerSalesQty")
+      .get("http://localhost/capstone/submit.php?action=topSales")
       .then((response) => {
-        const rows = response.data.map((item) => [
-          item.fullname,
-          Number(item.grandTotal),
-          Number(item.totalQuantity),
-        ]);
-        setCustomers([["Name", "Grand Total", "Quantity"], ...rows]);
+        console.log("Top sales API:", response.data);
+
+        const newData = [["Item", "Quantity"]];
+        response.data.forEach((item) => {
+          newData.push([item.inventory_name, Number(item.quantity)]);
+        });
+
+        setData(newData);
+      })
+      .catch((error) => {
+        console.error("Error fetching top sales:", error);
       });
   }, []);
+
   return (
     <section>
       <Chart
         chartType="BarChart"
         options={options}
-        data={customers}
+        data={data}
         width={"100%"}
         height={"300px"}
       />
@@ -40,4 +43,4 @@ const CustomerSales = ({}) => {
   );
 };
 
-export default CustomerSales;
+export default TopItemSales;
