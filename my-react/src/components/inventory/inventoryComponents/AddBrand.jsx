@@ -89,7 +89,6 @@ const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
               <button
                 type="button"
                 className="btn btn-primary"
-                data-bs-dismiss="modal"
                 onClick={() => checkValidation()}
               >
                 Save changes

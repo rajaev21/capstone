@@ -1279,7 +1279,9 @@ function insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $d
         $inventoryID = $order['id'];
         $quantity = $order['orderQty'];
         $price = $order['price'];
-
+        if ($detail === "direct order") {
+            $price += 10;
+        }
         $total = ($printPrice + $price) * $quantity;
 
 

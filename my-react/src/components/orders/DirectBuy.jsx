@@ -117,7 +117,7 @@ const DirectBuy = ({ item }) => {
               </div>
               <div className="text-center mt-3">
                 <span className="fs-5 fw-bold">Total : </span>₱{" "}
-                {quantity * item.price - discount}
+                {quantity * (item.price + 10) - discount}
               </div>
             </div>
             <div class="modal-footer">

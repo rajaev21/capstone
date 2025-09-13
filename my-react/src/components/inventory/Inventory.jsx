@@ -29,6 +29,45 @@ const Inventory = ({
   const [savedID, setSavedID] = useState(0);
   const navigate = useNavigate();
   const paramID = new URLSearchParams(useLocation().search);
+  const colorOrder = [
+    "white",
+    "light yellow",
+    "yellow",
+    "gold",
+    "orange",
+    "mandarin",
+    "pearl blush",
+    "acid pink",
+    "laso",
+    "peach",
+    "red",
+    "maroon",
+    "rose red",
+    "bright fuchsia",
+    "purple",
+    "magenta",
+    "violet",
+    "aqua glass",
+    "pulis",
+    "light blue",
+    "teal",
+    "dagat",
+    "royal blue",
+    "batis",
+    "navy blue",
+    "pool green",
+    "apple green",
+    "fatigue",
+    "dahon",
+    "emerald green",
+    "black",
+    "gray",
+    "pilak",
+    "nomad",
+    "incense",
+    "cinnamon",
+    "brown",
+  ];
 
   const selected_brand = Array.isArray(brand)
     ? brand.find((item) => item.brand_name === selected.brand)
@@ -50,10 +89,14 @@ const Inventory = ({
     : [];
 
   const colors = Array.isArray(filteredTypes)
-    ? filteredTypes.filter(
-        (c, index, self) =>
-          index === self.findIndex((item) => item.color === c.color)
-      )
+    ? filteredTypes
+        .filter(
+          (c, index, self) =>
+            index === self.findIndex((item) => item.color === c.color)
+        )
+        .sort(
+          (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
+        )
     : [];
 
   const filteredColors = Array.isArray(filteredTypes)
@@ -199,7 +242,7 @@ const Inventory = ({
               {types.map((item, index) => {
                 let typename = item.type.replace(/\s+/g, "-");
                 let name = `${typename}${index}`;
-                console.log(types);
+                console.log(colors);
                 return (
                   <div key={index} className="accordion-item">
                     <h2 className="accordion-header">

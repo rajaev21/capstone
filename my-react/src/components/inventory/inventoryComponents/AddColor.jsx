@@ -159,7 +159,7 @@ const AddColor = ({
                       className="form-select"
                       id="floatingSelect"
                       aria-label="Floating label select example"
-                      default={addInput}
+                      value={addInput}
                       onChange={(e) => setAddInput(e.target.value)}
                     >
                       <option selected>Select</option>
@@ -245,7 +245,6 @@ const AddColor = ({
               <button
                 type="button"
                 className="btn btn-primary"
-                data-bs-dismiss="modal"
                 onClick={() => checkValidation()}
               >
                 Save changes
