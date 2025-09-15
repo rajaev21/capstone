@@ -67,6 +67,7 @@ const Inventory = ({
     "incense",
     "cinnamon",
     "brown",
+    "mustasa"
   ];
 
   const selected_brand = Array.isArray(brand)
