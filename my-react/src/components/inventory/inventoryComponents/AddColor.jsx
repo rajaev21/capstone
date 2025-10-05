@@ -3,75 +3,38 @@ import { useState } from "react";
 
 const AddColor = ({
   title,
-  selected,
-  brands,
-  types,
   colors,
-  exsistingType,
   fetchInventory,
   fetchColor,
+  setIsAddNewColor,
 }) => {
-  const [addInput, setAddInput] = useState("");
-  const [selectInput, setselectInput] = useState(true);
+  const [addColor, setaddColor] = useState("");
   const [hex, setHex] = useState("#ffffff");
   const [image, setImage] = useState(null);
-  const optionName = `${title}_name`;
-  const optionHex = `${title}`;
   const data = {};
-  const newOption =
-    Array.isArray(exsistingType) && Array.isArray(colors)
-      ? colors.filter(
-          (item) =>
-            !exsistingType.some((color) => color.color === item.color_name)
-        )
-      : [];
 
   function checkValidation() {
-    const value = addInput.trim().toLowerCase();
-    const checkDuplicate =
-      Array.isArray(colors) &&
-      colors.some((item) => item[optionName] === value);
-    const checkHex =
-      Array.isArray(colors) && colors.some((item) => item.hex === hex);
-    var brand_id = brands.find(
-      (item) => item.brand_name === selected.brand
-    ).brand_id;
-    var type_id = types.find(
-      (item) => item.type_name === selected.type
-    ).type_id;
+    const value = addColor.trim().toLowerCase();
+    const checkDuplicate = colors.some((item) => item.color_name === value);
+    const checkHex = colors.some((item) => item.hex === hex);
 
-    if (value === "") {
-      alert("Put or select a color");
+    if (!value) {
+      alert("Color name cant be empty");
       return;
     }
-    if (!selectInput) {
-      if (checkDuplicate) {
-        alert(`${addInput} already exist`);
-        return;
-      }
-      if (checkHex) {
-        alert(`Hex ${hex} already exist`);
-        return;
-      }
-      data.action = "insertOption";
-      data.value = value;
-      data.table = title;
-      data.brand = brand_id;
-      data.type = type_id;
-      data.hex = hex;
+    if (checkDuplicate) {
+      alert(`${addColor} already exist`);
+      return;
     }
-
-    if (selectInput) {
-      if (value === "select") {
-        alert(`Please select a color`);
-        return;
-      }
-
-      data.action = "insertBrandTypeColor";
-      data.brand = brand_id;
-      data.type = type_id;
-      data.color = value;
+    if (checkHex) {
+      alert(`Hex ${hex} already exist`);
+      return;
     }
+    data.action = "insertOption";
+    data.value = value;
+    data.table = title;
+    data.hex = hex;
+
     console.log(data);
     insertData();
   }
@@ -86,6 +49,7 @@ const AddColor = ({
       .then((res) => {
         console.log(res.data);
         reset();
+        setIsAddNewColor(false);
       })
       .catch((err) => console.error("Error adding option:", err));
   }
@@ -99,160 +63,92 @@ const AddColor = ({
 
   function reset() {
     setHex("#ffffff");
-    setAddInput("");
+    setaddColor("");
     fetchInventory();
     fetchColor();
   }
 
   return (
     <section>
-      <div
-        className="modal fade"
-        id="addColor"
-        tabIndex="-1"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-      >
-        <div className="modal-dialog modal-xl">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1
-                className="modal-title fs-5 text-capitalize"
-                id="addColorLabel"
-              >
-                Add {title}
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                onClick={() => {
-                  setImage(null);
-                  setHex("#ffffff");
-                  setAddInput("");
-                }}
-              ></button>
-            </div>
-            <div className="modal-body">
-              {/* body */}
-              <section>
-                {["type", "size", "color"].some((item) => item === title) && (
-                  <button
-                    className="btn btn-secondary ms-auto"
-                    onClick={() => {
-                      setselectInput((prev) => !prev);
-                      setImage(null);
-                      setHex("#ffffff");
-                      setAddInput("");
-                    }}
-                  >
-                    {!selectInput
-                      ? `Click here to choose existing ${title}`
-                      : `Click here to enter new ${title}`}
-                  </button>
-                )}
-                <hr />
-
-                {selectInput ? (
-                  <div className="form-floating">
-                    <select
-                      className="form-select"
-                      id="floatingSelect"
-                      aria-label="Floating label select example"
-                      value={addInput}
-                      onChange={(e) => setAddInput(e.target.value)}
-                    >
-                      <option selected>Select</option>
-                      {Array.isArray(newOption) &&
-                        newOption.map((item) => {
-                          const name = `${title}_name`;
-                          const itemid = `${title}_id`;
-                          return (
-                            <option value={item[itemid]}>{item[name]}</option>
-                          );
-                        })}
-                    </select>
-                    <label htmlFor="floatingSelect">
-                      Select an existing {title} here
-                    </label>
-                  </div>
-                ) : (
-                  <div className="row my-3 align-items-start">
-                    <div className="input-group mb-3">
-                      <span className="input-group-text text-capitalize fs-5">
-                        {title} :
-                      </span>
-                      <div className="form-floating">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="add"
-                          placeholder={title}
-                          value={addInput}
-                          onChange={(e) => setAddInput(e.target.value)}
-                        />
-                        <label htmlFor="add">Add {title} name </label>
-                      </div>
-                    </div>
-                    <div className={`${image ? "col-md-6" : "col"}`}>
-                      <label className="form-label fw-semibold text-capitalize">
-                        Pick color :
-                      </label>
-                      <div className="input-group mb-3">
-                        <input
-                          type="color"
-                          name="color"
-                          className="form-control form-control-color"
-                          style={{ maxWidth: "60px" }}
-                          value={hex}
-                          onChange={(e) => setHex(e.target.value)}
-                          required
-                        />
-                        <span className="form-control input-group-text fw-bold text-uppercase">
-                          {hex}
-                        </span>
-                      </div>
-
-                      <label className="form-label fw-semibold text-capitalize">
-                        Pick image for color picker :
-                      </label>
-                      <input
-                        type="file"
-                        name="image"
-                        accept="image/*"
-                        className="form-control"
-                        onChange={handleFileChange}
-                        required
-                      />
-                    </div>
-                    {image && (
-                      <div className="col-md-6 text-center">
-                        <p className="fw-bold">Preview:</p>
-                        <img
-                          src={URL.createObjectURL(image)}
-                          alt="preview"
-                          className="img-thumbnail"
-                          style={{ maxWidth: "100%", height: "auto" }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </section>
-              {/* end body */}
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => checkValidation()}
-              >
-                Save changes
-              </button>
-            </div>
+      {/* body */}
+      <div className="row my-3 align-items-start">
+        <div className="input-group mb-3">
+          <span className="input-group-text text-capitalize fs-5">
+            {title} :
+          </span>
+          <div className="form-floating">
+            <input
+              type="text"
+              className="form-control"
+              id="add"
+              placeholder={title}
+              value={addColor}
+              onChange={(e) => setaddColor(e.target.value)}
+            />
+            <label htmlFor="add">Add {title} name </label>
           </div>
         </div>
+        <div className={`${image ? "col-md-6" : "col"}`}>
+          <label className="form-label fw-semibold text-capitalize">
+            Pick color :
+          </label>
+          <div className="input-group mb-3">
+            <input
+              type="color"
+              name="color"
+              className="form-control form-control-color"
+              style={{ maxWidth: "60px" }}
+              value={hex}
+              onChange={(e) => setHex(e.target.value)}
+              required
+            />
+            <span className="form-control input-group-text fw-bold text-uppercase">
+              {hex}
+            </span>
+          </div>
+
+          <label className="form-label fw-semibold text-capitalize">
+            Pick image for color picker :
+          </label>
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            className="form-control"
+            onChange={handleFileChange}
+            required
+          />
+          <div className="d-flex justify-content-end mt-2 gap-2">
+            <button
+              className="btn btn-danger"
+              onClick={() => {
+                reset();
+                setIsAddNewColor(false);
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => checkValidation()}
+            >
+              Add
+            </button>
+          </div>
+        </div>
+        {image && (
+          <div className="col-md-6 text-center">
+            <p className="fw-bold">Preview:</p>
+            <img
+              src={URL.createObjectURL(image)}
+              alt="preview"
+              className="img-thumbnail"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          </div>
+        )}
       </div>
+      {/* end body */}
     </section>
   );
 };

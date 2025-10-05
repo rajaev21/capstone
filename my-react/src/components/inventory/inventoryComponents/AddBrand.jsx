@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import { Modal } from "bootstrap";
 
 const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
   const [addInput, setAddInput] = useState("");
@@ -37,6 +38,7 @@ const AddBrand = ({ title, option, fetchInventory, fetchBrand }) => {
       .then((res) => {
         console.log(res.data);
         reset();
+        document.querySelector(`#${title} .btn-close`)?.click();
       })
       .catch((err) => console.error("Error adding option:", err));
   }

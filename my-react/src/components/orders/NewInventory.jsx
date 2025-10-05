@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { Collapse } from "bootstrap";
-import DirectBuy from "./DirectBuy";
 import { useLocation } from "react-router-dom";
+import DirectBuy from "./DirectBuy";
+import AddPrice from "./AddPrice";
 
 const NewInventory = ({ inventory, color, setOrder, order }) => {
   const paramID = new URLSearchParams(useLocation().search);
   const location = useLocation();
   const [selected, setSelected] = useState({});
+  const colorOrder = color.map((item) => item.color_name);
+  const sizeOrder = ["xs", "s", "m", "l", "xl", "2xl", "3xl", "4xl", "5xl"];
+  const [item, setItem] = useState({});
 
-  const brands = Array.isArray(inventory)
+  const brands = inventory
     ? inventory.filter(
         (t, index, self) =>
           index === self.findIndex((item) => item.brand === t.brand)
@@ -31,10 +35,14 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
     : [];
 
   const colors = Array.isArray(filteredTypes)
-    ? filteredTypes.filter(
-        (c, index, self) =>
-          index === self.findIndex((item) => item.color === c.color)
-      )
+    ? filteredTypes
+        .filter(
+          (c, index, self) =>
+            index === self.findIndex((item) => item.color === c.color)
+        )
+        .sort(
+          (a, b) => colorOrder.indexOf(a.color) - colorOrder.indexOf(b.color)
+        )
     : [];
 
   const filteredColors = Array.isArray(filteredTypes)
@@ -42,10 +50,12 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
     : [];
 
   const sizes = Array.isArray(filteredColors)
-    ? filteredColors.filter(
-        (s, index, self) =>
-          index === self.findIndex((item) => item.size === s.size)
-      )
+    ? filteredColors
+        .filter(
+          (s, index, self) =>
+            index === self.findIndex((item) => item.size === s.size)
+        )
+        .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size))
     : [];
 
   function getHex(colorName) {
@@ -79,10 +89,6 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
     });
   }
 
-  const addOrder = (item) => {
-    setOrder((prev) => [...prev, { ...item, orderQty: 1 }]);
-  };
-
   function inOrder(id) {
     return order.some((item) => item.id === id);
   }
@@ -91,22 +97,21 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
     <section>
       <div className="fs-3 fw-bold">Brands</div>
       <ul className="nav nav-tabs mb-3">
-        {Array.isArray(brands) &&
-          brands.map((brand, index) => (
-            <li key={index} className="nav-item">
-              <a
-                href="#"
-                className="text-capitalize nav-link fs-4"
-                data-bs-toggle="tab"
-                onClick={() => {
-                  setSelected({ brand: brand.brand, type: "" });
-                  closeCollapse();
-                }}
-              >
-                {brand.brand}
-              </a>
-            </li>
-          ))}
+        {brands.map((brand, index) => (
+          <li key={index} className="nav-item">
+            <a
+              href="#"
+              className="text-capitalize nav-link fs-4"
+              data-bs-toggle="tab"
+              onClick={() => {
+                setSelected({ brand: brand.brand, type: "" });
+                closeCollapse();
+              }}
+            >
+              {brand.brand}
+            </a>
+          </li>
+        ))}
       </ul>
       {selected.brand ? (
         <>
@@ -142,7 +147,7 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
                     <div className="accordion-body">
                       {/* Body here */}
                       <div className="row">
-                        <div className="col-4">
+                        <div className="col-6">
                           <div className="fs-3 fw-bold pb-3">Colors</div>
                           <div className="list-group list-group-horizontal row row-cols-4">
                             {colors.map((color) => (
@@ -205,40 +210,37 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
                                   <tr>
                                     <th>Size</th>
                                     <th>Quantity</th>
-                                    <th>Price ( ₱ )</th>
                                     <th>Action</th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {sizes.map((item) => {
-                                    console.log(item);
                                     return (
                                       <tr>
                                         <td>{item.size}</td>
                                         <td>{item.qty}</td>
-                                        <td>₱{item.price}</td>
                                         <td>
                                           <div className="d-flex gap-2 justify-content-center">
                                             <button
                                               className="btn btn-primary"
-                                              onClick={() => addOrder(item)}
+                                              data-bs-toggle="modal"
+                                              data-bs-target="#setPrice"
+                                              onClick={() => setItem(item)}
                                               disabled={inOrder(item.id)}
                                             >
                                               <i className="bi bi-cart"></i>
                                             </button>
-                                            {location.pathname === "/order" && (
-                                              <>
-                                                <button
-                                                  type="button"
-                                                  class="btn btn-secondary"
-                                                  data-bs-toggle="modal"
-                                                  data-bs-target="#directBuy"
-                                                >
-                                                  <i className="bi bi-cash"></i>
-                                                </button>
-                                                <DirectBuy item={item} />
-                                              </>
-                                            )}
+                                            <>
+                                              <button
+                                                type="button"
+                                                class="btn btn-secondary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#directBuy"
+                                                onClick={() => setItem(item)}
+                                              >
+                                                <i className="bi bi-cash"></i>
+                                              </button>
+                                            </>
                                           </div>
                                         </td>
                                       </tr>
@@ -264,6 +266,8 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
       ) : (
         <div className="fs-3 fw-bold">Please select a brand</div>
       )}
+      <AddPrice item={item} setOrder={setOrder} />
+      <DirectBuy item={item} />
     </section>
   );
 };

@@ -17,7 +17,6 @@ const Order = ({
   setCustomers,
 }) => {
   const [quickOrder, setQuickOrder] = useState(false);
-  const [printPrice, setPrintPrice] = useState("");
   const [discount, setDiscount] = useState("");
   const [order, setOrder] = useState([]);
   const [customerDetail, setCustomerDetail] = useState({
@@ -72,15 +71,6 @@ const Order = ({
       alert("Please set orders.");
       return;
     }
-    if (printPrice === "") {
-      alert("Please set print price.");
-      return;
-    }
-    if (printPrice === "0") {
-      setPrintPrice("");
-      alert("Print price cant be 0");
-      return;
-    }
     if (discount === "0") {
       setDiscount("");
       alert("discount is 0 please double check");
@@ -93,18 +83,18 @@ const Order = ({
       transaction,
       customerDetail,
       order,
-      printPrice,
       discount,
     };
 
-    console.log(data);
+    console.log(data)
+
     axios
       .post("http://localhost/capstone/submit.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
         console.log(response.data);
-        window.location.reload();
+        // window.location.reload();
       })
       .catch((error) => {
         console.error("There was an error submitting the order!", error);
@@ -119,7 +109,6 @@ const Order = ({
       address: "",
     });
   }
-  console.log(customers);
   return (
     <>
       {placement.length > 0 ? (
@@ -134,7 +123,6 @@ const Order = ({
                 size={size}
                 setOrder={setOrder}
                 order={order}
-                printPrice={printPrice}
               />
             </div>
             <div className="card col-3 ">
@@ -195,8 +183,6 @@ const Order = ({
                     inventory={inventory}
                     order={order}
                     setOrder={setOrder}
-                    printPrice={printPrice}
-                    setPrintPrice={setPrintPrice}
                     discount={discount}
                     setDiscount={setDiscount}
                   />

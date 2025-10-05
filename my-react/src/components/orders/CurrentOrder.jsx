@@ -3,14 +3,12 @@ const CurrentOrder = ({
   inventory,
   order,
   setOrder,
-  printPrice,
-  setPrintPrice,
   discount,
   setDiscount,
 }) => {
   const [newInventory, setNewInventory] = useState([]);
   const grandTotal = order.reduce(
-    (sum, item) => sum + item.orderQty * (item.price + Number(printPrice)),
+    (sum, item) => sum + item.orderQty * item.price,
     0
   );
 
@@ -58,21 +56,7 @@ const CurrentOrder = ({
     });
   }
   return (
-    <div className="">
-      <div class="input-group input-group-sm mb-3">
-        <span class="input-group-text">Print price</span>
-        <input
-          type="number"
-          class="form-control"
-          value={printPrice}
-          onChange={(e) => setPrintPrice(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "-" || e.key === "+" || e.key === "e") {
-              e.preventDefault();
-            }
-          }}
-        />
-      </div>
+    <div>
       <table className="table table-bordered table-sm">
         <thead>
           <tr>
@@ -86,7 +70,7 @@ const CurrentOrder = ({
           {Array.isArray(newInventory) &&
             order.length > 0 &&
             order.map((item, index) => {
-              const total = (item.price + Number(printPrice)) * item.orderQty;
+              const total = item.price * item.orderQty;
               return (
                 <tr key={index}>
                   <td className="text-capitalize lh-sm">

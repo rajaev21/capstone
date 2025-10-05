@@ -10,6 +10,7 @@ const Return = ({
   colors,
   sizes,
   fetchInventory,
+  setItemReturn,
 }) => {
   const [addInput, setAddInput] = useState("");
   const [remarks, setRemarks] = useState("");
@@ -73,6 +74,9 @@ const Return = ({
         console.log(res.data);
         reset();
       })
+      .then(() => {
+        document.querySelector(`#btn-close`)?.click();
+      })
       .catch((err) => console.error("Error adding option:", err));
   }
 
@@ -80,6 +84,7 @@ const Return = ({
     setAddInput("");
     setRemarks("");
     fetchInventory();
+    setItemReturn(false);
   }
 
   return (
@@ -157,6 +162,14 @@ const Return = ({
               {/* end body */}
             </div>
             <div className="modal-footer">
+              <button
+                type="button"
+                id="btn-close"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
               <button
                 type="button"
                 className="btn btn-primary"

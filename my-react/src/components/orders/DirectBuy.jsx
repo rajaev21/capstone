@@ -4,6 +4,7 @@ import { useState } from "react";
 const DirectBuy = ({ item }) => {
   const [quantity, setQuantity] = useState("");
   const [discount, setDiscount] = useState("");
+  const [price, setPrice] = useState("");
   const account = JSON.parse(localStorage.getItem("account"));
 
   function directBuy() {
@@ -21,6 +22,7 @@ const DirectBuy = ({ item }) => {
     data.action = "directBuy";
     data.order = item;
     data.order.orderQty = quantity;
+    data.order.price = price;
     data.discount = discount;
     console.log(data);
     axios
@@ -35,6 +37,7 @@ const DirectBuy = ({ item }) => {
         console.error("There was an error submitting the order!", error);
       });
   }
+
   return (
     <section>
       <div
@@ -77,9 +80,6 @@ const DirectBuy = ({ item }) => {
                 <div className="text-capitalize">
                   <strong>qty : </strong> {item.qty}
                 </div>
-                <div className="text-capitalize">
-                  <strong>price : </strong> {item.price}
-                </div>
               </div>
               <div class="input-group mt-3">
                 <span class="input-group-text" id="basic-addon1">
@@ -91,6 +91,23 @@ const DirectBuy = ({ item }) => {
                   placeholder="Enter quantity"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "-" || e.key === "+" || e.key === "e") {
+                      e.preventDefault();
+                    }
+                  }}
+                />
+              </div>
+              <div class="input-group mt-3">
+                <span class="input-group-text" id="basic-addon1">
+                  Price
+                </span>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Enter price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "-" || e.key === "+" || e.key === "e") {
                       e.preventDefault();
@@ -116,8 +133,8 @@ const DirectBuy = ({ item }) => {
                 />
               </div>
               <div className="text-center mt-3">
-                <span className="fs-5 fw-bold">Total : </span>₱{" "}
-                {quantity * (item.price + 10) - discount}
+                <span className="fs-5 fw-bold">Total : </span>₱
+                {quantity * price - discount}
               </div>
             </div>
             <div class="modal-footer">

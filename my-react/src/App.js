@@ -17,6 +17,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/history/History";
 
 function App() {
+  const [loading, setLoading] = useState(true);
   const [inventory, setInventory] = useState({});
   const [allInventory, setAllInventory] = useState({});
   const [logs, setLogs] = useState({});
@@ -34,20 +35,58 @@ function App() {
       window.location.replace("/login");
     }
   }, []);
-
   useEffect(() => {
-    fetchStatus();
-    setStatus();
-    fetchInventory();
-    fetchAllInventory();
-    fetchLogs();
-    fetchBrand();
-    fetchColor();
-    fetchSize();
-    fetchType();
-    fetchTransaction();
-    fetchPlacement();
-    getCustomers();
+    const fetchAllData = async () => {
+      try {
+        const [
+          statusRes,
+          inventoryRes,
+          allInventoryRes,
+          logsRes,
+          brandRes,
+          colorRes,
+          sizeRes,
+          typeRes,
+          transactionRes,
+          placementRes,
+          customersRes,
+        ] = await Promise.all([
+          axios.get("http://localhost/capstone/submit.php?action=getStatus"),
+          axios.get("http://localhost/capstone/submit.php?action=getInventory"),
+          axios.get(
+            "http://localhost/capstone/submit.php?action=getAllInventory"
+          ),
+          axios.get("http://localhost/capstone/submit.php?action=getLogs"),
+          axios.get("http://localhost/capstone/submit.php?action=getBrand"),
+          axios.get("http://localhost/capstone/submit.php?action=getColor"),
+          axios.get("http://localhost/capstone/submit.php?action=getSize"),
+          axios.get("http://localhost/capstone/submit.php?action=getType"),
+          axios.get(
+            "http://localhost/capstone/submit.php?action=getTransaction"
+          ),
+          axios.get("http://localhost/capstone/submit.php?action=getPlacement"),
+          axios.get("http://localhost/capstone/submit.php?action=getCustomers"),
+        ]);
+
+        setStatus(statusRes.data);
+        setInventory(inventoryRes.data);
+        setAllInventory(allInventoryRes.data);
+        setLogs(logsRes.data);
+        setBrand(brandRes.data);
+        setColor(colorRes.data);
+        setSize(sizeRes.data);
+        setType(typeRes.data);
+        setTransaction(transactionRes.data);
+        setPlacement(placementRes.data);
+        setCustomers(customersRes.data);
+
+        setLoading(false); // All done
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+      }
+    };
+
+    fetchAllData();
   }, []);
 
   const getCustomers = () => {
@@ -162,7 +201,18 @@ function App() {
   };
   return (
     <>
-      {Array.isArray(inventory) ? (
+      {loading ? (
+        <div className="container mt-5">
+          <div class="d-flex align-items-center h3">
+            <strong>Loading...</strong>
+            <div
+              class="spinner-border ms-auto"
+              role="status"
+              aria-hidden="true"
+            ></div>
+          </div>
+        </div>
+      ) : (
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
@@ -249,8 +299,6 @@ function App() {
             }
           />
         </Routes>
-      ) : (
-        "No Data Acquired"
       )}
     </>
   );
