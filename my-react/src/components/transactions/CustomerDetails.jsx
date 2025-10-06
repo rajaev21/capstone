@@ -149,16 +149,18 @@ const CustomerDetails = ({
 
   return (
     <div className="container mb-4">
-      <button
-        className="btn btn-primary"
-        onClick={() => generatePDF("card", details[0].transaction_id)}
-      >
-        Generate Card PDF
-      </button>
-      <div id="card">
+      {details && (
+        <button
+          className="btn btn-primary"
+          onClick={() => generatePDF("card-pdf", details[0].transaction_id)}
+        >
+          Generate Card PDF
+        </button>
+      )}
+      <div className="mx-3" id="card-pdf">
         {Array.isArray(details) && details.length > 0 ? (
           <>
-            <div className="card mb-4">
+            <div className="card my-4">
               <div className="card-body">
                 <span>Transaction : {details[0].transaction_id} </span>
                 {["ongoing", "pending"].includes(
@@ -247,7 +249,7 @@ const CustomerDetails = ({
                 details[0].transactionStatus
               ) && (
                 <button
-                  className="btn btn-transparent"
+                  className="btn btn-transparent no-print"
                   data-bs-toggle="modal"
                   data-bs-target="#addOrder"
                 >
