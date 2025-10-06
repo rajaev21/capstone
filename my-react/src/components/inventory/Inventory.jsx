@@ -113,11 +113,10 @@ const Inventory = ({
     });
   }
 
-  console.log(filteredInventory);
+  // console.log(filteredInventory);
 
   return (
-    // <section onClick={() => navigate(useLocation.pathname)}>
-    <section>
+    <section onClick={() => navigate(useLocation.pathname)}>
       <div className="fs-3 fw-bold">
         Brands
         <button

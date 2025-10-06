@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
+import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 
 const Return = ({
   inventory,
@@ -12,6 +14,7 @@ const Return = ({
   fetchInventory,
   setItemReturn,
 }) => {
+  const [buttonLoad, setButtonLoad] = useState(false);
   const [addInput, setAddInput] = useState("");
   const [remarks, setRemarks] = useState("");
   const data = {};
@@ -52,6 +55,8 @@ const Return = ({
       return;
     }
 
+    setButtonLoad(true);
+
     data.action = "returnItem";
     data.value = value;
     data.brand = brand_id;
@@ -85,6 +90,7 @@ const Return = ({
     setRemarks("");
     fetchInventory();
     setItemReturn(false);
+    setButtonLoad(false);
   }
 
   return (
@@ -170,15 +176,28 @@ const Return = ({
               >
                 Close
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => {
-                  checkValidation();
-                }}
-              >
-                Save changes
-              </button>
+              {buttonLoad ? (
+                <Button variant="primary" disabled>
+                  <Spinner
+                    as="span"
+                    animation="grow"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  Loading...
+                </Button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    checkValidation();
+                  }}
+                >
+                  Save changes
+                </button>
+              )}
             </div>
           </div>
         </div>

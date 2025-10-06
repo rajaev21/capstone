@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
+import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 
 const AddNewStocks = ({
   selected,
@@ -11,10 +13,11 @@ const AddNewStocks = ({
   fetchInventory,
 }) => {
   const [stock, setStock] = useState([]);
-
+  const [buttonLoad, setButtonLoad] = useState(false);
   function reset() {
     setStock([]);
     fetchInventory();
+    setButtonLoad(false);
   }
 
   function addStocks(value, id) {
@@ -36,6 +39,7 @@ const AddNewStocks = ({
       return;
     }
 
+    setButtonLoad(true);
     const data = {
       action: "addStocks",
       stock: stock,
@@ -88,22 +92,21 @@ const AddNewStocks = ({
                 <thead>
                   <tr>
                     <th></th>
-                    {Array.isArray(size) &&
-                      size
-                        .filter((item) =>
-                          filteredInventory.find(
-                            (matchInventory) =>
-                              matchInventory.size === item.size_name
-                          )
+                    {size
+                      .filter((item) =>
+                        filteredInventory.find(
+                          (matchInventory) =>
+                            matchInventory.size === item.size_name
                         )
-                        .map((size) => (
-                          <th
-                            key={size.size_id}
-                            className="text-uppercase text-center"
-                          >
-                            {size.size_name}
-                          </th>
-                        ))}
+                      )
+                      .map((size) => (
+                        <th
+                          key={size.size_id}
+                          className="text-uppercase text-center"
+                        >
+                          {size.size_name}
+                        </th>
+                      ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -142,7 +145,6 @@ const AddNewStocks = ({
 
                           return (
                             <td key={id}>
-                              {/* <span>{id}</span> */}
                               <input
                                 type="number"
                                 style={{ width: "5em" }}
@@ -180,13 +182,27 @@ const AddNewStocks = ({
               >
                 Close
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={validateInput}
-              >
-                Save changes
-              </button>
+
+              {buttonLoad ? (
+                <Button variant="primary" disabled>
+                  <Spinner
+                    as="span"
+                    animation="grow"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  Loading...
+                </Button>
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => validateInput()}
+                >
+                  Save changes
+                </button>
+              )}
             </div>
           </div>
         </div>
