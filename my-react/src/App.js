@@ -31,10 +31,24 @@ function App() {
   const [status, setStatus] = useState({});
   const [customers, setCustomers] = useState({});
   useEffect(() => {
-    if (window.location.pathname === "/") {
+    const currentPath = window.location.pathname;
+    const paths = [
+      "/login",
+      "/register",
+      "/transaction",
+      "/order",
+      "/inventory",
+      "/dashboard",
+      "/history",
+    ];
+
+    const isAllowed = paths.some((p) => currentPath.startsWith(p));
+
+    if (!isAllowed) {
       window.location.replace("/login");
     }
   }, []);
+
   useEffect(() => {
     const fetchAllData = async () => {
       try {

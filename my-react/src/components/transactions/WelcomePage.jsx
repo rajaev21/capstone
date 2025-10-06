@@ -44,7 +44,7 @@ const WelcomePage = ({
             console.log(res.data);
             window.location.reload();
           });
-        console.log(data);
+        // console.log(data);
       }
     });
 
@@ -55,7 +55,7 @@ const WelcomePage = ({
   const goto = (id) => {
     navigate(`/transaction?id=${id}`);
   };
-  console.log(transaction);
+  // console.log(transaction);
   return (
     <div className="">
       {transaction ? (
