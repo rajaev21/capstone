@@ -92,28 +92,18 @@ const Dashboard = ({}) => {
             <span className="fw-bold" style={{ fontSize: "4em" }}>
               {data.ordersToday ? data.ordersToday : 0}
             </span>
-            <div className="fs-5 p-2 text-capitalize">orders made</div>
+            <div className="fs-5 p-2 text-capitalize">shirt orders made</div>
           </div>
           <div className="text-center card" style={{ width: "13em" }}>
             <span className="fw-bold" style={{ fontSize: "4em" }}>
               {data.ordersFinished ? data.ordersFinished : 0}
             </span>
-            <div className="fs-5 p-2 text-capitalize">orders finished</div>
+            <div className="fs-5 p-2 text-capitalize">
+              shirt orders finished
+            </div>
           </div>
         </div>
-
-        {/* if clicked show linechart of earnings on that timeframe
-         Total orders/today this week/ months
-        Top selling products
-        Low stock alert
-        Pending deliveries
-        Pwedi mn nga top 3 or 5 lang Ng products butang beng sa graph
-        Tapus total order Muna Ang report tanan lang order butang mo.. 
-        top customer by quantity and sales */}
-
         <OrderData />
-
-        <div className="card ">{/* line chart for each item sales */}</div>
       </div>
     </section>
   );

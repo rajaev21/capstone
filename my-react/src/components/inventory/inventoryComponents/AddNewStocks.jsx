@@ -159,6 +159,7 @@ const AddNewStocks = ({
                                     e.preventDefault();
                                   }
                                 }}
+                                min="0"
                               />
                             </td>
                           );

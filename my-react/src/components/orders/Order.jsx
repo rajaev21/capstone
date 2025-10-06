@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Spinner from "react-bootstrap/Spinner";
+import Button from "react-bootstrap/Button";
 import CustomerForm from "./CustomerForm";
 import TransansactionForm from "./TransansactionForm";
 import CurrentOrder from "./CurrentOrder";
@@ -16,6 +18,7 @@ const Order = ({
   customers,
   setCustomers,
 }) => {
+  const [buttonLoad, setButtonLoad] = useState(false);
   const [quickOrder, setQuickOrder] = useState(false);
   const [discount, setDiscount] = useState("");
   const [order, setOrder] = useState([]);
@@ -77,6 +80,7 @@ const Order = ({
       return;
     }
 
+    setButtonLoad(true);
     const data = {
       quickOrder,
       action: "submitOrder",
@@ -86,7 +90,7 @@ const Order = ({
       discount,
     };
 
-    console.log(data)
+    console.log(data);
 
     axios
       .post("http://localhost/capstone/submit.php", data, {
@@ -94,7 +98,7 @@ const Order = ({
       })
       .then((response) => {
         console.log(response.data);
-        // window.location.reload();
+        window.location.reload();
       })
       .catch((error) => {
         console.error("There was an error submitting the order!", error);
@@ -188,13 +192,27 @@ const Order = ({
                   />
                   {order.length > 0 && (
                     <div className="d-flex my-3 justify-content-evenly">
-                      <button
-                        className="btn btn-success"
-                        onClick={() => addOrder()}
-                      >
-                        {" "}
-                        Submit Order{" "}
-                      </button>
+                      {buttonLoad ? (
+                        <Button variant="success" disabled>
+                          <Spinner
+                            as="span"
+                            animation="grow"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                          Loading...
+                        </Button>
+                      ) : (
+                        <button
+                          className="btn btn-success"
+                          onClick={() => addOrder()}
+                        >
+                          {" "}
+                          Submit Order{" "}
+                        </button>
+                      )}
+
                       <button
                         className="btn btn-danger"
                         onClick={() => window.location.reload()}
