@@ -37,7 +37,7 @@ const DeleteBrand = ({
         id="deleteBrand"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
-        tabindex="-1"
+        tabIndex="-1"
         aria-labelledby="deleteBrandLabel"
         aria-hidden="true"
       >

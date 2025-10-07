@@ -194,7 +194,7 @@ const AddQuantity = ({
       <div
         className="modal fade"
         id="quantity"
-        tabindex="-1"
+        tabIndex="-1"
         data-bs-backdrop="static"
         data-bs-keyboard="false"
       >
@@ -235,7 +235,7 @@ const AddQuantity = ({
                     <option value="directPurchase">Direct Purchase</option>
                     <option value="supplierDelivery">Supplier Delivery</option>
                   </select>
-                  <label for="floatingSelect">Stock Option</label>
+                  <label htmlFor="floatingSelect">Stock Option</label>
                 </div>
                 <hr />
                 {changeOption()}

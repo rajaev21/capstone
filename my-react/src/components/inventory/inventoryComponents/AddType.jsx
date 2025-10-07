@@ -148,8 +148,8 @@ const AddType = ({
             <div className="modal-body">
               {/* body */}
               <div className="row">
-                <div class="input-group flex-nowrap">
-                  <span class="input-group-text" id="addon-wrapping">
+                <div className="input-group flex-nowrap">
+                  <span className="input-group-text" id="addon-wrapping">
                     <button
                       className="btn btn-secondary"
                       onClick={() => {
@@ -205,7 +205,7 @@ const AddType = ({
                 Sizes
                 <button
                   type="button"
-                  class="btn btn-transparent"
+                  className="btn btn-transparent"
                   onClick={() => {
                     setIsAddNewSize((prev) => !prev);
                     setNewSize("");
@@ -287,7 +287,7 @@ const AddType = ({
                 Colors
                 <button
                   type="button"
-                  class="btn btn-transparent"
+                  className="btn btn-transparent"
                   onClick={() => {
                     setIsAddNewColor((prev) => !prev);
                     setNewSize("");

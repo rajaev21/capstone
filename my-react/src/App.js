@@ -217,10 +217,10 @@ function App() {
     <>
       {loading ? (
         <div className="container mt-5">
-          <div class="d-flex align-items-center h3">
+          <div className="d-flex align-items-center h3">
             <strong>Loading...</strong>
             <div
-              class="spinner-border ms-auto"
+              className="spinner-border ms-auto"
               role="status"
               aria-hidden="true"
             ></div>

@@ -175,7 +175,7 @@ const Inventory = ({
                 types or click{" "}
                 <button
                   type="button"
-                  class="btn btn-outline-danger btn-sm"
+                  className="btn btn-outline-danger btn-sm"
                   data-bs-toggle="modal"
                   data-bs-target="#deleteBrand"
                 >
@@ -225,7 +225,7 @@ const Inventory = ({
                         <div className="fs-6 mb-2">
                           <button
                             type="button"
-                            class="btn btn-primary"
+                            className="btn btn-primary"
                             data-bs-toggle="modal"
                             data-bs-target="#addStoks"
                           >
@@ -233,7 +233,7 @@ const Inventory = ({
                           </button>
                           <button
                             type="button"
-                            class="btn btn-danger ms-2"
+                            className="btn btn-danger ms-2"
                             onClick={() => setItemReturn((prev) => !prev)}
                           >
                             Return Item
@@ -279,7 +279,14 @@ const Inventory = ({
                                   const qty = match ? match.qty : 0;
 
                                   return (
-                                    <td key={i}>
+                                    <td
+                                      key={i}
+                                      style={
+                                        qty < 30 && qty !== 0
+                                          ? { backgroundColor: "#f00d0d1f" }
+                                          : {}
+                                      }
+                                    >
                                       <span>{qty}</span>
                                       {itemReturn && qty > 0 && (
                                         <button

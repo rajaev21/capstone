@@ -93,6 +93,8 @@ const Return = ({
     setButtonLoad(false);
   }
 
+  console.log(selected);
+
   return (
     <section>
       <div
@@ -120,10 +122,12 @@ const Return = ({
             <div className="modal-body">
               {/* body */}
               <section>
-                <div className="fs-5 fw-bold text-center mb-3">
-                  Return Damage Item
-                </div>
-                <div className="input-group mb-3">
+                <div className="fs-5 fw-bold text-center mb-3">Return Item</div>
+                <span className="text-capitalize">
+                  {selected.brand} - {selected.type} - {selected.color} -{" "}
+                  {selected.size}
+                </span>
+                <div className="input-group my-3">
                   <span className="input-group-text text-capitalize fs-5">
                     Return :
                   </span>
@@ -149,9 +153,9 @@ const Return = ({
                   <span className="input-group-text text-capitalize fs-5">
                     Reason :
                   </span>
-                  <div class="form-floating">
+                  <div className="form-floating">
                     <textarea
-                      class="form-control"
+                      className="form-control"
                       placeholder="Leave a comment here"
                       id="floatingTextarea2"
                       name="remarks"

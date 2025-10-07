@@ -23,7 +23,6 @@ const WelcomePage = ({
       (item) => item.status !== "pending" && item.status !== "ongoing"
     );
   const data = {};
-  console.log(pending);
 
   Array.isArray(pending) &&
     pending.forEach((item) => {

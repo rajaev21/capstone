@@ -10,6 +10,7 @@ export const generatePDF = async (elementToPrintId, id) => {
   if (!element) {
     throw new Error(`Element with id ${elementToPrintId} not found`);
   }
+  
   const canvas = await html2canvas(element, { scale: 2 });
   const data = canvas.toDataURL("image/png");
   const pdf = new jsPDF({

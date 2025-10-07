@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 const Notification = ({ inventory }) => {
   const paramID = new URLSearchParams(useLocation().search);
   const lowStocks = Array.isArray(inventory)
-    ? inventory.filter((item) => item.qty < 5)
+    ? inventory.filter((item) => item.qty < 30)
     : [];
   return (
     <ul className="navbar-nav me-3">

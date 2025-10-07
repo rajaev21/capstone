@@ -16,7 +16,7 @@ const TransactionTable = ({ transaction, goto, title }) => {
     ? filteredItems.slice(start, end)
     : [];
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
-  console.log();
+  
   return (
     <div className="">
       <div className="row row-cols-2">
