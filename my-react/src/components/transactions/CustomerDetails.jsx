@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import axios, { all } from "axios";
+import axios, { all, getAdapter } from "axios";
 import VerifyModal from "./subComponents/VerifyModal";
 import VerifyTransaction from "./subComponents/VerifyTransaction";
 import AddOrder from "./subComponents/AddOrder";
 import CancelTransaction from "./subComponents/CancelTransaction";
 import Reorder from "./subComponents/Reorder";
 import { generatePDF } from "../pdf";
+import { Link } from "react-router-dom";
 
 const CustomerDetails = ({
   id,
@@ -14,6 +15,8 @@ const CustomerDetails = ({
   brand,
   color,
   fetchTransaction,
+  addOrder,
+  setAddOrder
 }) => {
   const [details, setDetails] = useState({});
   const [allOrderDone, setAllOrderDone] = useState(false);
@@ -26,6 +29,10 @@ const CustomerDetails = ({
     fetchCustomerDetails(id);
   }, [id]);
 
+  function addZ(n) {
+    return n < 10 ? "0" + n : "" + n;
+  }
+
   const fetchCustomerDetails = () => {
     axios
       .get(
@@ -34,7 +41,12 @@ const CustomerDetails = ({
       .then((response) => {
         // console.log(response.data);
         setDetails(response.data);
-        setDeadline(response.data[0].deadline);
+        const newDate = new Date(response.data[0].deadline);
+        const getYear = newDate.getFullYear();
+        const getMonth = addZ(newDate.getMonth());
+        const getDay = addZ(newDate.getDay());
+        console.log(`\n${getYear}-${getMonth}-${getDay}`);
+        setDeadline(`${getYear}-${getMonth}-${getDay}`);
         if (response.data) {
           const data = response.data;
           setAllOrderDone(
@@ -68,7 +80,8 @@ const CustomerDetails = ({
       })
       .then((res) => {
         console.log(res.data);
-        window.location.reload();
+        // window.location.reload();
+        fetchCustomerDetails();
       })
       .catch((err) => {
         console.error(err);
@@ -145,28 +158,34 @@ const CustomerDetails = ({
       });
   }
 
-  // console.log(details);
-
   return (
     <div className="container mb-4">
-      {details && (
-        <button
-          className="btn btn-primary"
-          onClick={() => generatePDF("card-pdf", details[0].transaction_id)}
-        >
-          Generate Card PDF
-        </button>
-      )}
       <div className="mx-3" id="card-pdf">
-        {Array.isArray(details) && details.length > 0 ? (
-          <>
+        {addOrder ? (
+          <AddOrder
+            inventory={inventory}
+            brand={brand}
+            color={color}
+            transactionID={details[0].transaction_id}
+            printPrice={details[0].printPrice}
+            design={details[0].designName}
+            setAddOrder={setAddOrder}
+          />
+        ) : details.length > 0 ? (
+          <div>
+            <button
+              className="btn btn-primary no-print"
+              onClick={() => generatePDF("card-pdf", details[0].transaction_id)}
+            >
+              Generate Transaction Image
+            </button>
             <div className="card my-4">
               <div className="card-body">
                 <span>Transaction : {details[0].transaction_id} </span>
                 {["ongoing", "pending"].includes(
                   details[0].transactionStatus
                 ) && (
-                  <div className="d-grid gap-2">
+                  <div className="d-grid gap-2 no-print">
                     <button
                       className="btn btn-success"
                       data-bs-toggle="modal"
@@ -207,26 +226,154 @@ const CustomerDetails = ({
                   <p className="card-text mb-1 col">
                     <strong>Design:</strong> {details[0].designName}
                   </p>
+                  <p className="card-text mb-1 col">
+                    <strong>Order date:</strong> {details[0].orderDate}
+                  </p>
                 </div>
                 <hr />
-                <div className="d-flex">
-                  Print :
-                  <span className="ms-auto">{details[0].printPrice}</span>
-                </div>
-                {details.map((item, index) => {
-                  if (
-                    ["ongoing", "pending", "finished"].includes(
-                      item.orderStatus
-                    )
-                  ) {
-                    return (
-                      <div className="d-flex">
-                        Order ID {item.orderID}
-                        <span className="ms-auto">{item.total}</span>
-                      </div>
-                    );
-                  }
-                })}
+                <h5>
+                  Orders :
+                  {["ongoing", "pending"].includes(
+                    details[0].transactionStatus
+                  ) && (
+                    <button
+                      className="btn btn-transparent"
+                      onClick={() => setAddOrder((prev) => !prev)}
+                    >
+                      <i className="bi bi-plus-circle"></i>
+                    </button>
+                  )}
+                </h5>
+                <table className="table table-bordered table-striped table-sm">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Brand</th>
+                      <th>Type</th>
+                      <th>Color</th>
+                      <th>Size</th>
+                      <th>QTY</th>
+                      <th>Status</th>
+                      <th>Total</th>
+                      {["ongoing", "pending"].includes(
+                        details[0].transactionStatus
+                      ) && <th className="no-print">Action</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {details.map((item, index) => {
+                      return (
+                        <tr key={index}>
+                          <td>{item.brand}</td>
+                          <td>{item.type}</td>
+                          <td>{item.color}</td>
+                          <td>{item.size}</td>
+                          <td>{item.quantity}</td>
+                          <td>{item.orderStatus}</td>
+                          <td>{item.total}</td>
+                          {["ongoing", "pending"].includes(
+                            details[0].transactionStatus
+                          ) && (
+                            <td className="d-flex flex-row justify-content-center gap-2 no-print">
+                              {["pending", "ongoing"].includes(
+                                item.orderStatus
+                              ) && (
+                                <>
+                                  <button
+                                    className="btn btn-success btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target={`#modal${item.orderID}3`}
+                                    onClick={() => {
+                                      setSelectedInventoryID(item.inventoryID);
+                                      setSelectedTotal(item.total);
+                                    }}
+                                  >
+                                    <i className="bi bi-check"></i>
+                                  </button>
+                                  <VerifyModal
+                                    title={"finish"}
+                                    orderID={item.orderID}
+                                    setDone={setDone}
+                                    status={3}
+                                    orderQty={item.quantity}
+                                  />
+                                  <>
+                                    <button
+                                      className="btn btn-danger btn-sm"
+                                      data-bs-toggle="modal"
+                                      data-bs-target={`#modal${item.orderID}4`}
+                                      onClick={() => {
+                                        setSelectedInventoryID(
+                                          item.inventoryID
+                                        );
+                                        setSelectedTotal(item.total);
+                                      }}
+                                    >
+                                      <i className="bi bi-x"></i>
+                                    </button>
+                                    <VerifyModal
+                                      title={"cancel"}
+                                      orderID={item.orderID}
+                                      orderStatus={orderStatus}
+                                      setDone={setDone}
+                                      status={4}
+                                      orderQty={item.quantity}
+                                    />
+                                  </>
+                                </>
+                              )}
+
+                              {item.orderStatus === "finished" && (
+                                <>
+                                  <button
+                                    className="btn btn-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target={`#modal${item.orderID}2`}
+                                    onClick={() => {
+                                      setSelectedInventoryID(item.inventoryID);
+                                      setSelectedTotal(item.total);
+                                    }}
+                                  >
+                                    Set to ongoing
+                                  </button>
+                                  <VerifyModal
+                                    title={"set to ongoing"}
+                                    orderID={item.orderID}
+                                    setDone={setDone}
+                                    status={2}
+                                    orderQty={item.quantity}
+                                  />
+                                </>
+                              )}
+
+                              {item.orderStatus === "voided" && (
+                                <>
+                                  <button
+                                    className="btn btn-success btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target={`#modal${item.orderID}2`}
+                                    onClick={() => {
+                                      setSelectedInventoryID(item.inventoryID);
+                                      setSelectedTotal(item.total);
+                                    }}
+                                  >
+                                    Reorder
+                                  </button>
+                                  <VerifyModal
+                                    title={"reorder"}
+                                    orderID={item.orderID}
+                                    setDone={setDone}
+                                    status={2}
+                                    orderQty={item.quantity}
+                                  />
+                                </>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
                 <hr />
                 <div className="d-flex">
                   Subtotal :
@@ -243,167 +390,13 @@ const CustomerDetails = ({
                 </div>
               </div>
             </div>
-            <h5>
-              Orders
-              {["ongoing", "pending"].includes(
-                details[0].transactionStatus
-              ) && (
-                <button
-                  className="btn btn-transparent no-print"
-                  data-bs-toggle="modal"
-                  data-bs-target="#addOrder"
-                >
-                  <i className="bi bi-plus-circle"></i>
-                </button>
-              )}
-            </h5>
-            <AddOrder
-              inventory={inventory}
-              brand={brand}
-              color={color}
-              transactionID={details[0].transaction_id}
-              printPrice={details[0].printPrice}
-              design={details[0].designName}
-            />
             {/* modal start */}
-
-            <div className="table-responsive">
-              <table className="table table-bordered table-striped table-sm">
-                <thead className="table-light">
-                  <tr>
-                    <th>ID</th>
-                    <th>Brand</th>
-                    <th>Type</th>
-                    <th>Color</th>
-                    <th>Size</th>
-                    <th>QTY</th>
-                    <th>Status</th>
-                    {["ongoing", "pending"].includes(
-                      details[0].transactionStatus
-                    ) && <th>Action</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {details.map((item, index) => {
-                    return (
-                      <tr key={index}>
-                        <td>{item.orderID}</td>
-                        <td>{item.brand}</td>
-                        <td>{item.type}</td>
-                        <td>{item.color}</td>
-                        <td>{item.size}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.orderStatus}</td>
-                        {["ongoing", "pending"].includes(
-                          details[0].transactionStatus
-                        ) && (
-                          <td className="d-flex flex-row justify-content-center gap-2">
-                            {["pending", "ongoing"].includes(
-                              item.orderStatus
-                            ) && (
-                              <>
-                                <button
-                                  className="btn btn-success btn-sm"
-                                  data-bs-toggle="modal"
-                                  data-bs-target={`#modal${item.orderID}3`}
-                                  onClick={() => {
-                                    setSelectedInventoryID(item.inventoryID);
-                                    setSelectedTotal(item.total);
-                                  }}
-                                >
-                                  <i className="bi bi-check"></i>
-                                </button>
-                                <VerifyModal
-                                  title={"finish"}
-                                  orderID={item.orderID}
-                                  setDone={setDone}
-                                  status={3}
-                                  orderQty={item.quantity}
-                                />
-                                <>
-                                  <button
-                                    className="btn btn-danger btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target={`#modal${item.orderID}4`}
-                                    onClick={() => {
-                                      setSelectedInventoryID(item.inventoryID);
-                                      setSelectedTotal(item.total);
-                                    }}
-                                  >
-                                    <i className="bi bi-x"></i>
-                                  </button>
-                                  <VerifyModal
-                                    title={"cancel"}
-                                    orderID={item.orderID}
-                                    orderStatus={orderStatus}
-                                    setDone={setDone}
-                                    status={4}
-                                    orderQty={item.quantity}
-                                  />
-                                </>
-                              </>
-                            )}
-
-                            {item.orderStatus === "finished" && (
-                              <>
-                                <button
-                                  className="btn btn-danger btn-sm"
-                                  data-bs-toggle="modal"
-                                  data-bs-target={`#modal${item.orderID}2`}
-                                  onClick={() => {
-                                    setSelectedInventoryID(item.inventoryID);
-                                    setSelectedTotal(item.total);
-                                  }}
-                                >
-                                  Set to ongoing
-                                </button>
-                                <VerifyModal
-                                  title={"set to ongoing"}
-                                  orderID={item.orderID}
-                                  setDone={setDone}
-                                  status={2}
-                                  orderQty={item.quantity}
-                                />
-                              </>
-                            )}
-
-                            {item.orderStatus === "voided" && (
-                              <>
-                                <button
-                                  className="btn btn-success btn-sm"
-                                  data-bs-toggle="modal"
-                                  data-bs-target={`#modal${item.orderID}2`}
-                                  onClick={() => {
-                                    setSelectedInventoryID(item.inventoryID);
-                                    setSelectedTotal(item.total);
-                                  }}
-                                >
-                                  Reorder
-                                </button>
-                                <VerifyModal
-                                  title={"reorder"}
-                                  orderID={item.orderID}
-                                  setDone={setDone}
-                                  status={2}
-                                  orderQty={item.quantity}
-                                />
-                              </>
-                            )}
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
             <div className="fw-bold fs-3 text-center">
               Transaction {details[0].transactionStatus}
             </div>
 
             {["pending", "ongoing"].includes(details[0].transactionStatus) && (
-              <div className="d-flex gap-2">
+              <div className="d-flex gap-2 no-print">
                 <button
                   className="btn btn-success"
                   data-bs-toggle="modal"
@@ -433,7 +426,7 @@ const CustomerDetails = ({
             )}
 
             {["expired", "voided"].includes(details[0].transactionStatus) && (
-              <div className="d-grid gap-2">
+              <div className="d-grid gap-2 no-print">
                 <button
                   className="btn btn-success"
                   data-bs-toggle="modal"
@@ -453,7 +446,7 @@ const CustomerDetails = ({
                 />
               </div>
             )}
-          </>
+          </div>
         ) : (
           <div className="alert alert-info">No customer details found.</div>
         )}

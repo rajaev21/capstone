@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import DirectBuy from "./DirectBuy";
 import AddPrice from "./AddPrice";
 
-const NewInventory = ({ inventory, color, setOrder, order }) => {
+const NewInventory = ({ inventory, color, setOrder, order, transactionID }) => {
   const paramID = new URLSearchParams(useLocation().search);
   const location = useLocation();
   const [selected, setSelected] = useState({});
@@ -230,17 +230,21 @@ const NewInventory = ({ inventory, color, setOrder, order }) => {
                                             >
                                               <i className="bi bi-cart"></i>
                                             </button>
-                                            <>
-                                              <button
-                                                type="button"
-                                                class="btn btn-secondary"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#directBuy"
-                                                onClick={() => setItem(item)}
-                                              >
-                                                <i className="bi bi-cash"></i>
-                                              </button>
-                                            </>
+                                            {transactionID ? (
+                                              ""
+                                            ) : (
+                                              <>
+                                                <button
+                                                  type="button"
+                                                  class="btn btn-secondary"
+                                                  data-bs-toggle="modal"
+                                                  data-bs-target="#directBuy"
+                                                  onClick={() => setItem(item)}
+                                                >
+                                                  <i className="bi bi-cash"></i>
+                                                </button>
+                                              </>
+                                            )}
                                           </div>
                                         </td>
                                       </tr>

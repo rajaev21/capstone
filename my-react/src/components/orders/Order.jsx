@@ -16,7 +16,6 @@ const Order = ({
   fetchInventory,
   placement,
   customers,
-  setCustomers,
 }) => {
   const [buttonLoad, setButtonLoad] = useState(false);
   const [quickOrder, setQuickOrder] = useState(false);
@@ -207,6 +206,7 @@ const Order = ({
                         <button
                           className="btn btn-success"
                           onClick={() => addOrder()}
+                          disabled={!transaction.deadline}
                         >
                           {" "}
                           Submit Order{" "}

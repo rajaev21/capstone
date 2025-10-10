@@ -47,7 +47,7 @@ const Reorder = ({
                 data-bs-dismiss="modal"
                 onClick={() => {
                   setIsReorder(false);
-                  setDeadline(details[0].deadline);
+                  setDeadline(deadline);
                 }}
               >
                 no
@@ -59,7 +59,7 @@ const Reorder = ({
                 onClick={() => {
                   validateDeadline();
                   setIsReorder(false);
-                  setDeadline(details[0].deadline);
+                  setDeadline(deadline);
                 }}
               >
                 yes

@@ -253,20 +253,14 @@ function App() {
             element={
               <Layout inventory={inventory}>
                 <Order
+                  inventory={inventory}
                   brand={brand}
                   type={type}
                   color={color}
                   size={size}
-                  inventory={inventory}
-                  inventoryCheck={inventoryCheck}
-                  setInventoryCheck={setInventoryCheck}
-                  fetchInventoryCheck={fetchInventoryCheck}
                   fetchInventory={fetchInventory}
-                  fetchLogs={fetchLogs}
                   placement={placement}
-                  setPlacement={setPlacement}
                   customers={customers}
-                  setCustomers={setCustomers}
                 />
               </Layout>
             }

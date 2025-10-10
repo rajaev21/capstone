@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import TransactionTable from "./TransactionTable";
 import CustomerDetails from "./CustomerDetails";
@@ -12,6 +13,7 @@ const WelcomePage = ({
   brand,
   color,
 }) => {
+  const [addOrder, setAddOrder] = useState(false);
   const pending =
     Array.isArray(transaction) &&
     transaction.filter(
@@ -59,8 +61,8 @@ const WelcomePage = ({
     <div className="">
       {transaction ? (
         <>
-          <div className="row row-cols-2">
-            <div className="d-flex flex-column gap-3">
+          <div className={!addOrder && "row row-cols-2"}>
+            <div className={addOrder ? "d-none" : "d-flex flex-column gap-3"}>
               <TransactionTable
                 title={"pending"}
                 transaction={pending}
@@ -85,6 +87,8 @@ const WelcomePage = ({
                 brand={brand}
                 color={color}
                 fetchTransaction={fetchTransaction}
+                addOrder={addOrder}
+                setAddOrder={setAddOrder}
               />
             ) : (
               <div className="d-flex justify-content-center">

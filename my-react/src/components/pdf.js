@@ -1,29 +1,25 @@
 import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 
 export const generatePDF = async (elementToPrintId, id) => {
-  const element = document.getElementById(elementToPrintId);
+  const wholeDiv = document.getElementById(elementToPrintId);
+  const duplicate = wholeDiv.cloneNode(true);
+  wholeDiv.appendChild(duplicate);
 
-  const buttons = element.querySelectorAll("button, .no-print");
-  buttons.forEach((btn) => (btn.style.display = "none"));
-
-  if (!element) {
+  if (!wholeDiv) {
     throw new Error(`Element with id ${elementToPrintId} not found`);
   }
-  
-  const canvas = await html2canvas(element, { scale: 2 });
-  const data = canvas.toDataURL("image/png");
-  const pdf = new jsPDF({
-    orientation: "portrait",
-    unit: "px",
-    format: "a4",
-  });
-  const imgProperties = pdf.getImageProperties(data);
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
 
-  pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
-  pdf.save(`pdf_${id}.pdf`);
+  const noPrintElements = wholeDiv.querySelectorAll(".no-print");
+  noPrintElements.forEach((element) => element.classList.add("d-none"));
 
-  buttons.forEach((btn) => (btn.style.display = ""));
+  const canvas = await html2canvas(wholeDiv, { scale: 2 });
+  const data = canvas.toDataURL("image/jpeg", 1.0);
+
+  const link = document.createElement("a");
+  link.href = data;
+  link.download = `transaction_${id}.jpeg`;
+  link.click();
+
+  wholeDiv.removeChild(duplicate);
+  noPrintElements.forEach((element) => element.classList.remove("d-none"));
 };
