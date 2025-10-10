@@ -450,7 +450,7 @@ class Database
         COALESCE(cd.address, '') AS address,
         td.td_id AS transaction_id,
         std.status_name AS transactionStatus,
-        DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%Y-%m-%d') as deadline,
+        DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%M %d, %Y') as deadline,
         DATE_FORMAT(FROM_UNIXTIME(td.order_date), '%M %d, %Y') AS orderDate,
         td.note AS note,
         td.subTotal ,
