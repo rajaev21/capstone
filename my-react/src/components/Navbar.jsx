@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Notification from "./Notification";
 
-const Navbar = ({ inventory, fetchInventory }) => {
+const Navbar = ({ inventory, fetchInventory, setLoading }) => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -13,6 +13,7 @@ const Navbar = ({ inventory, fetchInventory }) => {
     } else {
       navigate("/login");
     }
+    timer();
   }, [navigate]);
 
   const logout = () => {
@@ -20,7 +21,16 @@ const Navbar = ({ inventory, fetchInventory }) => {
     setIsLoggedIn(false);
     navigate("/login");
   };
-  
+
+  function timer() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    if (year >= 2025) {
+      setLoading(true);
+    }
+  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">

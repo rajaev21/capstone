@@ -234,7 +234,7 @@ function App() {
           <Route
             path="/transaction"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} setLoading={setLoading}>
                 <WelcomePage
                   status={status}
                   transaction={transaction}
@@ -251,7 +251,7 @@ function App() {
           <Route
             path="/order"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} setLoading={setLoading}>
                 <Order
                   inventory={inventory}
                   brand={brand}
@@ -269,7 +269,7 @@ function App() {
           <Route
             path="/inventory"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} setLoading={setLoading}>
                 <Inventory
                   inventory={allInventory}
                   brand={brand}
@@ -288,7 +288,7 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <Layout inventory={inventory}>
+              <Layout inventory={inventory} setLoading={setLoading}>
                 <Dashboard inventory={inventory} color={color} logs={logs} />
               </Layout>
             }
