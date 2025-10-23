@@ -13,7 +13,7 @@ const Navbar = ({ inventory, fetchInventory, setLoading }) => {
     } else {
       navigate("/login");
     }
-    timer();
+    // timer();
   }, [navigate]);
 
   const logout = () => {
@@ -21,16 +21,6 @@ const Navbar = ({ inventory, fetchInventory, setLoading }) => {
     setIsLoggedIn(false);
     navigate("/login");
   };
-
-  function timer() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth();
-
-    if (year >= 2025) {
-      setLoading(true);
-    }
-  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light border-bottom">

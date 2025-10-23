@@ -159,15 +159,15 @@ const Order = ({
                   }}
                   disabled={quickOrder}
                 >
-                  {Array.isArray(customers) &&
-                    customers.map((item, i) => {
-                      const fullname = `${item.first_name} ${item.last_name}`;
-                      return (
-                        <option key={i} value={i}>
-                          {fullname}
-                        </option>
-                      );
-                    })}
+                  <option defaultChecked>Select Customer</option>
+                  {customers.map((item, i) => {
+                    const fullname = `${item.first_name} ${item.last_name}`;
+                    return (
+                      <option key={i} value={i}>
+                        {fullname}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
               <>

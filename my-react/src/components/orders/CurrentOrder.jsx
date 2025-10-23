@@ -114,6 +114,7 @@ const CurrentOrder = ({
         <input
           type="number"
           class="form-control"
+          min="0"
           value={discount}
           onChange={(e) => setDiscount(e.target.value)}
           onKeyDown={(e) => {

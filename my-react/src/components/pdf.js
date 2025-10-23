@@ -3,7 +3,6 @@ import html2canvas from "html2canvas";
 export const generatePDF = async (elementToPrintId, id) => {
   const wholeDiv = document.getElementById(elementToPrintId);
   const duplicate = wholeDiv.cloneNode(true);
-  wholeDiv.appendChild(duplicate);
 
   if (!wholeDiv) {
     throw new Error(`Element with id ${elementToPrintId} not found`);
@@ -20,6 +19,5 @@ export const generatePDF = async (elementToPrintId, id) => {
   link.download = `transaction_${id}.jpeg`;
   link.click();
 
-  wholeDiv.removeChild(duplicate);
   noPrintElements.forEach((element) => element.classList.remove("d-none"));
 };

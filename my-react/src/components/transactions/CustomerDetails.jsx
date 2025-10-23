@@ -16,7 +16,7 @@ const CustomerDetails = ({
   color,
   fetchTransaction,
   addOrder,
-  setAddOrder
+  setAddOrder,
 }) => {
   const [details, setDetails] = useState({});
   const [allOrderDone, setAllOrderDone] = useState(false);
@@ -173,12 +173,24 @@ const CustomerDetails = ({
           />
         ) : details.length > 0 ? (
           <div>
-            <button
-              className="btn btn-primary no-print"
-              onClick={() => generatePDF("card-pdf", details[0].transaction_id)}
-            >
-              Generate Transaction Image
-            </button>
+            <div className="d-flex justify-content-between">
+              <button
+                className="btn btn-primary no-print"
+                onClick={() =>
+                  generatePDF("card-pdf", details[0].transaction_id)
+                }
+              >
+                Generate Transaction Image
+              </button>
+              <button
+                className="btn btn-primary no-print"
+                onClick={() =>
+                  generatePDF("card-pdf", details[0].transaction_id)
+                }
+              >
+                Print Receipt
+              </button>
+            </div>
             <div className="card my-4">
               <div className="card-body">
                 <span>Transaction : {details[0].transaction_id} </span>
