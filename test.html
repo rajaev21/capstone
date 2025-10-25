@@ -1,0 +1,73 @@
+import html2canvas from "html2canvas"; export const generatePDF = async
+(elementToPrintId, id) => { const wholeDiv =
+document.getElementById(elementToPrintId); const duplicate =
+wholeDiv.cloneNode(true); if (!wholeDiv) { throw new Error(`Element with id
+${elementToPrintId} not found`); } const noPrintElements =
+wholeDiv.querySelectorAll(".no-print"); noPrintElements.forEach((element) =>
+element.classList.add("d-none")); const canvas = await html2canvas(wholeDiv, {
+scale: 2 }); const data = canvas.toDataURL("image/jpeg", 1.0); const link =
+document.createElement("a"); link.href = data; link.download =
+`transaction_${id}.jpeg`; link.click(); noPrintElements.forEach((element) =>
+element.classList.remove("d-none")); }; export const printReceipt =
+(customerDetails) => { const tableData = customerDetails .map( (item) => `
+<tr>
+  <td>${item.brand}-${item.type}-${item.color}</td>
+  <td>${item.size}</td>
+  <td>${item.quantity}</td>
+  <td>${item.total}</td>
+</tr>
+` ) .join(""); const printWindow = window.open("", "_blank");
+printWindow.document.write(`
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receipt</title>
+    <style>
+      body {
+        font-size: 11px;
+        width: 80mm;
+      }
+      table {
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="receipt" id="receipt">
+      <div class="center">
+        <div class="bold">ABC STORE</div>
+        <div>123 Main St, City</div>
+        <div>Tel: (02) 123-4567</div>
+      </div>
+      <hr />
+      <div>Date:${new Date().toLocaleString()}</div>
+      <div>Receipt #: <span id="receiptNo">000123</span></div>
+      <div>Cashier: <span id="cashier">John</span></div>
+      <hr />
+      <table class="items">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Size</th>
+            <th>Qty</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableData}
+        </tbody>
+      </table>
+      <hr />
+      <div class="total">Total: ₱230.00</div>
+      <hr />
+      <div class="footer">
+        Thank you for shopping!<br />
+        Visit again soon.
+      </div>
+    </div>
+  </body>
+</html>
+
+`); printWindow.document.close(); printWindow.focus(); // printWindow.print();
+// printWindow.close(); };

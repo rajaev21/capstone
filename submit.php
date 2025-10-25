@@ -471,13 +471,25 @@ class Database
         join inventory i on i.inventory_id = o.inventory_id
         join transaction_detail td on td.td_id = o.transaction_id
         join status std on std.status_id = td.status
-		join status os  on os.status_id  = o.status
+		    join status os  on os.status_id  = o.status
         join brand b on b.brand_id = i.brand
         join type t on t.type_id = i.type
         join color c on c.color_id = i.color
         join size s on s.size_id = i.size
         join customer_detail cd on cd.cd_id = td.customer_id
         where td_id = ?";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $result;
+  }
+
+  public function fetchPayments($id)
+  {
+    $query = "SELECT *,  DATE_FORMAT(created_at, '%b, %d, %Y %h:%i %p') AS formatted_date FROM payments WHERE transaction_id = ?";
 
     $stmt = $this->conn->prepare($query);
     $stmt->bind_param("i", $id);
@@ -674,6 +686,29 @@ class Database
       return null;
     }
   }
+
+  public function insertPayment($id, $payment)
+  {
+    $query = "INSERT INTO payments (`transaction_id`, `payment`) VALUES (?, ?)";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $id, $payment);
+    $stmt->execute();
+    $result = $stmt->insert_id;
+    $stmt->close();
+    $this->conn->commit();
+    return $result;
+  }
+
+  public function deleteTable($brand, $type)
+  {
+    $query = "delete FROM inventory where brand = ? and type = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $brand, $type);
+    $stmt->execute();
+    $result = $stmt->affected_rows;
+    $stmt->close();
+    return $result;
+  }
 }
 
 
@@ -768,6 +803,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $result = $db->fetchCustomerOrder($id);
         echo json_encode($result);
         break;
+      case 'getPayments':
+        $id = $_GET['id'];
+        $result = $db->fetchPayments($id);
+        echo json_encode($result);
+        break;
       default:
         echo json_encode(['message' => 'Invalid action']);
         break;
@@ -831,8 +871,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     case 'deleteBrand':
       deleteBrand($db, $data);
       break;
-    case 'deleteType':
-      deleteBrandType($db, $data);
+    case 'deleteTable':
+      deleteTable($db, $data);
       break;
     case 'deleteColor':
       deleteBrandType($db, $data);
@@ -864,6 +904,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     case 'addStocks':
       addStocks($db, $data, $unixNow);
       break;
+    case 'addPayment':
+      addPayment($db, $data);
+      break;
     default:
       echo json_encode(['message' => 'Invalid action']);
       break;
@@ -871,8 +914,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 
+function deleteTable($db, $data)
+{
+  $brand = $data["selected"]["brand"];
+  $type = $data["selected"]["type"];
 
+  $brandid = $db->getIdByName("brand", $brand);
+  $typeid = $db->getIdByName("type", $type);
+  $result = $db->deleteTable($brandid->brand_id, $typeid->type_id);
+  echo json_encode($result);
+}
+function addPayment($db, $data)
+{
+  $id = $data['id'];
+  $payment = $data['payment'];
 
+  $db->insertPayment($id, $payment);
+  echo json_encode($id, $payment);
+}
 function addStocks($db, $data, $unixNow)
 {
   $stocks = $data['stock'];
