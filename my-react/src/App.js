@@ -94,7 +94,7 @@ function App() {
         setPlacement(placementRes.data);
         setCustomers(customersRes.data);
 
-        setLoading(false); // All done
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching initial data:", error);
       }
@@ -103,26 +103,26 @@ function App() {
     fetchAllData();
   }, []);
 
-  const getCustomers = () => {
-    axios
-      .get("http://localhost/capstone/submit.php?action=getCustomers")
-      .then((response) => {
-        setCustomers(response.data);
-      })
-      .catch((error) => {
-        console.error("There was na error", error);
-      });
-  };
-  const fetchStatus = () => {
-    axios
-      .get("http://localhost/capstone/submit.php?action=getStatus")
-      .then((response) => {
-        setStatus(response.data);
-      })
-      .catch((error) => {
-        console.error("There was na error", error);
-      });
-  };
+  // const getCustomers = () => {
+  //   axios
+  //     .get("http://localhost/capstone/submit.php?action=getCustomers")
+  //     .then((response) => {
+  //       setCustomers(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was na error", error);
+  //     });
+  // };
+  // const fetchStatus = () => {
+  //   axios
+  //     .get("http://localhost/capstone/submit.php?action=getStatus")
+  //     .then((response) => {
+  //       setStatus(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("There was na error", error);
+  //     });
+  // };
   const fetchTransaction = () => {
     axios
       .get("http://localhost/capstone/submit.php?action=getTransaction")
@@ -229,7 +229,14 @@ function App() {
       ) : (
         <Routes>
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<RegisterForm />} />
+          <Route
+            path="/register"
+            element={
+              <Layout inventory={inventory} setLoading={setLoading}>
+                <RegisterForm />
+              </Layout>
+            }
+          />
 
           <Route
             path="/transaction"

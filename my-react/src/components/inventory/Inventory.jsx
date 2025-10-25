@@ -21,6 +21,7 @@ const Inventory = ({
   fetchColor,
   fetchSize,
 }) => {
+  const role = localStorage.getItem("role");
   const [selected, setSelected] = useState({});
   const [itemReturn, setItemReturn] = useState(false);
   const navigate = useNavigate();
@@ -117,17 +118,19 @@ const Inventory = ({
 
   return (
     <section onClick={() => navigate(useLocation.pathname)}>
-      <div className="fs-3 fw-bold">
-        Brands
-        <button
-          type="button"
-          className="btn btn-transparent"
-          data-bs-toggle="modal"
-          data-bs-target="#brand"
-        >
-          <i className="bi bi-plus-circle"></i>
-        </button>
-      </div>
+      {role === "1" && (
+        <div className="fs-3 fw-bold">
+          Brands
+          <button
+            type="button"
+            className="btn btn-transparent"
+            data-bs-toggle="modal"
+            data-bs-target="#brand"
+          >
+            <i className="bi bi-plus-circle"></i>
+          </button>
+        </div>
+      )}
       <AddBrand
         title={"brand"}
         option={brand}
@@ -158,16 +161,18 @@ const Inventory = ({
         <>
           <div className="fs-3 fw-bold pb-3 ">
             Types
-            <button
-              type="button"
-              className="btn btn-transparent"
-              data-bs-toggle="modal"
-              data-bs-target="#type"
-            >
-              <i className="bi bi-plus-circle"></i>
-            </button>
+            {role === "1" && (
+              <button
+                type="button"
+                className="btn btn-transparent"
+                data-bs-toggle="modal"
+                data-bs-target="#type"
+              >
+                <i className="bi bi-plus-circle"></i>
+              </button>
+            )}
           </div>
-          {types.length < 1 ? (
+          {types.length < 1 && role === "1" ? (
             <>
               <div className="fs-6">
                 No types found. Click the{" "}
@@ -231,13 +236,26 @@ const Inventory = ({
                           >
                             Add new stocks
                           </button>
-                          <button
-                            type="button"
-                            className="btn btn-danger ms-2"
-                            onClick={() => setItemReturn((prev) => !prev)}
-                          >
-                            Return Item
-                          </button>
+                          {role === "1" && (
+                            <>
+                              <button
+                                type="button"
+                                className="btn btn-warning ms-2"
+                                onClick={() => setItemReturn((prev) => !prev)}
+                              >
+                                Return Item
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-danger ms-2"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteType"
+                              >
+                                Delete Table
+                              </button>
+                            </>
+                          )}
+                          <DeleteType selected={selected} />
                         </div>
                         <table className="table table-sm table-hover">
                           <thead>

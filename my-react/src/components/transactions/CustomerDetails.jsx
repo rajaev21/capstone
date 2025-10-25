@@ -6,7 +6,7 @@ import AddOrder from "./subComponents/AddOrder";
 import CancelTransaction from "./subComponents/CancelTransaction";
 import Reorder from "./subComponents/Reorder";
 import { generatePDF } from "../pdf";
-import { Link } from "react-router-dom";
+import Payments from "./subComponents/Payments";
 
 const CustomerDetails = ({
   id,
@@ -24,14 +24,27 @@ const CustomerDetails = ({
   const [deadline, setDeadline] = useState("");
   const [selectedTotal, setSelectedTotal] = useState("");
   const [selectedInventoryID, setSelectedInventoryID] = useState("");
+  const [payments, setPayments] = useState("");
   const data = {};
   useEffect(() => {
     fetchCustomerDetails(id);
+    getPayments(id);
   }, [id]);
 
   function addZ(n) {
     return n < 10 ? "0" + n : "" + n;
   }
+
+  const getPayments = (id) => {
+    axios
+      .get(`http://localhost/capstone/submit.php?action=getPayments&id=${id}`)
+      .then((response) => {
+        setPayments(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching customer details!", error);
+      });
+  };
 
   const fetchCustomerDetails = () => {
     axios
@@ -157,7 +170,7 @@ const CustomerDetails = ({
         }
       });
   }
-
+  console.log(details);
   return (
     <div className="container mb-4">
       <div className="mx-3" id="card-pdf">
@@ -175,20 +188,12 @@ const CustomerDetails = ({
           <div>
             <div className="d-flex justify-content-between">
               <button
-                className="btn btn-primary no-print"
+                className="btn btn-secondary no-print"
                 onClick={() =>
                   generatePDF("card-pdf", details[0].transaction_id)
                 }
               >
                 Generate Transaction Image
-              </button>
-              <button
-                className="btn btn-primary no-print"
-                onClick={() =>
-                  generatePDF("card-pdf", details[0].transaction_id)
-                }
-              >
-                Print Receipt
               </button>
             </div>
             <div className="card my-4">
@@ -387,19 +392,7 @@ const CustomerDetails = ({
                   </tbody>
                 </table>
                 <hr />
-                <div className="d-flex">
-                  Subtotal :
-                  <span className="ms-auto">{details[0].subTotal}</span>
-                </div>
-                <div className="d-flex">
-                  Discount :
-                  <span className="ms-auto">{details[0].discount}</span>
-                </div>
-                <hr />
-                <div className="d-flex">
-                  Grand total :
-                  <span className="ms-auto">{details[0].grand_total}</span>
-                </div>
+                <Payments id={id} details={details} />
               </div>
             </div>
             {/* modal start */}

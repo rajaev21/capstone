@@ -60,7 +60,7 @@ const RegisterForm = () => {
         setPassword("");
         setConfirmPassword("");
         setPhonenumber("");
-        navigate("/home");
+        navigate("/dashboard");
       }
     } catch (error) {
       alert(`Registration failed: ${error.message}`);
@@ -171,15 +171,6 @@ const RegisterForm = () => {
                   Register
                 </button>
               </form>
-
-              <div className="text-center mt-3">
-                <small>
-                  Back to options! {" "}
-                  <Link to="/settings" className="text-decoration-none">
-                    Click here
-                  </Link>
-                </small>
-              </div>
             </div>
           </div>
         </div>
