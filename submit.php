@@ -709,6 +709,16 @@ class Database
     $stmt->close();
     return $result;
   }
+  public function deleteItem($id)
+  {
+    $query = "delete FROM payments where id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->affected_rows;
+    $stmt->close();
+    return $result;
+  }
 }
 
 
@@ -907,13 +917,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     case 'addPayment':
       addPayment($db, $data);
       break;
+    case 'deleteItem':
+      deleteItem($db, $data);
+      break;
     default:
       echo json_encode(['message' => 'Invalid action']);
       break;
   }
 }
 
+function deleteItem($db, $data)
+{
+  $id = $data['id'];
 
+  $db->deleteItem($id);
+  echo json_encode($id);
+}
 function deleteTable($db, $data)
 {
   $brand = $data["selected"]["brand"];

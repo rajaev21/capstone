@@ -392,11 +392,13 @@ const CustomerDetails = ({
                   </tbody>
                 </table>
                 <hr />
-                <Payments id={id} details={details} />
+                <div className="no-print">
+                  <Payments id={id} details={details} />
+                </div>
               </div>
             </div>
             {/* modal start */}
-            <div className="fw-bold fs-3 text-center">
+            <div className="fw-bold fs-3 text-center no-print">
               Transaction {details[0].transactionStatus}
             </div>
 
@@ -419,7 +421,6 @@ const CustomerDetails = ({
                   className="btn btn-danger"
                   data-bs-toggle="modal"
                   data-bs-target={`#cancelTransaction${details[0].transaction_id}`}
-                  onClick={() => {}}
                 >
                   <i className="bi bi-x"></i>
                 </button>
