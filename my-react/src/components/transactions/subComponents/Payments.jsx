@@ -43,6 +43,10 @@ const Payments = ({ id, details }) => {
       alert("payment cant be zero");
       return;
     }
+
+    if (parseInt(newPayment) - details[0].grand_total < 0) {
+      return;
+    }
     data.action = "addPayment";
     data.id = id;
     data.payment = newPayment;
