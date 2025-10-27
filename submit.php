@@ -50,11 +50,11 @@ class Database
     return $result;
   }
 
-  public function insertTransaction($cd_id, $status_id, $user_id, $order_deadline, $note, $unixNow, $discount)
+  public function insertTransaction($cd_id, $status_id, $user_id, $order_deadline, $note, $unixNow, $discount, $pricePrint)
   {
-    $query = "INSERT INTO transaction_detail ( `customer_id`,`status`,`user_id`,`deadline`,`note`, `order_date`, `discount`) VALUES (?,?,?,?,?,?,?)";
+    $query = "INSERT INTO transaction_detail ( `customer_id`,`status`,`user_id`,`deadline`,`note`, `order_date`, `discount`, `price_print`) VALUES (?,?,?,?,?,?,?,?)";
     $stmt = $this->conn->prepare($query);
-    $stmt->bind_param("iiiisii", $cd_id, $status_id, $user_id, $order_deadline, $note, $unixNow, $discount);
+    $stmt->bind_param("iiiisiii", $cd_id, $status_id, $user_id, $order_deadline, $note, $unixNow, $discount, $pricePrint);
     $stmt->execute();
     $result = $stmt->insert_id;
     $stmt->close();
@@ -87,7 +87,7 @@ class Database
         JOIN customer_detail cd ON cd.cd_id = td.customer_id
         JOIN user u ON u.user_id = td.user_id
         JOIN status s ON s.status_id = td.status
-        ORDER BY td.deadline ASC;";
+        ORDER BY td.deadline ASC";
 
 
 
@@ -147,7 +147,7 @@ class Database
               INNER JOIN type t ON i.type = t.type_id 
               INNER JOIN color c ON i.color = c.color_id 
               INNER JOIN size s ON i.size = s.size_id 
-              ORDER BY l.timestamp DESC;";
+              ORDER BY l.timestamp desc;";
 
     $stmt = $this->conn->prepare($query);
     $stmt->execute();
@@ -453,8 +453,9 @@ class Database
         DATE_FORMAT(FROM_UNIXTIME(td.deadline), '%M %d, %Y') as deadline,
         DATE_FORMAT(FROM_UNIXTIME(td.order_date), '%M %d, %Y') AS orderDate,
         td.note AS note,
-        td.subTotal ,
+        td.subtotal as subTotal,
         td.discount ,
+        td.price_print as printPrice,
         td.grand_total ,
         o.order_id as orderID,
         o.quantity as quantity,
@@ -1013,7 +1014,7 @@ function directBuy($db, $data, $unixNow)
   $designName = "";
   $discount = $data['discount'];
 
-  $transactionID = $db->insertTransaction(0, 3, 4, $unixNow, $note, $unixNow, $discount);
+  $transactionID = $db->insertTransaction(0, 3, 4, $unixNow, $note, $unixNow, $discount, 0);
   $ordersArray = insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $designName, 3, $discount);
 
   echo json_encode($ordersArray);
@@ -1077,20 +1078,20 @@ function cancelTransaction($db, $data, $unixNow)
   echo json_encode($result);
 }
 
-function addOrder($db, $data, $unixNow)
-{
-  $transactionID = $data['transactionID'];
-  $orders = $data['order'];
-  $designName = $data['design'];
-  $price = $data['price'];
-  $detail = "additional order";
-  $note = "additional order to $transactionID";
-  $discount = $data['discount'];
+// function addOrder($db, $data, $unixNow)
+// {
+//   $transactionID = $data['transactionID'];
+//   $orders = $data['order'];
+//   $designName = $data['design'];
+//   $price = $data['price'];
+//   $detail = "additional order";
+//   $note = "additional order to $transactionID";
+//   $discount = $data['discount'];
 
-  $result = insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $designName, 2, $price, $discount);
-  $db->setCustom("transaction_detail", ["discount = discount + '$discount'"], ["td_id = '$transactionID'"]);
-  echo json_encode($result);
-}
+//   $result = insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $designName, 2, $price, $discount);
+//   $db->setCustom("transaction_detail", ["discount = discount + '$discount'"], ["td_id = '$transactionID'"]);
+//   echo json_encode($result);
+// }
 
 function setTransactionExpired($db, $data,  $unixNow)
 {
@@ -1369,6 +1370,7 @@ function submitOrder($db, $data, $unixNow)
   $order_deadline = strtotime($data['transaction']['deadline']);
   $designName = $data['transaction']['design'] ?? "";
   $orders = $data['order'];
+  $pricePrint = $data['pricePrint'];
 
   $exsisting_customer = $db->selectCustomerWithNumber($phonenumber);
 
@@ -1386,7 +1388,7 @@ function submitOrder($db, $data, $unixNow)
     $cd_id = $db->insertCustomerDetail($firstname, $lastname, $phonenumber, $address);
   }
 
-  $transactionID = $db->insertTransaction($cd_id, 1, $user_id, $order_deadline, $note, $unixNow, $discount);
+  $transactionID = $db->insertTransaction($cd_id, 1, $user_id, $order_deadline, $note, $unixNow, $discount, $pricePrint);
   $arrayTotal = insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $designName, 2, $discount);
 
   echo json_encode($arrayTotal);
@@ -1426,7 +1428,6 @@ function insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $d
       $price += 10;
     }
     $total = $price * $quantity;
-
 
     $oldValue = $db->selectCustom(["qty"], "inventory", ["inventory_id = $inventoryID"]);
     $db->returnItem($inventoryID, $quantity);

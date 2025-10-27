@@ -36,15 +36,20 @@ export const printReceipt = (customerDetails, payments) => {
     )
     .join("");
   const payment = payments
-    .map((item) => `<div>${item.formatted_date}--- &#8369;${item.payment}</div>`)
+    .map(
+      (item) => `<div>${item.formatted_date}--- &#8369;${item.payment}</div>`
+    )
     .join("");
+  let totalPricePrint =
+    customerDetails.reduce((x, y) => x + Number(y.quantity), 0) *
+    customerDetails[0].printPrice;
+  let total = customerDetails[0].subTotal + totalPricePrint;
+  let grandTotal = payments.reduce(
+    (x, y) => x - y.payment,
+    total - customerDetails[0].discount
+  );
 
-  const grandTotal = payments
-    .map((item) => item.payment)
-    .reduce(
-      (x, y) => x - y,
-      customerDetails[0].grand_total - customerDetails[0].discount
-    );
+  console.log(grandTotal, customerDetails);
 
   const printWindow = window.open("", "_blank");
   printWindow.document.write(`
@@ -89,7 +94,7 @@ export const printReceipt = (customerDetails, payments) => {
             </tbody>
           </table>
           <hr />
-          <div>Total: ${customerDetails[0].subTotal}</div>
+          <div>Total: ${total}</div>
           <div>Discount: ${customerDetails[0].discount}</div>
           <hr />
           <div>Payments: ${payment}</div>

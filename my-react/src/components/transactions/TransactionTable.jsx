@@ -16,6 +16,8 @@ const TransactionTable = ({ transaction, goto, title }) => {
     ? filteredItems.slice(start, end)
     : [];
   const totalPage = Math.ceil(filteredItems.length / itemsPerPage);
+
+  console.log(transaction);
   return (
     <div className="">
       <div className="row row-cols-2">
@@ -56,7 +58,10 @@ const TransactionTable = ({ transaction, goto, title }) => {
                 <td>
                   <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => goto(item.transaction_id, item)}
+                    onClick={() => {
+                      goto(item.transaction_id, item);
+                      window.location.reload();
+                    }}
                   >
                     <i className="bi bi-eye"></i>
                   </button>

@@ -45,6 +45,7 @@ const WelcomePage = ({
             console.log(res.data);
             window.location.reload();
           });
+          return
         // console.log(data);
       }
     });

@@ -1,20 +1,32 @@
-import { use, useState } from "react";
+import { useEffect, useState } from "react";
 const CurrentOrder = ({
   inventory,
   order,
   setOrder,
   discount,
   setDiscount,
+  pricePrint,
+  setPricePrint,
 }) => {
   const [newInventory, setNewInventory] = useState([]);
-  const grandTotal = order.reduce(
-    (sum, item) => sum + item.orderQty * item.price,
-    0
-  );
+  let [grandTotal, setGrandTotal] = useState(0);
 
-  useState(() => {
+  useEffect(() => {
     setNewInventory(inventory);
-  }, []);
+    let total = order.reduce(
+      (sum, item) => sum + Number(item.orderQty) * item.price,
+      0
+    );
+    if (pricePrint > 0) {
+      total +=
+        order.reduce((sum, item) => sum + Number(item.orderQty), 0) *
+        pricePrint;
+    }
+    total -= Number(discount) || 0;
+    setGrandTotal(total);
+  }, [pricePrint, discount, order, inventory]);
+
+  console.log(order);
 
   function removeOrder(id) {
     setOrder((prev) => prev.filter((item, index) => index !== id));
@@ -67,8 +79,7 @@ const CurrentOrder = ({
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(newInventory) &&
-            order.length > 0 &&
+          {order.length > 0 &&
             order.map((item, index) => {
               const total = item.price * item.orderQty;
               return (
@@ -110,6 +121,21 @@ const CurrentOrder = ({
         </tbody>
       </table>
       <div class="input-group input-group-sm mb-3">
+        <span class="input-group-text">Print Price</span>
+        <input
+          type="number"
+          class="form-control"
+          min="0"
+          value={pricePrint}
+          onChange={(e) => setPricePrint(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "-" || e.key === "+" || e.key === "e") {
+              e.preventDefault();
+            }
+          }}
+        />
+      </div>
+      <div class="input-group input-group-sm mb-3">
         <span class="input-group-text">Discount ₱</span>
         <input
           type="number"
@@ -124,9 +150,7 @@ const CurrentOrder = ({
           }}
         />
       </div>
-      <div className="fw-bold fs-5 text-center">
-        Grand total : {grandTotal - discount}
-      </div>
+      <div className="fw-bold fs-5 text-center">Grand total : {grandTotal}</div>
     </div>
   );
 };

@@ -5,21 +5,44 @@ import PrintModal from "./PrintModal";
 const Payments = ({ id, details }) => {
   const data = {};
   const [newPayment, setNewPayment] = useState("");
-  const [payments, setPayments] = useState("");
+  const [payments, setPayments] = useState([]);
+  const [pricePrint, setPricePrint] = useState(details[0].printPrice);
+  const totalPricePrint =
+    details.reduce((x, y) => x + y.quantity, 0) * pricePrint;
+  const discount = details[0].discount;
+  const [grandTotal, setGrandTotal] = useState();
+  const isOngoing = ["ongoing", "pending"].includes(
+    details[0].transactionStatus
+  );
+
+  console.log(details);
 
   useEffect(() => {
-    getPayments(id);
+    const fetchPayments = async () => {
+      await getPayments(id);
+    };
+    fetchPayments();
   }, [id]);
 
-  const getPayments = (id) => {
-    axios
-      .get(`http://localhost/capstone/submit.php?action=getPayments&id=${id}`)
-      .then((response) => {
-        setPayments(response.data);
-      })
-      .catch((error) => {
-        console.error("There was an error fetching customer details!", error);
-      });
+  useEffect(() => {
+    const totalPayments = payments.reduce(
+      (sum, p) => sum + Number(p.payment || 0),
+      0
+    );
+    const total =
+      totalPricePrint + details[0].subTotal - discount - totalPayments;
+    setGrandTotal(total);
+  }, [payments, totalPricePrint, discount, details]);
+
+  const getPayments = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost/capstone/submit.php?action=getPayments&id=${id}`
+      );
+      setPayments(response.data);
+    } catch (error) {
+      console.error("There was an error fetching customer details!", error);
+    }
   };
 
   function deleteItem(id) {
@@ -40,11 +63,12 @@ const Payments = ({ id, details }) => {
 
   const addPayment = () => {
     if (newPayment === "0" || newPayment === "") {
-      alert("payment cant be zero");
+      console.log("payment cant be zero");
       return;
     }
 
-    if (parseInt(newPayment) - details[0].grand_total < 0) {
+    if (grandTotal - Number(newPayment) < 0) {
+      console.log(`${Number(newPayment) - grandTotal} is less than 0`);
       return;
     }
     data.action = "addPayment";
@@ -63,50 +87,50 @@ const Payments = ({ id, details }) => {
         console.error("There was an error submitting the order!", error);
       });
   };
-  console.log(payments);
+
   return (
     <>
-      <div class="btn-group" role="group" aria-label="Basic example">
-        <div class="input-group input-group-sm">
-          <span class="input-group-text" id="basic-addon1">
-            Add Payment :
-          </span>
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            value={newPayment}
-            onChange={(e) => setNewPayment(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "-" || e.key === "+" || e.key === "e") {
-                e.preventDefault();
-              }
-            }}
-          />
-          <button
-            type="button"
-            class="btn btn-primary"
-            onClick={() => {
-              addPayment();
-            }}
-          >
-            Add
-          </button>
-        </div>
-      </div>
-      <button
-        type="button"
-        class="btn btn-primary btn-sm ms-3"
-        data-bs-toggle="modal"
-        data-bs-target="#printModal"
+      <div
+        className={`input-group input-group-sm mb-3 ${isOngoing ? "" : "d-none"}`}
       >
-        Print Receipt
-      </button>
-      <PrintModal details={details} payments={payments} />
-      <div className="d-flex">
-        Subtotal :<span className="ms-auto">{details[0].subTotal}</span>
+        <span className="input-group-text" id="basic-addon1">
+          Add Payment :
+        </span>
+        <input
+          type="number"
+          min="0"
+          className="form-control"
+          value={newPayment}
+          onChange={(e) => setNewPayment(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "-" || e.key === "+" || e.key === "e") {
+              e.preventDefault();
+            }
+          }}
+        />
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            addPayment();
+          }}
+        >
+          Add
+        </button>
+        <button
+          type="button"
+          className={`btn btn-primary btn-sm ms-3`}
+          data-bs-toggle="modal"
+          data-bs-target="#printModal"
+        >
+          Print Receipt
+        </button>
       </div>
+      <PrintModal details={details} payments={payments} />
       {/* payments */}
+      <div className="d-flex">
+        Print Price:<span className="ms-auto">{totalPricePrint}</span>
+      </div>
       <hr />
       Payments :
       {payments &&
@@ -117,7 +141,9 @@ const Payments = ({ id, details }) => {
               <span className="ms-auto">
                 {item.payment}{" "}
                 <button
-                  className="btn btn-danger btn-sm"
+                  className={`btn btn-danger btn-sm ${
+                    isOngoing ? "" : "d-none"
+                  }`}
                   onClick={() => deleteItem(item.id)}
                 >
                   <i className="bi bi-trash"></i>
@@ -128,20 +154,15 @@ const Payments = ({ id, details }) => {
         })}
       <hr />
       <div className="d-flex">
-        Discount :<span className="ms-auto">{details[0].discount}</span>
+        Grand Total :
+        <span className="ms-auto">{details[0].subTotal + totalPricePrint}</span>
+      </div>
+      <div className="d-flex">
+        Discount :<span className="ms-auto">{discount}</span>
       </div>
       <hr />
       <div className="d-flex">
-        Grand total :
-        <span className="ms-auto">
-          {payments &&
-            payments
-              .map((item) => item.payment)
-              .reduce(
-                (x, y) => x - y,
-                details[0].grand_total - details[0].discount
-              )}
-        </span>
+        Balance :<span className="ms-auto">{grandTotal}</span>
       </div>
     </>
   );

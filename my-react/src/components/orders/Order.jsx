@@ -17,6 +17,7 @@ const Order = ({
   placement,
   customers,
 }) => {
+  const [pricePrint, setPricePrint] = useState(0);
   const [buttonLoad, setButtonLoad] = useState(false);
   const [quickOrder, setQuickOrder] = useState(false);
   const [discount, setDiscount] = useState("");
@@ -87,6 +88,7 @@ const Order = ({
       customerDetail,
       order,
       discount,
+      pricePrint
     };
 
     console.log(data);
@@ -112,6 +114,7 @@ const Order = ({
       address: "",
     });
   }
+
   return (
     <>
       {placement.length > 0 ? (
@@ -188,6 +191,8 @@ const Order = ({
                     setOrder={setOrder}
                     discount={discount}
                     setDiscount={setDiscount}
+                    pricePrint={pricePrint}
+                    setPricePrint={setPricePrint}
                   />
                   {order.length > 0 && (
                     <div className="d-flex my-3 justify-content-evenly">
