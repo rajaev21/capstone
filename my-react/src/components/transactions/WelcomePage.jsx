@@ -25,30 +25,31 @@ const WelcomePage = ({
       (item) => item.status !== "pending" && item.status !== "ongoing"
     );
   const data = {};
+  
+  // pending.forEach((item) => {
+  //   if (
+  //     Math.floor(Date.now() / 1000) >
+  //     Math.floor(new Date(item.deadline).getTime() / 1000) + 86399
+  //   ) {
+  //      setExpired(item);
+  //   }
+  // });
 
-  Array.isArray(pending) &&
-    pending.forEach((item) => {
-      if (
-        Math.floor(Date.now() / 1000) >
-        Math.floor(new Date(item.deadline).getTime() / 1000) + 86399
-      ) {
-        data.action = "setTransactionExpired";
-        data.id = item.transaction_id;
-        data.table = "transaction_detail";
-        data.discount = item.discount;
-        console.log(data);
-        axios
-          .post("http://localhost/capstone/submit.php", data, {
-            headers: { "Content-Type": "application/json" },
-          })
-          .then((res) => {
-            console.log(res.data);
-            window.location.reload();
-          });
-          return
-        // console.log(data);
-      }
-    });
+  // async function setExpired(item) {
+  //   data.action = "setTransactionExpired";
+  //   data.id = item.transaction_id;
+  //   data.table = "transaction_detail";
+  //   data.discount = item.discount;
+  //   console.log(data);
+  //   axios
+  //     .post("http://localhost/capstone/submit.php", data, {
+  //       headers: { "Content-Type": "application/json" },
+  //     })
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       window.location.reload();
+  //     });
+  // }
 
   const navigate = useNavigate();
   const paramID = new URLSearchParams(useLocation().search);

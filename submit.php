@@ -72,6 +72,16 @@ class Database
     return $result;
   }
 
+  public function getExpired()
+  {
+    $query = "select * from transaction_detail where deadline < unix_timestamp(now()) and status in (1,2)";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $result;
+  }
+
   public function getTransaction()
   {
     $query = "SELECT 
@@ -88,8 +98,6 @@ class Database
         JOIN user u ON u.user_id = td.user_id
         JOIN status s ON s.status_id = td.status
         ORDER BY td.deadline ASC";
-
-
 
     $stmt = $this->conn->prepare($query);
     $stmt->execute();
@@ -770,6 +778,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         echo json_encode($result);
         break;
       case 'getTransaction':
+        $data = $db->getExpired();
+        if ($data) {
+          setTransactionExpired($db, $data, $unixNow);
+        }
         $result = $db->getTransaction();
         echo json_encode($result);
         break;
@@ -890,9 +902,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       break;
     case 'deleteSize':
       deleteBrandType($db, $data);
-      break;
-    case 'setTransactionExpired':
-      setTransactionExpired($db, $data,  $unixNow);
       break;
     case 'addOrder':
       addOrder($db, $data, $unixNow);
@@ -1078,32 +1087,19 @@ function cancelTransaction($db, $data, $unixNow)
   echo json_encode($result);
 }
 
-// function addOrder($db, $data, $unixNow)
-// {
-//   $transactionID = $data['transactionID'];
-//   $orders = $data['order'];
-//   $designName = $data['design'];
-//   $price = $data['price'];
-//   $detail = "additional order";
-//   $note = "additional order to $transactionID";
-//   $discount = $data['discount'];
-
-//   $result = insertOrders($db, $orders, $transactionID, $note, $detail, $unixNow, $designName, 2, $price, $discount);
-//   $db->setCustom("transaction_detail", ["discount = discount + '$discount'"], ["td_id = '$transactionID'"]);
-//   echo json_encode($result);
-// }
-
 function setTransactionExpired($db, $data,  $unixNow)
 {
-  $transactionID = $data['id'];
-  $note = "transaction expired";
-  $detail = "order expired";
-  $discount = $data['discount'];
+  foreach ($data as $transaction) {
+    $transactionID = $transaction['td_id'];
+    $note = "transaction expired";
+    $detail = "order expired";
+    $discount = $transaction['discount'];
 
-  $db->setCustom("transaction_detail", ["status = '5'"], ["td_id = '$transactionID'"]);
-  $orders = $db->selectCustomFetchAll(["*"], "orders", ["transaction_id = '$transactionID'", "status in (1,2)"]);
-  $result = removeOrders($db, $orders, $note, $detail, $unixNow, $discount);
-  echo json_encode($result);
+    $db->setCustom("transaction_detail", ["status = '5'"], ["td_id = '$transactionID'"]);
+    $orders = $db->selectCustomFetchAll(["*"], "orders", ["transaction_id = '$transactionID'", "status in (1,2)"]);
+    $result = removeOrders($db, $orders, $note, $detail, $unixNow, $discount);
+  }
+  // echo json_encode($result);
 }
 
 function deleteBrandType($db, $data)

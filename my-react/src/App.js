@@ -81,7 +81,7 @@ function App() {
           axios.get("http://localhost/capstone/submit.php?action=getPlacement"),
           axios.get("http://localhost/capstone/submit.php?action=getCustomers"),
         ]);
-
+        console.log(transactionRes.data)
         setStatus(statusRes.data);
         setInventory(inventoryRes.data);
         setAllInventory(allInventoryRes.data);
@@ -102,27 +102,7 @@ function App() {
 
     fetchAllData();
   }, []);
-
-  // const getCustomers = () => {
-  //   axios
-  //     .get("http://localhost/capstone/submit.php?action=getCustomers")
-  //     .then((response) => {
-  //       setCustomers(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("There was na error", error);
-  //     });
-  // };
-  // const fetchStatus = () => {
-  //   axios
-  //     .get("http://localhost/capstone/submit.php?action=getStatus")
-  //     .then((response) => {
-  //       setStatus(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("There was na error", error);
-  //     });
-  // };
+  
   const fetchTransaction = () => {
     axios
       .get("http://localhost/capstone/submit.php?action=getTransaction")
