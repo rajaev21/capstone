@@ -44,7 +44,7 @@ const RegisterForm = () => {
     };
 
     try {
-      const response = await fetch("http://localhost/capstone/submit.php", {
+      const response = await fetch("https://allsite.infy.click/backend/my-react.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

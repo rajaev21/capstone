@@ -29,7 +29,7 @@ const DeleteColor = ({
 
     console.log(data);
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {

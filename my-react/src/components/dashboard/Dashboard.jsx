@@ -12,7 +12,7 @@ const Dashboard = ({}) => {
   }, []);
   function getOrdersFinishedToday() {
     axios
-      .get("http://localhost/capstone/submit.php?action=getOrdersFinishedToday")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getOrdersFinishedToday")
       .then((response) => {
         setData((prev) => ({
           ...prev,
@@ -26,7 +26,7 @@ const Dashboard = ({}) => {
 
   function getOrdersToday() {
     axios
-      .get("http://localhost/capstone/submit.php?action=getOrdersToday")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getOrdersToday")
       .then((response) => {
         setData((prev) => ({
           ...prev,
@@ -39,7 +39,7 @@ const Dashboard = ({}) => {
   }
   function getTasksToday() {
     axios
-      .get("http://localhost/capstone/submit.php?action=getTasksToday")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getTasksToday")
       .then((response) => {
         setData((prev) => ({
           ...prev,
@@ -52,7 +52,7 @@ const Dashboard = ({}) => {
   }
   function getDeadlineToday() {
     axios
-      .get("http://localhost/capstone/submit.php?action=getDeadlineToday")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getDeadlineToday")
       .then((response) => {
         setData((prev) => ({
           ...prev,

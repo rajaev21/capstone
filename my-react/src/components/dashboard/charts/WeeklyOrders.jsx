@@ -12,11 +12,11 @@ const WeeklyOrders = () => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost/capstone/submit.php?action=getWeeklyOrders&day=${selectedDate}`
+        `https://allsite.infy.click/backend/my-react.php?action=getWeeklyOrders&day=${selectedDate}`
       )
       .then((response) => {
         console.log(response.data);
-        setWeeklyOrders(response.data); // ✅ set API response
+        setWeeklyOrders(response.data);
       })
       .catch((error) => {
         console.error("There was an error", error);

@@ -14,7 +14,7 @@ const TopItemSales = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost/capstone/submit.php?action=topSales")
+      .get("https://allsite.infy.click/backend/my-react.php?action=topSales")
       .then((response) => {
         console.log("Top sales API:", response.data);
 

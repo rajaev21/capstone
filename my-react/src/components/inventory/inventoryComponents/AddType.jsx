@@ -57,7 +57,7 @@ const AddType = ({
 
   function insertData() {
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
@@ -107,7 +107,7 @@ const AddType = ({
     data.value = value;
 
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {

@@ -37,7 +37,7 @@ const Payments = ({ id, details }) => {
   const getPayments = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost/capstone/submit.php?action=getPayments&id=${id}`
+        `https://allsite.infy.click/backend/my-react.php?action=getPayments&id=${id}`
       );
       setPayments(response.data);
     } catch (error) {
@@ -49,7 +49,7 @@ const Payments = ({ id, details }) => {
     data.action = "deleteItem";
     data.id = id;
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
@@ -76,7 +76,7 @@ const Payments = ({ id, details }) => {
     data.payment = newPayment;
     console.log(data);
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {

@@ -37,7 +37,7 @@ const CustomerDetails = ({
 
   const getPayments = (id) => {
     axios
-      .get(`http://localhost/capstone/submit.php?action=getPayments&id=${id}`)
+      .get(`https://allsite.infy.click/backend/my-react.php?action=getPayments&id=${id}`)
       .then((response) => {
         setPayments(response.data);
       })
@@ -49,7 +49,7 @@ const CustomerDetails = ({
   const fetchCustomerDetails = () => {
     axios
       .get(
-        `http://localhost/capstone/submit.php?action=getCustomerDetails&id=${id}`
+        `https://allsite.infy.click/backend/my-react.php?action=getCustomerDetails&id=${id}`
       )
       .then((response) => {
         // console.log(response.data);
@@ -88,7 +88,7 @@ const CustomerDetails = ({
     }
     console.log(data);
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
@@ -106,7 +106,7 @@ const CustomerDetails = ({
     data.action = "finishOrder";
     data.customer_id = customer_id;
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
@@ -124,7 +124,7 @@ const CustomerDetails = ({
     data.discount = details[0].discount;
     console.log(data);
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
@@ -157,7 +157,7 @@ const CustomerDetails = ({
     }
     console.log(data);
     axios
-      .post("http://localhost/capstone/submit.php", data, {
+      .post("https://allsite.infy.click/backend/my-react.php", data, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {

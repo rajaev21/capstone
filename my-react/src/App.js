@@ -17,7 +17,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 import History from "./components/history/History";
 
 function App() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [inventory, setInventory] = useState({});
   const [allInventory, setAllInventory] = useState({});
   const [logs, setLogs] = useState({});
@@ -65,21 +65,21 @@ function App() {
           placementRes,
           customersRes,
         ] = await Promise.all([
-          axios.get("http://localhost/capstone/submit.php?action=getStatus"),
-          axios.get("http://localhost/capstone/submit.php?action=getInventory"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getStatus"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getInventory"),
           axios.get(
-            "http://localhost/capstone/submit.php?action=getAllInventory"
+            "https://allsite.infy.click/backend/my-react.php?action=getAllInventory"
           ),
-          axios.get("http://localhost/capstone/submit.php?action=getLogs"),
-          axios.get("http://localhost/capstone/submit.php?action=getBrand"),
-          axios.get("http://localhost/capstone/submit.php?action=getColor"),
-          axios.get("http://localhost/capstone/submit.php?action=getSize"),
-          axios.get("http://localhost/capstone/submit.php?action=getType"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getLogs"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getBrand"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getColor"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getSize"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getType"),
           axios.get(
-            "http://localhost/capstone/submit.php?action=getTransaction"
+            "https://allsite.infy.click/backend/my-react.php?action=getTransaction"
           ),
-          axios.get("http://localhost/capstone/submit.php?action=getPlacement"),
-          axios.get("http://localhost/capstone/submit.php?action=getCustomers"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getPlacement"),
+          axios.get("https://allsite.infy.click/backend/my-react.php?action=getCustomers"),
         ]);
         console.log(transactionRes.data)
         setStatus(statusRes.data);
@@ -105,7 +105,7 @@ function App() {
   
   const fetchTransaction = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getTransaction")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getTransaction")
       .then((response) => {
         setTransaction(response.data);
       })
@@ -116,7 +116,7 @@ function App() {
 
   const fetchLogs = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getLogs")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getLogs")
       .then((response) => {
         setLogs(response.data);
       })
@@ -127,7 +127,7 @@ function App() {
 
   const fetchInventory = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getInventory")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getInventory")
       .then((response) => {
         setInventory(response.data);
       })
@@ -138,7 +138,7 @@ function App() {
 
   const fetchAllInventory = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getAllInventory")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getAllInventory")
       .then((response) => {
         setAllInventory(response.data);
       })
@@ -149,7 +149,7 @@ function App() {
 
   const fetchInventoryCheck = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getInventoryCheck")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getInventoryCheck")
       .then((response) => {
         setInventoryCheck(response.data);
       })
@@ -160,35 +160,35 @@ function App() {
 
   const fetchBrand = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getBrand")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getBrand")
       .then((response) => {
         setBrand(response.data);
       });
   };
   const fetchColor = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getColor")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getColor")
       .then((response) => {
         setColor(response.data);
       });
   };
   const fetchSize = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getSize")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getSize")
       .then((response) => {
         setSize(response.data);
       });
   };
   const fetchType = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getType")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getType")
       .then((response) => {
         setType(response.data);
       });
   };
   const fetchPlacement = () => {
     axios
-      .get("http://localhost/capstone/submit.php?action=getPlacement")
+      .get("https://allsite.infy.click/backend/my-react.php?action=getPlacement")
       .then((response) => {
         setPlacement(response.data);
       });

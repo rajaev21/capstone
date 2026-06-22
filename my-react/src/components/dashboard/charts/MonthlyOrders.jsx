@@ -16,7 +16,7 @@ const MonthlyOrders = () => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost/capstone/submit.php?action=getMonthOrder&year=${year}`
+        `https://allsite.infy.click/backend/my-react.php?action=getMonthOrder&year=${year}`
       )
       .then((response) => {
         console.log("API response:", response.data);
